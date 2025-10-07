@@ -1,0 +1,409 @@
+GCU Assam,,,,,,,,,,,,
+,,,,,,,,,,,,
+Faculty List,,,,,,,,,,,,
+,,,,,,,,,,,,
+"Empmultibrandcampusname : Girijananda Chowdhury University-Assam
+Status : Active",,,,,,,,,,,,
+,,,,,,,,,,,,
+Serial No,Employee ID,Name,Department,Group Name,User Type,Designation,Joining Date,Email ID,Mobile No.,Date of Birth,Sub Department,Academy
+1,APPLICANT_PORTAL_USER,APP_FIRST_NAME APP_MIDDLE_NAME APP_LAST_NAME,-,Admin,-,-,-,-,-,-,-,Girijananda Chowdhury University
+2,mis,MIS  Admin,Administration,Admin,-,-,-,mayank.pandya@serosoft.in,+91-1111111111,18/03/1999,-,Girijananda Chowdhury University
+3,EMP4,Lokesh  Yadav,School of Allied Health Sciences,Admin,-,-,-,lokesh.yadav@serosoft.in,+91-1111111111,09/01/1989,-,Girijananda Chowdhury University
+4,EMP5,Birshu  Sarma,School Of Engineering and Technology,Admin,Regular,-,-,birshusarma@yopmail.com,+91-1111111111,01/01/1990,-,Girijananda Chowdhury University
+5,GCU020041,Bhabajit  Baruah,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2012,bhabajit_me@gcuniversity.ac.in,+91-7002128252,06/05/1988,Department of Mechanical Engineering,Girijananda Chowdhury University
+6,GCU020132,Ian Stewart Suchiang,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,16/08/2023,ianstewart_pharmag@gcuniversity.ac.in,+91-8413057197,20/07/1996,Department of Pharmacognosy - Guwahati,Girijananda Chowdhury University
+7,GCU020043,Abhinandan  Kalita,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2012,abhinandan_ece@gcuniversity.ac.in,+91-8638552443,16/10/1988,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+8,GCU020115,Sunayan  Bardoloi,School of Natural Science,Admin,Regular,Sr. Professor & HoD,18/05/2023,sunayan_zoology@gcuniversity.ac.in,+91-9864042395,01/09/1962,Department of Botany,Girijananda Chowdhury University
+9,GCU010042,ANJAN  DEKA,Administration,Admin,-,Administration,01/02/2023,anjan_adm@gcuniversity.ac.in,+91-7002098657,03/10/1994,-,Girijananda Chowdhury University
+10,GCU030144,Kalyan Changmai,Admin Non Teaching,Other Employee,Other Employee,Multitasking Executive,01/12/2022,kalyan@gcuniversity.ac.in,+91-6901118927,19/05/1995,-,Girijananda Chowdhury University
+11,GCU030117,MOHD AZIZUDDIN AHMED,Admin Non Teaching,Faculty,Regular,Lab Instructor,08/04/2019,azizuddin_ee@gcuniversity.ac.in,+91-7508956425,01/03/1991,-,Girijananda Chowdhury University
+12,GCU020035,JEETUMONI  BARMAN,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2011,jeetumoni_mca@gcuniversity.ac.in,+91-9864262856,22/09/1983,Department of Computer Application,Girijananda Chowdhury University
+13,GCU020111,Rachel  Kabi,School Of Humanities & Social Science,Admin,Regular,Assistant Professor & HoD,02/05/2023,rachel_sw@gcuniversity.ac.in,+91-8729982517,10/10/1970,Department of Sociology & Social Work,Girijananda Chowdhury University
+14,GCU020048,Bipul Kumar Talukdar,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,03/02/2014,bipul_ee@gcuniversity.ac.in,+91-7002474526,01/09/1988,Department of Electrical Engineering,Girijananda Chowdhury University
+15,GCU020100,Nur Ahammed Khan,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,10/02/2023,nur_pharmag@gcuniversity.ac.in,+91-8073580093,21/08/1992,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+16,GCU010039,Babita  Baishya,Administration,Admin,-,-,01/01/2007,babita_adm@gcuniversity.ac.in,+91-9707057021,01/01/1981,-,Girijananda Chowdhury University
+17,GCU010041,NITUL  SARMA,Administration,Admin,-,-,01/08/2015,nitul_adm@gcuniversity.ac.in,+91-8638074329,01/05/1986,-,Girijananda Chowdhury University
+18,GCU020134,PRAYASH  BORAH,School of Allied Health Sciences,Faculty,Regular,Assistant Professor,21/08/2023,prayash_mlt@gcuniversity.ac.in,+91-7896502441,18/12/1998,Department of Medical Laboratory Technology,Girijananda Chowdhury University
+19,GCU020069,Mala  Ahmed,School Of Engineering and Technology,Admin,-,Assistant Professor,09/08/2019,mala_cse@gcuniversity.ac.in,+91-9706489981,15/08/1992,Department of Computer Science and Engineering,Girijananda Chowdhury University
+20,GCU020019,MUKTA RANJAN SINGHA,School Of Engineering and Technology,Admin,-,Associate Professor & HOD,13/07/2009,mrsingha_mca@gcunivresity.ac.in,+91-9957902404,08/02/1966,Department of Computer Application,Girijananda Chowdhury University
+21,GCU030009,Rupa Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,14/09/2006,dasrupahira@gmail.com,+91-8011304791,01/01/1986,-,Girijananda Chowdhury University
+22,GCU020117,Hari Prasad Goenka,School of Management and Commerce,Admin,-,Sr. Professor & HoD,12/06/2023,harigoenka_commerce@gcuniversity.ac.in,+91-9435168211,11/04/1963,Department of Commerce,Girijananda Chowdhury University
+23,GCU020057,Thokchom Shanta Kumar,School Of Engineering and Technology,Admin,-,Associate Professor,24/05/2016,shantakumar_cse@gcuniversity.ac.in,+91-9707819978,09/06/1973,Department of Computer Science and Engineering,Girijananda Chowdhury University
+24,GCU020061,Snehal  Kaushik,School Of Engineering and Technology,Faculty,Regular,Associate Professor,01/08/2018,snehal_ce@gcuniversity.ac.in,+91-9435746736,29/10/1975,Department of Civil Engineering,Girijananda Chowdhury University
+25,GCU010043,Papari  Das,Administration,Admin,-,-,25/04/2023,papari_adm@gcuniversity.ac.in,+91-8723955711,25/03/1995,-,Girijananda Chowdhury University
+26,GCU020030,Ritushree  Dutta,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,03/01/2011,ritushree_cse@gcuniversity.ac.in,+91-9706490539,08/08/1988,Department of Computer Science and Engineering,Girijananda Chowdhury University
+27,GCU010017,Ananya  Borah,Administration,Admin,-,-,17/01/2023,secretarytovc@gcuniversity.ac.in,+91-9101564324,17/12/1990,-,Girijananda Chowdhury University
+28,GCU010044,Angkesh Sarma Bordoloi,Administration,Admin,-,-,25/04/2023,angkesh_adm@gcuniversity.ac.in,+91-7086637500,21/04/1992,-,Girijananda Chowdhury University
+29,GCU020045,NAMRATA  KATAKI,School Of Engineering and Technology,Faculty,-,Assistant Professor,03/09/2012,namrata_ece@gcuniversity.ac.in,+91-9864842753,15/10/1988,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+30,GCU020077,Anupam  Sarma,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,19/03/2021,anupam_pharmag@gcuniversity.ac.in,+91-9864382630,23/10/1989,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+31,GCU010013,Raisa  Choudhury,Administration,Admin,-,-,02/01/2023,secretarytochancellor@gcuniversity.ac.in,+91-9561374424,05/10/1990,-,Girijananda Chowdhury University
+32,GCU010024,Mridul  Das,Administration,Admin,-,-,18/01/2010,mridul_adm@gcuniversity.ac.in,+91-9706215713,01/08/1975,-,Girijananda Chowdhury University
+33,GCU030054,KABINDRA MEDHI,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,11/09/2009,medhikabindra80@gmail.com,+91-9706352390,01/09/1980,-,Girijananda Chowdhury University
+34,GCU030108,Dipankar Baruah,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/02/2017,baruahdipankar950@gmail.com,+91-8011585227,01/06/1991,-,Girijananda Chowdhury University
+35,GCU010033,Parash Kumar Das,Administration,Other Employee,Other Employee,Lab assistant,02/02/2015,parash_me@gcuniversity.ac.in,+91-9864483798,26/06/1979,-,Girijananda Chowdhury University
+36,GCU010040,Banajit  Nath,Administration,Admin,-,-,01/08/2015,banajit_adm@gcuniversity.ac.in,+91-7002525512,01/03/1987,-,Girijananda Chowdhury University
+37,GCU020086,Arzoo Newar,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,04/10/2021,arzoo_pharmat@gcuniversity.ac.in,+91-7576859919,16/02/1996,-,Girijananda Chowdhury University
+38,GCU020011,MADHUMITA MAHANTA,School of Natural Science,Faculty,-,Associate Professor & HoD (I/c),11/07/2008,madhumita_maths@gcuniversity.ac.in,+91-9854022988,31/12/1975,Department of Mathematics,Girijananda Chowdhury University
+39,GCU020082,Damanbhalang Rynjah,School of Pharmaceutical Science - Guwahati,Admin,-,Assistant Professor,01/10/2021,damanbhalang_pharmat@gcuniversity.ac.in,+91-8258944511,22/12/1996,-,Girijananda Chowdhury University
+40,GCU020099,Robert  Ravi,School Of Engineering and Technology,Admin,-,Professor & HOD,06/12/2022,hod_ce@gcuniversity.ac.in,+91-9442513349,18/02/1969,Department of Civil Engineering,Girijananda Chowdhury University
+41,GCU020085,Farak Ali,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/10/2021,farak_pharmat@gcuniversity.ac.in,+91-7002070840,01/06/1996,-,Girijananda Chowdhury University
+42,GCU020084,Shahnaz Alom,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/10/2021,shahnaz_pharmat@gcuniversity.ac.in,+91-7002941958,19/04/1997,-,Girijananda Chowdhury University
+43,GCU020059,Jun Moni Kalita,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Associate Professor & HOD,01/08/2017,junmoni_pharmag@gcuniversity.ac.in,+91-9508980893,08/02/1984,Department of Pharmaceutical Chemistry - Guwahati,Girijananda Chowdhury University
+44,GCU020054,Damiki  Laloo,School of Pharmaceutical Science - Guwahati,Admin,Regular,Professor & HOD,05/01/2015,damiki_pharmag@gcuniversity.ac.in,+91-8134024767,29/10/1985,Department of Pharmacognosy - Guwahati,Girijananda Chowdhury University
+45,GCU020130,Ankur Jyoti Kashyap,School of Natural Science,Admin,-,Assistant Professor,16/08/2023,ankur_maths@gcuniversity.ac.in,+91-8011180712,05/12/1993,Department of Mathematics,Girijananda Chowdhury University
+46,GCU020039,Moytri Sarmah,School of Natural Science,Faculty,Regular,Associate Professor,02/08/2011,moytri_maths@gcuniversity.ac.in,+91-9864377265,30/06/1986,Department of Mathematics,Girijananda Chowdhury University
+47,GCU020047,Himangshu Sekhar Brahma,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,19/08/2013,himangshu_me@gcuniversity.ac.in,+91-8472042772,29/06/1988,Department of Mechanical Engineering,Girijananda Chowdhury University
+48,GCU020126,Punamjyoti Das,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/08/2023,daspunamjyoti@gmail.com,+91-7002947751,28/07/1994,-,Girijananda Chowdhury University
+49,GCU030052,Indreswar Baishya,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/08/2009,indreswarbaishya1986@gmail.com,+91-9577836116,01/01/1986,-,Girijananda Chowdhury University
+50,GCU020068,SHATABDI GHOSE,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/08/2019,shatabdi_pharmag@gcuniversity.ac.in,+91-6002268003,09/12/1990,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+51,GCU020121,Devilata  Pegu,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2023,devilata_ce@gcuniversity.ac.in,+91-7017225229,15/02/1987,Department of Civil Engineering,Girijananda Chowdhury University
+52,GCU020014,Debarshi  Mallick,School Of Engineering and Technology,Admin,Regular,Associate Professor & HOD,01/08/2008,debarshi_me@gcuniversity.ac.in,+91-7002474945,31/12/1982,Department of Mechanical Engineering,Girijananda Chowdhury University
+53,GCU030118,NAYANA  DAS,Admin Non Teaching,Faculty,Regular,Lab Instructor,15/05/2019,nayana_adm@gcuniversity.ac.in,+91-9706441972,01/08/1988,-,Girijananda Chowdhury University
+54,GCU020013,Ajanta  Deka,School of Natural Science,Faculty,Regular,Assistant Professor,28/07/2008,ajanta_physics@gcuniversity.ac.in,+91-9577835213,02/01/1975,Department of Physics,Girijananda Chowdhury University
+55,GCU020133,Dharitri  Sarkar,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,21/08/2023,dharitri164@gmail.com,+91-8721948656,25/01/1992,Department of Computer Science and Engineering,Girijananda Chowdhury University
+56,GCU020089,Binita  Devi,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,21/03/2022,binita_ce@gcuniversity.ac.in,+91-8638488694,22/01/1996,Department of Civil Engineering,Girijananda Chowdhury University
+57,GCU020026,Sangeeta  Das,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,23/08/2010,sangeeta_me@gcuniversity.ac.in,+91-6002396044,01/03/1987,Department of Mechanical Engineering,Girijananda Chowdhury University
+58,GCU030006,Bhaskar  Chakravarty,School of Natural Science,Faculty,Regular,Lab Instructor,01/09/2006,bhaskar_chem@gcuniversity.ac.in,+91-7002890837,01/03/1969,Department of Chemistry,Girijananda Chowdhury University
+59,GCU020102,Nilakshi  Goswami,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor & HoD (I/c),01/03/2023,nilakshi__english@gcuniversity.ac.in,+91-8638166313,08/02/1991,Department of English & Foreign Languages,Girijananda Chowdhury University
+60,GCU020109,Kriti  Phukan,School of Management and Commerce,Faculty,Regular,Assistant Professor,03/04/2023,kriti_commerce@gcuniversity.ac.in,+91-9365441127,05/11/1994,Department of Commerce,Girijananda Chowdhury University
+61,GCU030113,Simanta Thakuria,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,04/09/2017,simantathakuria519@gmail.com,+91-8761053718,15/12/1996,-,Girijananda Chowdhury University
+62,GCU020074,Bhrigu Kumar Das,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,04/01/2021,bhrigu_pharmag@gcuniversity.ac.in,+91-8011831765,31/08/1990,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+63,GCU030061,RUPAM  SARMAH,School Of Engineering and Technology,Faculty,Regular,Lab Instructor,15/09/2010,rupam_ee@gcuniversity.ac.in,+91-9854491018,31/12/1986,Department of Electrical Engineering,Girijananda Chowdhury University
+64,GCU020002,Swarnali  Pathak,School of Natural Science,Admin,Regular,Assistant Professor & HoD (I/c),01/09/2006,swarnali_chemistry@gcuniversity.ac.in,+91-9957569231,21/02/1982,Department of Chemistry,Girijananda Chowdhury University
+65,GCU020137,Kamal  Das,School of Natural Science,Faculty,-,Assistant Professor,01/09/2023,kamal_botany@gcuniversity.ac.in,+91-7002772214,01/10/1983,Department of Botany,Girijananda Chowdhury University
+66,GCU020135,JYOTI PRASAD DEKA,School of Natural Science,Faculty,Regular,Assistant Professor,23/08/2023,jyotiprasad_physics@gcuniversity.ac.in,+91-7399697829,17/08/1990,Department of Physics,Girijananda Chowdhury University
+67,GCU020058,Dheeman  Bhuyan,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,14/09/2016,dheeman_me@gcuniversity.ac.in,+91-9954948518,21/11/1990,Department of Mechanical Engineering,Girijananda Chowdhury University
+68,GCU020104,SUPRIYA SAHU,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Associate Professor,01/03/2023,supriya_pharmat@gcuniversity.ac.in,+91-6002976455,29/11/1988,-,Girijananda Chowdhury University
+69,GCU030033,Deepa Das Talukdar,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,30/06/2008,talukdardasdeepa@gmail.com,+91-8812097574,01/10/1986,-,Girijananda Chowdhury University
+70,GCU020021,SAMPURNA  BHUYAN,School Of Humanities & Social Science,Admin,Regular,Associate Professor & HoD (I/c),16/07/2009,sampurna_economics@gcuniversity.ac.in,+91-9101994738,31/05/1981,Department of Economics,Girijananda Chowdhury University
+71,GCU020096,Pallab Jyoti Das,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,16/08/2022,pallabjyoti_ce@gcuniversity.ac.in,+91-9401591431,18/01/1993,Department of Civil Engineering,Girijananda Chowdhury University
+72,GCU020034,Rajib  Bhowmik,School Of Engineering and Technology,Faculty,-,Assistant Professor,01/08/2011,rajib_me@gcuniversity.ac.in,+91-9864655583,27/12/1984,Department of Mechanical Engineering,Girijananda Chowdhury University
+73,GCU020028,Sandip Bordoloi,School Of Engineering and Technology,Admin,-,Associate Professor & HOD,03/01/2011,sandip_ee@gcuniversity.ac.in,+91-9957430428,09/02/1986,Department of Electrical Engineering,Girijananda Chowdhury University
+74,GCU020088,Anwesha  Gayan,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,17/01/2022,anwesha_ce@gcuniversity.ac.in,+91-9706206293,06/03/1993,Department of Civil Engineering,Girijananda Chowdhury University
+75,GCU030099,Girija Nath,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,08/02/2016,girijanath567@gmail.com,+91-7399993911,18/05/1979,-,Girijananda Chowdhury University
+76,GCU020097,Bhaskar Jyoti Medhi,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,16/08/2022,bhaskarjyoti_ce@gcuniversity.ac.in,+91-7002473371,27/12/1989,Department of Civil Engineering,Girijananda Chowdhury University
+77,GCU020049,Pallavi  Roy,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2014,pallavi_ee@gcuniversity.ac.in,+91-8218085985,20/02/1987,Department of Electrical Engineering,Girijananda Chowdhury University
+78,GCU020120,NITISHA  Mazumdar,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2023,nitisha_ce@gcuniversity.ac.in,+91-8876582701,02/10/1990,Department of Civil Engineering,Girijananda Chowdhury University
+79,GCU030129,SAFIZUL  ISLAM,Admin Non Teaching,Faculty,Regular,Lab Instructor,01/10/2021,safizul_phy@gcuniversity.ac.in,+91-8472910189,28/02/1985,-,Girijananda Chowdhury University
+80,GCU020010,Adarsh  Pradhan,School Of Engineering and Technology,Faculty,-,Assistant Professor,11/07/2008,adarsh_cse@gcuniversity.ac.in,+91-9864364161,23/10/1982,Department of Computer Science and Engineering,Girijananda Chowdhury University
+81,GCU030143,Dipankar  Rabha,Admin Non Teaching,Other Employee,Other Employee,-,10/12/2022,dipankar@gcuniversity.ac.in,+91-6003326934,29/01/2001,-,Girijananda Chowdhury University
+82,GCU010012,Sourobh Mazinder Barua,Administration,Admin,-,-,09/01/2009,tpo@gcuniversity.ac.in,+91-9854075379,02/02/1977,-,Girijananda Chowdhury University
+83,GCU030050,Hari Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,10/03/2010,dhari6545@gamil.com,+91-9678422069,28/02/1969,-,Girijananda Chowdhury University
+84,GCU020023,ARNAB KUMAR DAS,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2009,arnab_mca@gcuniversity.ac.in,+91-9435145017,31/07/1982,Department of Computer Application,Girijananda Chowdhury University
+85,GCU020009,Manjula  Kalita,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,11/07/2008,manjula_cse@gcuniversity.ac.in,+91-9706341803,01/01/1982,Department of Computer Science and Engineering,Girijananda Chowdhury University
+86,GCU020093,Bhargab Deka,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,18/04/2022,bhargab_pharmag@gcuniversity.ac.in,+91-9957490155,07/09/1995,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+87,GCU020114,Nayana  Adhikari,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,08/05/2023,nayana_pharmag@gcuniversity.ac.in,+91-8876601373,02/05/1992,Department of Pharmaceutical Chemistry - Guwahati,Girijananda Chowdhury University
+88,GCU020070,Dhriti  Borah,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,19/09/2019,dhriti_economics@gcuniversity.ac.in,+91-9864852790,16/01/1988,Department of Economics,Girijananda Chowdhury University
+89,GCU030104,Amalesh Baruah,Admin Non Teaching,Other Employee,Other Employee,System Administrator,01/06/2016,amalesh@gcuniversity.ac.in,+91-9864265849,01/03/1979,-,Girijananda Chowdhury University
+90,GCU020129,Nirmala  Devi,School of Natural Science,Faculty,Regular,Associate Professor,11/08/2023,nirmala_chemistry@gcuniversity.ac.in,+91-9435654166,16/02/1981,Department of Chemistry,Girijananda Chowdhury University
+91,GCU020064,Zartaj Washmin Banu,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,02/01/2019,zartaj@yopmail.com,+91-9577258358,15/08/1991,Department of Pharmaceutical Chemistry - Guwahati,Girijananda Chowdhury University
+92,GCU020067,Priyanka Choudhury,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/08/2019,priyanka_pharmag@gcuniversity.ac.in,+91-8135999758,18/12/1990,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+93,GCU030049,Ranjit  Sinha,School Of Engineering and Technology,Faculty,Regular,Lab Instructor,03/02/2009,ranjit_ece@gcuniversity.ac.in,+91-8011836030,28/02/1966,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+94,GCU030085,Haren Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,03/03/2014,sangitadas995425@gmail.com,+91-7896360180,31/12/1990,-,Girijananda Chowdhury University
+95,GCU030093,Simanta Baishya,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,02/03/2015,simantabaishyaece@gmail.com,+91-9707472413,01/01/1983,-,Girijananda Chowdhury University
+96,GCU020072,Mrinmoy Deka,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,04/01/2021,mrinmoy_pharmag@gcuniversity.ac.in,+91-7002086065,31/07/1992,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+97,GCU020063,Asha  Das,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,02/01/2019,asha_pharmag@gcuniversity.ac.in,+91-9101628375,06/04/1992,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+98,GCU020079,Rupa  Sengupta,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/08/2019,Rupa_phamag@gcuniversity.ac.in,+91-9904348668,01/03/1978,Department of Pharmacognosy - Guwahati,Girijananda Chowdhury University
+99,GCU020075,TRIDEEP  SAIKIA,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,18/01/2021,trideep_pharmag@gcuniversity.ac.in,+91-9957252622,03/11/1994,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+100,GCU030111,Ratan Baishya,Admin Non Teaching,Other Employee,Other Employee,Lab assistant,01/06/2017,ratanbaishya985@gmail.com,+91-9854325819,01/02/1982,-,Girijananda Chowdhury University
+101,GCU020001,Lipi  Goswami,School of Natural Science,Admin,Regular,Assistant Professor & HoD (I/c),01/09/2006,lipi_physics@gcuniversity.ac.in,+91-8404064987,05/02/1977,Department of Physics,Girijananda Chowdhury University
+102,GCU020003,Kajal  Dutta,School of Natural Science,Admin,-,Assistant Professor,31/08/2006,kajal_chemistry@gcuniversity.ac.in,+91-9954121270,30/11/1979,Department of Chemistry,Girijananda Chowdhury University
+103,GCU020080,Alakesh  Bharali,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/10/2021,alakesh_pharmag@gcuniversity.ac.in,+91-9859892286,30/12/1997,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+104,GCU020107,Salema Khatun,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,16/03/2023,Salemakhatun@gips-guwahati.ac.in,+91-8638143462,01/01/1996,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+105,GCU020038,Priti  Sarmah,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,02/08/2011,priti_english@gcuniversity.ac.in,+91-6002688378,30/05/1986,Department of English & Foreign Languages,Girijananda Chowdhury University
+106,GCU020110,SANSWRANG BASUMATARY,School of Pharmaceutical Science - Guwahati,Admin,Regular,Assistant Professor,06/04/2023,sanswrang_pharmag@gcuniversity.ac.in,+91-7892588272,28/08/1996,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+107,GCU020005,Abdul Baquee Ahmed,School of Pharmaceutical Science - Tezpur,Faculty,-,Professor,01/08/2007,abahmed_pharmat@gcuniversity.ac.in,+91-9854046526,12/08/1977,Department of Pharmaceutical Chemistry - Tezpur,Girijananda Chowdhury University
+108,GCU020037,Oveepsa  Chakraborty,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,02/08/2011,oveepsa_me@gcuniversity.ac.in,+91-9707348385,10/12/1985,Department of Mechanical Engineering,Girijananda Chowdhury University
+109,GCU030010,Nabami Das Baruah,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,14/09/2006,Pujamonibaruah@gmail.com,+91-6002801064,30/09/1975,-,Girijananda Chowdhury University
+110,GCU010036,Pranjeet  Das,Administration,Admin,-,-,01/09/2009,pranjeet_adm@gcuniversity.ac.in,+91-7002582770,28/02/1982,-,Girijananda Chowdhury University
+111,GCU020071,Shekhar Chandra Bora,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/12/2020,shekhar_pharmat@gcuniversity.ac.in,+91-8486966803,08/10/1992,-,Girijananda Chowdhury University
+112,GCU030114,Deepa  Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/08/2018,idipabodo@gmail.com,+91-9957359513,08/08/1989,-,Girijananda Chowdhury University
+113,GCU020060,Tapash  Chakraborty,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,25/07/2018,tapash_pharmag@gcuniversity.ac.in,+91-7002926378,16/01/1987,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+114,GCU020056,ARINDOM  AIN,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,28/09/2015,arindom_mca@gcuniversity.ac.in,+91-7002873538,25/09/1984,Department of Computer Application,Girijananda Chowdhury University
+115,GCU030032,RUBI  KALITA,School Of Engineering and Technology,Faculty,Regular,Lab Instructor,03/03/2008,rubi_cse@gcuniversity.ac.in,+91-9954690650,03/01/1978,Department of Computer Science and Engineering,Girijananda Chowdhury University
+116,GCU020138,Salma  Mazid,School of Natural Science,Faculty,Regular,Assistant Professor,01/09/2023,salma.mithu@gmail.com,+91-7002207174,21/02/1985,Department of Zoology,Girijananda Chowdhury University
+117,GCU020004,Dipankar Saha,School of Pharmaceutical Science - Guwahati,Admin,-,Professor & HOD,01/06/2007,registrar@gcuniversity.ac.in,+91-7099034052,01/01/1980,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+118,GCU020127,Rubina Chowdhury,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/08/2023,rubchowdhury1212@gmail.com,+91-9365171399,12/07/1997,-,Girijananda Chowdhury University
+119,GCU020083,Bedanta Bhattacharjee,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/10/2021,bedanta_pharmat@gcuniversity.ac.in,+91-6901836383,13/12/1997,-,Girijananda Chowdhury University
+120,GCU020094,Ashis Kumar Goswami,School of Pharmaceutical Science - Guwahati,Faculty,Regular,-,18/04/2022,ashis_pharmag@gcuniversity.ac.in,+91-7002836897,15/09/1987,Department of Pharmacognosy - Guwahati,Girijananda Chowdhury University
+121,GCU020025,Alokojjwal  Das,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,02/03/2010,alokojjwal_ece@gcuniversity.ac.in,+91-9706014078,26/11/1986,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+122,GCU020062,Kankan Kishore Pathak,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,02/01/2019,kankan_me@gcuniversity.ac.in,+91-8258968598,01/10/1988,Department of Mechanical Engineering,Girijananda Chowdhury University
+123,GCU030101,Bhogeswar  Saikia,Admin Non Teaching,Other Employee,Other Employee,Workshop Instructor,02/02/2016,bhogeswar_ws@gcuniversity.ac.in,+91-9101089266,06/01/1967,-,Girijananda Chowdhury University
+124,GCU030014,Prabodh  Barman,Admin Non Teaching,Other Employee,Other Employee,Workshop Instructor,11/10/2006,Prabodh_ws@gcuniversity.ac.in,+91-7896816139,21/12/1972,-,Girijananda Chowdhury University
+125,GCU030041,Ramen  Talukdar,Admin Non Teaching,Other Employee,Other Employee,Workshop Instructor,08/09/2008,ramen_@gcuniversity.ac.in,+91-9101367625,08/10/1972,-,Girijananda Chowdhury University
+126,GCU020119,Bhaswati  Sarmah,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,26/07/2023,bhaswati_polsc@gcuniversity.ac.in,+91-9706927546,10/12/1991,Department of Political Science,Girijananda Chowdhury University
+127,GCU030008,Santosh Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,02/09/2006,hiralvsantoshdassamirandaskgf@gmail.com,+91-9957646336,02/01/1980,-,Girijananda Chowdhury University
+128,GCU020052,Dhruva Jyoti Sharma,School of Management and Commerce,Faculty,Regular,Assistant Professor,05/08/2014,dhruva_mgmt@gcuniversity.ac.in,+91-8011835762,27/01/1987,Department of Business Administration,Girijananda Chowdhury University
+129,GCU020008,Nilanjana  Deb,School of Management and Commerce,Faculty,Regular,Associate Professor & HoD (I/c),16/05/2008,nilanjana_mgmt@gcuniversity.ac.in,+91-9864020116,26/12/1974,Department of Business Administration,Girijananda Chowdhury University
+130,GCU020123,MONISHA  DEVI,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2023,monisha_cse@gcuniversity.ac.in,+91-8638450388,03/07/1988,Department of Computer Science and Engineering,Girijananda Chowdhury University
+131,GCU030141,Bhabajyoti Baishya,Admin Non Teaching,Other Employee,Other Employee,Multitasking Executive,01/10/2022,bhabajyoti@gcuniversity.ac.in,+91-8638891828,22/11/1999,-,Girijananda Chowdhury University
+132,GCU020051,Faruk  Ahmed,School of Management and Commerce,Faculty,Regular,Assistant Professor,01/08/2014,faruk_mgmt@gcuniversity.ac.in,+91-7002699418,28/02/1987,Department of Business Administration,Girijananda Chowdhury University
+133,GCU030042,Monirupa  Misra,School Of Engineering and Technology,Faculty,Regular,Lab Instructor,15/09/2008,monirupa_ce@gcuniversity.ac.in,+91-8638684891,28/02/1972,Department of Civil Engineering,Girijananda Chowdhury University
+134,GCU030145,Binod  Das,School Of Engineering and Technology,Faculty,Regular,Lab Instructor,19/10/2022,binod_ce@gcuniversity.ac.in,+91-9707364749,10/11/1990,Department of Civil Engineering,Girijananda Chowdhury University
+135,GCU020027,Junumoni  Das,School of Management and Commerce,Admin,-,Sr. Asst. Prof. & Head HR and Personnel Division,01/10/2010,hr_gcu@gcunivetsity.ac.in,+91-9864151408,19/07/1981,Department of Business Administration,Girijananda Chowdhury University
+136,GCU020131,Sujan  Sinha,School of Natural Science,Faculty,Regular,Assistant Professor,16/08/2023,sujan_maths@gcuniversity.ac.in,+91-8638694286,17/03/1986,Department of Mathematics,Girijananda Chowdhury University
+137,GCU020029,SANJIB  HAZARIKA,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,02/01/2011,sanjib_me@gcuniversity.ac.in,+91-8876089343,29/03/1985,Department of Electrical Engineering,Girijananda Chowdhury University
+138,GCU020044,Subhadra  Das,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2012,subhadra_ece@gcuniversity.ac.in,+91-9864126536,16/11/1987,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+139,GCU020015,MANASHI DEVI,School Of Humanities & Social Science,Faculty,-,Assistant Professor & HoD (I/c),02/09/2008,manashi_english@gcuniversity.ac.in,+91-7002585740,31/12/1984,Department of English & Foreign Languages,Girijananda Chowdhury University
+140,GCU020016,Gargi Kar Purkayastha,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,02/01/2009,gargi_ece@gcuniversity.ac.in,+91-8822528719,26/09/1985,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+141,GCU020050,BASAB  DAS,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2014,basab_ece@gcuniversity.ac.in,+91-9085923614,25/12/1987,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+142,GCU020046,Swapnaneel  Sarma,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/02/2013,swapnaneel_me@gcuniversity.ac.in,+91-9864469698,31/12/1987,Department of Mechanical Engineering,Girijananda Chowdhury University
+143,GCU020078,Lima  Patowary,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/08/2019,lima_pharmag@gcuniversity.ac.in,+91-8486586569,03/01/1994,Department of Pharmaceutical Chemistry - Guwahati,Girijananda Chowdhury University
+144,GCU030097,Hitesh  Barman,Admin Non Teaching,Other Employee,Other Employee,Workshop Instructor,01/02/2016,hitesh_ws@gimt-guwahati.ac.in,+91-9707044486,01/03/1983,-,Girijananda Chowdhury University
+145,GCU010037,ANUJ  MEDHI,Administration,Admin,-,-,15/10/2009,anuj_adm@gcuniversity.ac.in,+91-9864855054,01/01/1981,-,Girijananda Chowdhury University
+146,GCU030106,NILAM  BHARADWAJ,Admin Non Teaching,Faculty,Regular,Lab Instructor,01/09/2016,nilam_me@gcuniversity.ac.in,+91-9864121796,01/02/1983,-,Girijananda Chowdhury University
+147,GCU020090,Ravi Kumar Rajan,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/04/2022,ravi_pharmat@gcuniversity.ac.in,+91-8098490394,04/09/1989,-,Girijananda Chowdhury University
+148,GCU020113,DAISY  BHATTACHARJEE,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,04/05/2023,daisy_sociology@gcuniversity.ac.in,+91-8752816238,05/06/1993,Department of Sociology & Social Work,Girijananda Chowdhury University
+149,GCU020122,Monalisha  Gautom,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2023,monalisha_ce@gcuniversity.ac.in,+91-9101329660,03/01/1998,Department of Civil Engineering,Girijananda Chowdhury University
+150,GCU020108,Abhinav  Sarma,School of Management and Commerce,Faculty,Regular,Assistant Professor,20/03/2023,abhinav_mgmt@gcuniversity.ac.in,+91-9707024396,12/12/1986,Department of Business Administration,Girijananda Chowdhury University
+151,GCU020116,Jupitara  Boro,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,22/05/2023,jupitara_english@gcuniversity.ac.in,+91-9706474992,03/07/1992,Department of English & Foreign Languages,Girijananda Chowdhury University
+152,GCU020024,Trishna Das,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Associate Professor,18/01/2010,trishna_pharmag@gcuniversity.ac.in,+91-9707122829,01/01/1983,Department of Pharmacognosy - Guwahati,Girijananda Chowdhury University
+153,GCU020012,Minakshi  Gogoi,School Of Engineering and Technology,Admin,-,Professor & HOD,14/07/2008,minakshi_cse@gcuniversity.ac.in,+91-8638719004,09/05/1976,Department of Computer Science and Engineering,Girijananda Chowdhury University
+154,GCU030018,Mahesh  Das,School Of Engineering and Technology,Faculty,Regular,Lab Instructor,07/02/2007,mahesh_ece@gcuniversity.ac.in,+91-9954981724,01/06/1977,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+155,GCU020081,Hemanga  Hazarika,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/10/2021,hemanga_pharmat@gcuniversity.ac.in,+91-8638096366,01/02/1991,-,Girijananda Chowdhury University
+156,GCU020095,Padmanath Pegu,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/08/2022,Padmanath_pharmat@gcuniversity.ac.in,+91-7002780307,17/08/1994,-,Girijananda Chowdhury University
+157,GCU020101,Namrata Koushik,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,24/02/2023,namrata_pharmat@gcuniversity.ac.in,+91-8403818588,01/03/1994,-,Girijananda Chowdhury University
+158,GCU020125,Gitanjali  Devi,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2023,gitanjali_cse@gcuniversity.ac.in,+91-8136023414,02/02/1990,Department of Computer Science and Engineering,Girijananda Chowdhury University
+159,GCU020128,Anisha  Bordoloi,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,07/08/2023,anishabordoloi.8@gmail.com,+91-9678693879,08/06/1985,Department of History,Girijananda Chowdhury University
+160,GCU030069,Mridusmita  Baruah,Admin Non Teaching,Faculty,Regular,Lab Instructor,16/08/2011,mridusmita_cse@gcuniversity.ac.in,+91-9435500428,31/03/1982,-,Girijananda Chowdhury University
+161,GCU020124,Dipjyoti  Deka,School Of Engineering and Technology,Admin,-,Assistant Professor,01/08/2023,Dipjyoti_cse@gcuniversity.ac.in,+91-8402085350,01/08/1987,Department of Computer Science and Engineering,Girijananda Chowdhury University
+162,GCU020006,ANINDITA  BORA,School Of Engineering and Technology,Admin,Regular,Associate Professor & HOD,02/01/2008,anindita_bora@gcuniversity.ac.in,+91-9435089138,03/09/1980,Department of Electronics & Communication Engineering,Girijananda Chowdhury University
+163,GCU020103,Rajat Subhra Dutta,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/03/2023,rajat_pharmat@gcuniversity.ac.in,+91-6002977370,16/09/1986,-,Girijananda Chowdhury University
+164,GCU020007,Smriti Rekha Chanda Das,School of Pharmaceutical Science - Guwahati,Faculty,-,Associate Professor,01/01/2024,smriti_pharmag@gcuniversity.in,+91-8812097550,30/09/1980,Department of Pharmaceutical Chemistry - Guwahati,Girijananda Chowdhury University
+165,GCU010005,Dwipen  Das,Administration,Admin,-,Administration,01/01/2024,deputy_registrar@gcuniversity.ac.in,+91-9859174947,02/10/1977,-,Girijananda Chowdhury University
+166,GCU010002,Kandarpa  Das,Administration,Admin,-,-,-,kandarpadas@yopmail.com,+91-9435043124,01/01/1990,-,Girijananda Chowdhury University
+167,Admin,ERP  ADMIN,School Of Engineering and Technology,Admin,-,-,-,erp@gcuniversity.ac.in,+91-1111111111,01/01/1990,-,Girijananda Chowdhury University
+168,GCU020112,Palakshi  Sarmah,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,03/05/2023,palakshi_psychology@gcuniversity.ac.in,+91-8486538166,12/12/1993,Department of Psychology,Girijananda Chowdhury University
+169,GCU030012,Saraswati Das Patowary,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,14/09/2006,das635111@gmail.com,+91-8876409154,29/11/1989,-,Girijananda Chowdhury University
+170,GCU030164,Bhaskar Jyoti Bhuyan,Admin Non Teaching,Admin,Regular,Administration,14/11/2023,bhaskar_adm@gcuniversity.ac.in,+91-7002312941,16/01/1999,-,Girijananda Chowdhury University
+171,Management,Management  D,School of Natural Science,Admin,-,-,-,-,+91-7894563213,01/01/1990,-,Girijananda Chowdhury University
+172,CAP123,Captain  America,School Of Engineering and Technology,Other Employee,Other Employee,-,-,bjbonline20@gmail.com,+91-9292929292,01/01/1950,-,Girijananda Chowdhury University
+173,GCU030025,Latif Ali,Admin Non Teaching,Other Employee,Other Employee,Driver,01/09/2007,latifali@yopmail.com,+91-9957708859,01/01/1990,-,Girijananda Chowdhury University
+174,GCU030044,Jyotish Deka,Admin Non Teaching,Other Employee,Other Employee,Driver,20/10/2008,jyotishdeka@yopmail.com,+91-9401987313,01/01/1990,-,Girijananda Chowdhury University
+175,GCU020018,Bhanu P. Sahu,School of Pharmaceutical Science - Guwahati,Admin,-,Professor & HOD,02/02/2009,bhanusahu@yopmail.com,+91-7896843274,01/01/1990,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+176,GCU020142,Vidhya  Srinivasan,School of Allied Health Sciences,Faculty,-,Professor,01/01/2024,hodmlt@gcuniversity.ac.in,+91-8721062898,04/09/1984,Department of Medical Laboratory Technology,Girijananda Chowdhury University
+177,GCU020136,Shantanu  Chakravarty,School Of Humanities & Social Science,Faculty,-,Professor & HOD,01/01/2024,shantanu.c@yopmail.com,+91-1111111111,01/01/1990,Department of Political Science,Girijananda Chowdhury University
+178,GCU020118,Nozomi  Tokuma,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor (Foreign Languages),01/01/2024,nozomitokuma@gcuniversity.ac.in,+91-9818163552,30/09/1979,Department of English & Foreign Languages,Girijananda Chowdhury University
+179,GCU020040,Prithvi Narayan Sinha,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/03/2012,prithvi_ee@gcuniversity.ac.in,+91-9864010757,04/11/1983,Department of Electrical Engineering,Girijananda Chowdhury University
+180,GCU020139,Jyotima  Nath,School of Natural Science,Faculty,Regular,Assistant Professor,01/01/2024,jyotima_botany@gcuniversity.ac.in,+91-6900666886,23/12/1995,Department of Botany,Girijananda Chowdhury University
+181,GCU020092,Tutumoni Kalita,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,18/04/2022,tutumoni_pharmag@gcuniversity.ac.in,+91-9399912721,08/10/1996,Department of Pharmaceutical Chemistry - Guwahati,Girijananda Chowdhury University
+182,GCU020033,Kritanjali  Jaiswal,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,02/10/2011,kritanjali_sociology@gcuniversity.ac.in,+91-9864207561,31/03/1984,Department of Sociology & Social Work,Girijananda Chowdhury University
+183,GCU020036,Rajarshi  Paul,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,08/01/2011,rajarshi_mca@gcuniversity.ac.in,+91-9435044991,17/11/1981,Department of Computer Application,Girijananda Chowdhury University
+184,GCU020091,Nikhil Biswas,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Associate Professor,18/04/2022,nikhil_pharmag@gcuniversity.ac.in,+91-9875354800,03/01/1980,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+185,GCU020020,Shrabani  Medhi,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/01/2024,shrabani_cse@gcuniversity.ac.in,+91-7005733946,26/07/1985,Department of Computer Science and Engineering,Girijananda Chowdhury University
+186,GCU020022,PRANJAL DAS,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/08/2009,pranjal_mca@gcuniversity.ac.in,+91-9854033650,25/03/1979,Department of Computer Application,Girijananda Chowdhury University
+187,GCU020105,Sharmila  Sharan,School of Management and Commerce,Faculty,Regular,Sr. Assistant Professor,01/01/2024,sharmila_mgmt@gcuniversity.ac.in,+91-7289066994,10/10/1971,Department of Business Administration,Girijananda Chowdhury University
+188,GCU020106,Asish Bhaumik,School of Pharmaceutical Science - Tezpur,Faculty,-,Associate Professor,15/03/2023,asish_bhaumik@gcuniversity.ac.in,+91-8309614663,22/01/1978,-,Girijananda Chowdhury University
+189,GCU040005,Ankita  Saikia,School Of Humanities & Social Science,Faculty,Guest,-,-,ankitasaikia316@gmail.com,+91-7896370385,16/07/1995,Department of Political Science,Girijananda Chowdhury University
+190,GCU040001,Suman  Kumar,School of Pharmaceutical Science - Guwahati,Faculty,Guest,-,-,-,+91-7002756375,09/01/1993,-,Girijananda Chowdhury University
+191,GCU040002,Chinmoy  Bhuyan,School of Pharmaceutical Science - Guwahati,Faculty,Guest,-,-,-,+91-9101661801,10/12/1992,-,Girijananda Chowdhury University
+192,GCU020140,Dhimanjit  Sarma,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,01/01/2024,dhimanjit_pharmag@gcuniversity.ac.in,+91-8811897018,05/02/1997,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+193,GCU010025,Arup Kumar Das,Administration,Admin,-,Administration,01/01/2024,ps_registrar@gcuniversity.ac.in,+91-7002935262,01/02/1982,-,Girijananda Chowdhury University
+194,GCU030087,Diganta Kumar Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,10/06/2014,centrallibrary@gcuniversity.ac.in,+91-9854489812,31/10/1985,-,Girijananda Chowdhury University
+195,GCU030063,Gokul Chandra Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/01/2024,gakul.das82@gmail.com,+91-9101151177,31/10/1992,-,Girijananda Chowdhury University
+196,GCU030060,Sankar Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,13/07/2010,sankardasgimt2010@gmail.com,+91-7002577948,24/10/1984,-,Girijananda Chowdhury University
+197,GCU030165,Pranjit Sarma,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,14/11/2023,pranjits15@gmail.com,+91-7002099294,01/07/1980,-,Girijananda Chowdhury University
+198,GCU030122,Bandana Kalita,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/12/2019,bandanakalita217@gmail.com,+91-6900223619,31/01/1988,-,Girijananda Chowdhury University
+199,GCU010011,Nripen Chandra Barman,Administration,Other Employee,Other Employee,-,-,accounts@gcuniversity.ac.in,+91-9957189149,28/08/1963,-,Girijananda Chowdhury University
+200,GCU030146,Kanshouwa Torung Maring,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,05/12/2022,torungkanshouwa@gmail.com,+91-9612440640,01/03/1999,-,Girijananda Chowdhury University
+201,GCU010004,Kishore Kumar Choudhury,Administration,Admin,-,-,-,coe@gcuniversity.ac.in,+91-7042379051,17/08/1962,-,Girijananda Chowdhury University
+202,GCU020066,Uddipan  Das,School Of Engineering and Technology,Faculty,-,Assistant Professor,01/01/2024,uddipan_ce@gcuniversity.com,+91-7002443479,01/10/1990,Department of Civil Engineering,Girijananda Chowdhury University
+203,GCU020141,Junmoni Nath,School of Pharmaceutical Science - Guwahati,Faculty,-,Assistant Professor,15/09/2023,junmoninath_pharmag@gcuniversity.ac.in,+91-7002774641,15/06/1993,Department of Pharmaceutics - Guwahati,Girijananda Chowdhury University
+204,GCU020087,Kasturi  Bhuyan,School Of Engineering and Technology,Faculty,Regular,Assistant Professor,01/01/2024,kasturi_ce@gcuniversity.ac.in,+91-9707011161,11/10/1990,Department of Civil Engineering,Girijananda Chowdhury University
+205,GCU020073,Ranadeep Borgohain,School of Pharmaceutical Science - Guwahati,Faculty,-,Assistant Professor,04/01/2021,ranadeep_pharmag@gcuniversity.ac.in,+91-8472023840,10/11/1996,Department of Pharmaceutical Chemistry - Guwahati,Girijananda Chowdhury University
+206,GCU020076,Rajana James,School of Pharmaceutical Science - Guwahati,Faculty,-,Assistant Professor,02/02/2021,rjames_pharmag@gcuniversity.ac.in,+91-8074267962,14/04/1988,Department of Pharmacology - Guwahati,Girijananda Chowdhury University
+207,GCU000001,Bijoyananda  Chowdhury,Administration,Admin,-,-,-,-,+91-9864023413,01/01/1975,-,Girijananda Chowdhury University
+208,GCU030011,Nitul Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,14/09/2006,dasnitul843@gmail.com,+91-8876195255,01/01/1978,-,Girijananda Chowdhury University
+209,GCU030045,Naba Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,10/11/2008,-,+91-9954715394,01/01/1980,-,Girijananda Chowdhury University
+210,GCU030043,Mantu Saikia,Admin Non Teaching,Admin,-,Non Teaching,22/09/2008,-,+91-8724944511,01/01/1982,-,Girijananda Chowdhury University
+211,GCU020098,Sanghita Das,School of Pharmaceutical Science - Tezpur,Faculty,-,Assistant Professor,14/11/2022,sanghita_pharmat@gcuniversity.ac.in,+91-8724095840,27/12/1992,-,Girijananda Chowdhury University
+212,GCU030057,Parag Moni Kalita,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,27/11/2009,paragmonikalita352@gmail.com,+91-9678730358,01/01/1988,-,Girijananda Chowdhury University
+213,GCU030100,Sanjuma Begum,Admin Non Teaching,Other Employee,Other Employee,Multitasking Assistant,01/02/2016,sanjumabegum985@gmail.com,+91-8486455382,01/10/1997,-,Girijananda Chowdhury University
+214,GCU030086,Minakshi Das,Admin Non Teaching,Other Employee,Other Employee,Multitasking Assistant,21/04/2014,dminakshi662@gmail.com,+91-8134999420,05/07/1992,-,Girijananda Chowdhury University
+215,GCU030105,Pronita Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/07/2016,-,+91-9127259530,01/01/1970,-,Girijananda Chowdhury University
+216,GCU030103,Apurba Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/05/2016,-,+91-9127259530,09/10/1996,-,Girijananda Chowdhury University
+217,GCU030066,Mollika Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/08/2011,mollikadas001@gmail.com,+91-9706734708,25/12/1990,-,Girijananda Chowdhury University
+218,GCU030053,Sikha Rani Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,05/08/2009,-,+91-9706770268,28/02/1982,-,Girijananda Chowdhury University
+219,GCU030112,Rumi Begum,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/08/2017,bagum4372@gmail.com,+91-9678093985,01/05/1990,-,Girijananda Chowdhury University
+220,GCU030055,Anu Das,Admin Non Teaching,Other Employee,Other Employee,Multitasking Assistant,01/10/2009,dlda06452@gmail.com,+91-9854959229,01/05/1975,-,Girijananda Chowdhury University
+221,GCU010032,Luit  Chowdhury,Administration,Other Employee,Other Employee,-,-,luitchowdhury@gmail.com,+91-9864603100,30/01/1978,-,Girijananda Chowdhury University
+222,GCU010035,Utpal  Sarmah,Administration,Other Employee,Other Employee,-,-,utpalsarmah.gimt@gmail.com,+91-9706431518,09/01/1979,-,Girijananda Chowdhury University
+223,GCU030065,Jyoti Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/08/2011,jyoti.gimtt@gmail.com,+91-8721011370,29/11/1973,-,Girijananda Chowdhury University
+224,GCU030070,Jadu Nandan Pradhani,Admin Non Teaching,Other Employee,Other Employee,System Administrator,17/08/2011,jnpaei@gmail.com,+91-9508662810,29/12/1979,-,Girijananda Chowdhury University
+225,GCU030073,Hiranya Saikia,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,12/10/2011,hiranyasaikia664@gmail.com,+91-8486166322,10/02/1978,-,Girijananda Chowdhury University
+226,GCU030079,Bhaskar Jyoti Kalita,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/08/2013,bhaskarkalita803@gmail.com,+91-9101345317,08/01/1991,-,Girijananda Chowdhury University
+227,GCU030092,Abhijit Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,11/11/2014,dritu9388@gmail.com,+91-8638583134,05/10/1991,-,Girijananda Chowdhury University
+228,GCU030125,Krishnanu Biswa Kashyap,Admin Non Teaching,Other Employee,Other Employee,Lab Attendant,11/02/2021,bumonkashyap13@gmail.com,+91-7577024516,24/12/1996,-,Girijananda Chowdhury University
+229,GCU030134,Sanjib Sharma,Admin Non Teaching,Other Employee,Other Employee,Lab Attendant,01/03/2022,sanjibsharmaofficial@gmail.com,+91-9706191614,26/10/1977,-,Girijananda Chowdhury University
+230,GCU030135,Raktim Bhattacharya,Admin Non Teaching,Other Employee,Other Employee,Lab Attendant,02/03/2022,bhattacharyaraktim86@gmail.com,+91-6003136429,28/12/1994,-,Girijananda Chowdhury University
+231,GCU030152,Leena Lakra,School of Pharmaceutical Science - Tezpur,Other Employee,Other Employee,Non Teaching,01/08/2023,lakrachikki24@gmail.com,+91-6003782847,30/09/1999,-,Girijananda Chowdhury University
+232,GCU030154,Mondita Saikia,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,02/08/2023,saikiamondita71@gmail.com,+91-7002495696,07/08/1997,-,Girijananda Chowdhury University
+233,GCU030147,Jabir Khan,School of Pharmaceutical Science - Tezpur,Faculty,-,Lab Technician/Instructor,20/02/2023,khanjabir76648987@gmail.com,+91-9864705700,30/09/2001,-,Girijananda Chowdhury University
+234,GCU030148,Bhaskar Jyoti Hazarika,School of Pharmaceutical Science - Tezpur,Faculty,-,Lab Technician/Instructor,20/02/2023,bhaskarhazarika532@gmail.com,+91-8638483288,26/12/1997,-,Girijananda Chowdhury University
+235,T01,Netra Bordoloi,School of Pharmaceutical Science - Tezpur,Other Employee,Other Employee,Lab Attendant,01/01/2024,netrabordoloi2016@gmail.com,+91-9854506502,28/02/1976,-,Girijananda Chowdhury University
+236,T02,Nayan Moni Baruah,School of Pharmaceutical Science - Tezpur,Other Employee,Other Employee,Lab Attendant,13/03/2012,baruahnayanmoni804@gmail.com,+91-6001064804,13/12/1978,-,Girijananda Chowdhury University
+237,T03,Pranjit Saikia,School of Pharmaceutical Science - Tezpur,Other Employee,Other Employee,Lab Attendant,06/08/2013,pranjit.gimt1983@gmail.com,+91-7002732599,03/05/1983,-,Girijananda Chowdhury University
+238,GCU030072,PRAHLAD ROY,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/09/2011,royprahlad72@gmail.com,+91-6001870991,01/01/1997,-,Girijananda Chowdhury University
+239,GCU030035,Ritu Raj Phukan,Admin Non Teaching,Other Employee,Other Employee,Lab Instructor,12/08/2008,riturajp@rediffmail.com,+91-8638507567,30/07/1975,-,Girijananda Chowdhury University
+240,GCU030037,Kandarpa  Bezbaruah,Admin Non Teaching,Other Employee,Other Employee,Workshop Instructor,01/01/2024,kandarpa_ws@gcuniversity.ac.in,+91-9954648509,01/08/1968,-,Girijananda Chowdhury University
+241,GCU030046,Mantu Kr Kalita,Admin Non Teaching,Other Employee,Other Employee,Workshop Instructor,01/01/2024,mantu_ws@gcuniversity.ac.in,+91-7002572474,01/10/1968,-,Girijananda Chowdhury University
+242,GCU030058,Tapan Kr Tamuli,Admin Non Teaching,Other Employee,Other Employee,Workshop Instructor,01/01/2024,tapan_ws@gcuniversity.co.in,+91-6001578208,06/05/1969,-,Girijananda Chowdhury University
+243,GCU030015,Soneswar Kalita,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,11/12/2006,-,+91-9957520441,01/03/1965,-,Girijananda Chowdhury University
+244,GCU030027,Jibeswar Thakuria,Admin Non Teaching,Other Employee,Other Employee,Lab assistant,12/11/2007,jibeswarthakuria5@gmail.com,+91-6000282441,01/03/1976,-,Girijananda Chowdhury University
+245,GCU030132,Ripunjoy  Boruah,School of Pharmaceutical Science - Guwahati,Faculty,-,Lab assistant,01/01/2024,boruahr430@gmail.com,+91-9101612464,23/11/2001,-,Girijananda Chowdhury University
+246,GCU030161,Nausad Ahmed,School of Pharmaceutical Science - Guwahati,Faculty,-,Lab Technician/Instructor,01/09/2023,ahmednausad36@gmail.com,+91-9101269282,18/03/2000,-,Girijananda Chowdhury University
+247,GCU030062,Joydeep  Gupta,School Of Engineering and Technology,Faculty,Regular,Lab Instructor,01/01/2024,joymechanicagimt@gmail.com,+91-8474874140,14/05/1974,Department of Mechanical Engineering,Girijananda Chowdhury University
+248,GCU030067,Eyajul Ali,Admin Non Teaching,Other Employee,Other Employee,Lab assistant,01/08/2011,eyajula914@gmail.com,+91-7086728352,01/12/1988,-,Girijananda Chowdhury University
+249,GCU030028,Isha Haque Ali,Admin Non Teaching,Other Employee,Other Employee,Lab assistant,27/12/2007,ishahq123@gmail.com,+91-7002595985,01/02/1983,-,Girijananda Chowdhury University
+250,GCU030051,Prakash Talukdar,Admin Non Teaching,Other Employee,Other Employee,Lab assistant,01/04/2009,ptprakashtalukdar60@gmail.com,+91-9132732041,01/12/1984,-,Girijananda Chowdhury University
+251,GCU030162,Nripen Das,Admin Non Teaching,Other Employee,Other Employee,Multitasking Assistant,01/09/2023,-,+91-9707216624,01/01/1974,-,Girijananda Chowdhury University
+252,GCU030133,Ajit Ch. Phukan,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,14/02/2022,acphukan58@gmail.com,+91-9435392170,01/01/1970,-,Girijananda Chowdhury University
+253,GCU010001,Jayanta  Deka,Administration,Admin,-,-,19/02/2024,chancellor@gcuniversity.ac.in,+91-9435052301,01/01/1959,-,Girijananda Chowdhury University
+254,GCU030034,Bipul Sarmah,School of Pharmaceutical Science - Guwahati,Faculty,-,Lab Technician/Instructor,01/01/2024,bipulsarma98@gmail.com,+91-8638406547,28/09/1976,-,Girijananda Chowdhury University
+255,GCU010034,Manish  Das,Admin Non Teaching,Other Employee,Other Employee,-,-,manishkrdas2016@gmail.com,+91-9435344599,01/06/1968,-,Girijananda Chowdhury University
+256,GCU010038,Nayanjyoti  Baruah,Admin Non Teaching,Other Employee,Other Employee,-,-,nayanjyoti_adm@gcuniversity.ac.in,+91-9864812734,01/03/1994,-,Girijananda Chowdhury University
+257,GCU030036,Amrit Talukdar,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/01/2024,talukdaramrit7@gmail.com,+91-9859944341,01/05/1989,-,Girijananda Chowdhury University
+258,GCU030031,Tridib Roy,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/02/2008,tridibroy@gcuniversity.ac.in,+91-7002957458,01/02/1964,-,Girijananda Chowdhury University
+259,GCU030096,Kamal Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,20/08/2015,kdas71705@gmail.com,+91-7636061276,31/08/1995,-,Girijananda Chowdhury University
+260,GCU020143,Subarna Sankar Das,School of Allied Health Sciences,Faculty,-,Assistant Professor,04/03/2024,subarnasankar77@gmail.com,+91-8638556453,14/10/1994,-,Girijananda Chowdhury University
+261,GCU020144,Rohan Basu,School Of Humanities & Social Science,Faculty,Regular,Associate Professor,06/03/2024,rohan.cogito@gmail.com,+91-9874606543,27/05/1985,-,Girijananda Chowdhury University
+262,GCU030166,Hiran Devi,Admin Non Teaching,Other Employee,Other Employee,Multitasking Executive,19/02/2024,hirandevi48@gmail.com,+91-6002059105,01/02/1969,-,Girijananda Chowdhury University
+263,GCU030126,Rita Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/03/2021,dassimran306@gmail.com,+91-7099540408,01/11/1983,-,Girijananda Chowdhury University
+264,GCU030001,Sakina Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2006,nooo@xyz.com,+91-7399327575,01/08/1975,-,Girijananda Chowdhury University
+265,GCU030002,Rehena Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2006,nooo@xyz.com,+91-7086174735,01/10/1969,-,Girijananda Chowdhury University
+266,GCU030003,Iaja Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2006,nooo@xyz.com,+91-1111111111,15/07/1975,-,Girijananda Chowdhury University
+267,GCU030016,Bijuli Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2007,nooo@xyz.com,+91-8876911500,07/09/1976,-,Girijananda Chowdhury University
+268,GCU030019,Gitanjali Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,07/07/2007,nooo@xyz.com,+91-9365348259,01/01/1976,-,Girijananda Chowdhury University
+269,GCU030020,Julo Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,07/07/2007,nooo@xyz.com,+91-7089966715,01/05/1970,-,Girijananda Chowdhury University
+270,GCU030021,Rahijan Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,07/07/2007,nooo@xyz.com,+91-8723962814,01/05/1973,-,Girijananda Chowdhury University
+271,GCU030022,Runu Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,07/07/2007,nooo@xyz.com,+91-8134030277,01/01/1987,-,Girijananda Chowdhury University
+272,GCU030029,Gita Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2008,nooo@xyz.com,+91-8011148595,10/05/1978,-,Girijananda Chowdhury University
+273,GCU030030,Noni Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2008,nooo@xyz.com,+91-9085916551,22/12/1976,-,Girijananda Chowdhury University
+274,GCU030038,Sajida Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,03/09/2008,nooo@xyz.com,+91-7896809566,16/02/1978,-,Girijananda Chowdhury University
+275,GCU030039,Merina Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,03/09/2008,nooo@xyz.com,+91-8761895607,11/04/1981,-,Girijananda Chowdhury University
+276,GCU030040,Anima Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,03/09/2008,nooo@xyz.com,+91-8402001463,03/04/1981,-,Girijananda Chowdhury University
+277,GCU030047,Juna Begum,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2009,nooo@xyz.com,+91-8099914446,20/11/1988,-,Girijananda Chowdhury University
+278,GCU030048,Sabitri Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2009,nooo@xyz.com,+91-8486382314,12/03/1976,-,Girijananda Chowdhury University
+279,GCU030074,Purnima Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2012,nooo@xyz.com,+91-8761987598,02/02/1982,-,Girijananda Chowdhury University
+280,GCU030075,Kamala Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2012,nooo@xyz.com,+91-7896769540,03/08/1970,-,Girijananda Chowdhury University
+281,GCU030077,Sarada Das,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2012,nooo@xyz.com,+91-1111111111,01/08/1978,-,Girijananda Chowdhury University
+282,GCU030078,Kalpana Roy,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/09/2012,nooo@xyz.com,+91-1111111111,12/08/1984,-,Girijananda Chowdhury University
+283,GCU030081,Indrabati Basfore,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2013,nooo@xyz.com,+91-8724949402,01/09/1976,-,Girijananda Chowdhury University
+284,GCU030082,Basanti Basfore,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2013,nooo@xyz.com,+91-9678225516,14/06/1980,-,Girijananda Chowdhury University
+285,GCU030088,Bina Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2014,nooo@xyz.com,+91-1111111111,15/01/1985,-,Girijananda Chowdhury University
+286,GCU030089,Hanufa Bibi,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2014,nooo@xyz.com,+91-1111111111,12/01/1978,-,Girijananda Chowdhury University
+287,GCU030090,Mina Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2014,nooo@xyz.com,+91-1111111111,10/04/1986,-,Girijananda Chowdhury University
+288,GCU030094,Amit Basfore,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2015,nooo@xyz.com,+91-1111111111,19/01/1989,-,Girijananda Chowdhury University
+289,GCU030095,Hemanti Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2015,nooo@xyz.com,+91-1111111111,15/01/1984,-,Girijananda Chowdhury University
+290,GCU030109,Rina Deka,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/02/2017,nooo@xyz.com,+91-1111111111,31/03/1972,-,Girijananda Chowdhury University
+291,GCU030119,Karan  Basfor,Admin Non Teaching,Other Employee,Full Time,-,01/07/2019,nooo@xyz.com,+91-1111111111,15/04/1997,-,Girijananda Chowdhury University
+292,GCU030120,Churiya Begum,Admin Non Teaching,Other Employee,Other Employee,Cleaner,24/07/2019,nooo@xyz.com,+91-8486521446,18/10/1986,-,Girijananda Chowdhury University
+293,GCU030123,Sumit Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/02/2020,nooo@xyz.com,+91-1111111111,27/07/2000,-,Girijananda Chowdhury University
+294,GCU030138,Anita Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/07/2022,nooo@xyz.com,+91-1111111111,30/09/1986,-,Girijananda Chowdhury University
+295,GCU030139,Kisan Basfor,Admin Non Teaching,Other Employee,Full Time,-,14/07/2022,nooo@xyz.com,+91-6900577088,28/11/1998,-,Girijananda Chowdhury University
+296,GCU030149,Rina Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/04/2023,nooo@xyz.com,+91-1111111111,25/10/1989,-,Girijananda Chowdhury University
+297,GCU030163,Sagar Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/01/2024,nooo@xyz.com,+91-1111111111,01/01/1990,-,Girijananda Chowdhury University
+298,GCU030083,Sufia Khatun,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/09/2013,nooo@xyz.com,+91-1111111111,03/10/1996,-,Girijananda Chowdhury University
+299,GCU030004,Nur Islam Ali Islam Ali,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/02/2006,noo@xyz.com,+91-7002431346,01/12/1981,-,Girijananda Chowdhury University
+300,GCU030005,Bhadreswar Das,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/08/2006,noo@xyz.com,+91-9085647517,07/02/1966,-,Girijananda Chowdhury University
+301,GCU030007,Biren Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,04/09/2006,noo@xyz.com,+91-9706574023,19/12/1969,-,Girijananda Chowdhury University
+302,GCU030013,Jiban Kalita,Admin Non Teaching,Other Employee,Other Employee,Driver,01/10/2006,noo@xyz.com,+91-9864211119,07/10/1978,-,Girijananda Chowdhury University
+303,GCU030017,Hanif Ali,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/02/2007,noo@xyz.com,+91-7662881830,31/12/1988,-,Girijananda Chowdhury University
+304,GCU030023,Tahik Ali,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/08/2007,noo@xyz.com,+91-9954751535,01/09/1975,-,Girijananda Chowdhury University
+305,GCU030024,Kamrup Das,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/08/2007,noo@xyz.com,+91-8011040965,01/01/1976,-,Girijananda Chowdhury University
+306,GCU030056,Lakhi Nath Barman,Admin Non Teaching,Other Employee,Other Employee,Driver,01/10/2009,noo@xyz.com,+91-9126072353,15/03/1972,-,Girijananda Chowdhury University
+307,GCU030068,Anup Baruah,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/08/2011,noo@xyz.com,+91-8723087642,01/01/1983,-,Girijananda Chowdhury University
+308,GCU030076,Utpal Das,Admin Non Teaching,Other Employee,Other Employee,Driver,01/06/2012,noo@xyz.com,+91-9508656031,01/01/1978,-,Girijananda Chowdhury University
+309,GCU030080,Laba Ram Das,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/08/2013,noo@xyz.com,+91-8471846729,01/10/1977,-,Girijananda Chowdhury University
+310,GCU030084,Thaneswar Kalita,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/11/2013,noo@xyz.com,+91-9957125074,01/01/1968,-,Girijananda Chowdhury University
+311,GCU030091,Ashutosh Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,05/08/2014,ashutoshdas31184@gmail.com,+91-1111111111,04/12/1994,-,Girijananda Chowdhury University
+312,GCU030098,Bakul Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,05/08/2014,noo@xyz.com,+91-1111111111,04/12/1994,-,Girijananda Chowdhury University
+313,GCU030102,Jit Keleng,Admin Non Teaching,Other Employee,Other Employee,Security Guard,04/04/2016,noo@xyz.com,+91-9613066100,31/12/1982,-,Girijananda Chowdhury University
+314,GCU030107,Diganta  Deka,Admin Non Teaching,Other Employee,Full Time,Non Teaching,01/09/2016,diganta@gimt-guwahati.ac.in,+91-9678535589,30/12/1979,-,Girijananda Chowdhury University
+315,GCU030110,Paresh Das,Admin Non Teaching,Other Employee,Other Employee,Security Guard,17/02/2017,noo@xyz.com,+91-9365667846,01/01/1982,-,Girijananda Chowdhury University
+316,GCU030115,Md Siddik Ali,Admin Non Teaching,Other Employee,Other Employee,Security Guard,06/08/2018,noo@xyz.com,+91-7670082843,01/02/1977,-,Girijananda Chowdhury University
+317,GCU030116,Khalil Ali,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,27/08/2018,noo@xyz.com,+91-6002428504,31/12/1972,-,Girijananda Chowdhury University
+318,GCU030121,Niranjan Chowary,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/09/2019,noo@xyz.com,+91-1111111111,01/09/1970,-,Girijananda Chowdhury University
+319,GCU030124,Dimbeswar Borah,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,18/08/2020,noo@xyz.com,+91-1111111111,11/05/1965,-,Girijananda Chowdhury University
+320,GCU030127,Safiqul Haque,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/04/2021,noo@xyz.com,+91-8638953498,01/12/1984,-,Girijananda Chowdhury University
+321,GCU030128,Dilip Kumar Das,Admin Non Teaching,Other Employee,Full Time,Non Teaching,01/07/2021,noo@xyz.com,+91-9706734719,31/12/1982,-,Girijananda Chowdhury University
+322,GCU030130,Md Jamser Ali,Admin Non Teaching,Other Employee,Other Employee,Driver,01/11/2021,noo@xyz.com,+91-9859834132,11/05/1979,-,Girijananda Chowdhury University
+323,GCU030140,Madan Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/01/2022,noo@xyz.com,+91-1111111111,01/01/1990,-,Girijananda Chowdhury University
+324,GCU030142,Bijoy Mandal,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/09/2022,noo@xyz.com,+91-6000246913,20/08/1998,-,Girijananda Chowdhury University
+325,GCU030150,Hitesh Kalita,Admin Non Teaching,Other Employee,Other Employee,Security Guard,12/07/2023,noo@xyz.com,+91-8822569060,31/08/1989,-,Girijananda Chowdhury University
+326,GCU030151,Raja Mohan,Admin Non Teaching,Other Employee,Other Employee,Security Guard,12/07/2023,noo@xyz.com,+91-9957263463,31/12/1997,-,Girijananda Chowdhury University
+327,GCU030153,Pinku Mohan,Admin Non Teaching,Other Employee,Other Employee,Driver,12/07/2023,noo@xyz.com,+91-9957263463,31/12/1997,-,Girijananda Chowdhury University
+328,GCU030155,Md Zakir Hussain,Admin Non Teaching,Other Employee,Other Employee,Security (I/C),16/08/2023,noo@xyz.com,+91-7002286055,28/02/1967,-,Girijananda Chowdhury University
+329,GCU030156,Simanta Talukdar,Admin Non Teaching,Other Employee,Other Employee,Security Guard,16/08/2023,noo@xyz.com,+91-6003822896,17/08/1994,-,Girijananda Chowdhury University
+330,GCU030157,Pabitra Das,Admin Non Teaching,Other Employee,Other Employee,Security Guard,16/08/2023,noo@xyz.com,+91-8474078993,30/04/1980,-,Girijananda Chowdhury University
+331,GCU030158,Puja  Das,Admin Non Teaching,Other Employee,Full Time,-,16/08/2023,noo@xyz.com,+91-6900777231,30/06/1997,-,Girijananda Chowdhury University
+332,GCU030159,Sangita  Das,Admin Non Teaching,Other Employee,Full Time,-,16/08/2023,noo@xyz.com,+91-6003605719,26/03/1998,-,Girijananda Chowdhury University
+333,GCU030160,Krishana Sonar,Admin Non Teaching,Other Employee,Other Employee,Driver,23/08/2023,noo@xyz.com,+91-9707298036,01/01/1990,-,Girijananda Chowdhury University
+334,GCU030026,Bikash Singh,Admin Non Teaching,Other Employee,Other Employee,Driver,01/09/2007,noo@xyz.com,+91-9101258789,01/01/1991,-,Girijananda Chowdhury University
+335,GCU030168,Sajahan Ali,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/09/2006,noo@xyz.xom,+91-1111111111,01/01/1990,-,Girijananda Chowdhury University
+336,GCU030169,Himangshu Patowary,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/11/2014,-,+91-1111111111,01/01/1990,-,Girijananda Chowdhury University
+337,T100,Test  Account,Administration,Admin,-,-,-,-,-,01/01/1990,-,Girijananda Chowdhury University
+338,GCU030064,Biman Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,08/01/2011,bimangimt@gmail.com,+91-6003324605,31/03/1985,-,Girijananda Chowdhury University
+339,GCU030071,Jogeswar Kurmi,Admin Non Teaching,Faculty,-,Lab Instructor,01/09/2011,jogeswarkurmi2@gmail.com,+91-6001256421,01/04/1965,-,Girijananda Chowdhury University
+340,GCU030131,Rajib Baruah,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,11/01/2021,marybaruahbaruah@gmail.com,+91-7638079551,19/11/1973,-,Girijananda Chowdhury University
+341,GCU030167,Gourav  Phukan,School of Pharmaceutical Science - Guwahati,Faculty,-,-,-,gouravphukan2018@gmail.com,+91-9365332847,15/08/2001,-,Girijananda Chowdhury University
+342,GCU020065,Susankar Kushari,School of Pharmaceutical Science - Guwahati,Faculty,Regular,Assistant Professor,02/01/2019,susankar_pharmag@gcuniversity.ac.in,+91-6001965957,14/01/1994,Department of Pharmaceutical Chemistry - Guwahati,Girijananda Chowdhury University
+343,GCU030059,Hamid Ali,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/07/2010,hamedali7584@gmail.com,+91-6003602026,01/01/1989,-,Girijananda Chowdhury University
+344,GCU030170,Imran  Ali,Admin Non Teaching,Other Employee,Other Employee,-,-,hasinaimran3@gmail.com,+91-9435349709,06/05/1974,-,Girijananda Chowdhury University
+345,GCU020145,Niju Moni Das,School Of Humanities & Social Science,Faculty,-,Assistant Professor,01/04/2024,nijumonidas2012@gmail.com,+91-8822841315,05/01/1981,-,Girijananda Chowdhury University
+346,GCU030173,Hridai Gautam,Admin Non Teaching,Other Employee,Other Employee,Lab Technician/Instructor,01/04/2024,-,+91-9395521474,18/01/2003,-,Girijananda Chowdhury University
+347,GCU020146,Barsha Chhetri,School Of Humanities & Social Science,Faculty,-,Assistant Professor & HoD (I/c),17/04/2024,barsha_education@gcuniversity.ac.in,+91-7431936077,02/08/1993,-,Girijananda Chowdhury University
+348,GCU020147,Puja Sen,School Of Humanities & Social Science,Faculty,Regular,Assistant Professor,20/04/2024,senpuja28@gmail.com,+91-9101071410,01/05/1992,-,Girijananda Chowdhury University
+349,SeroCST,Santosh  Sahu,Administration,Admin,-,-,-,-,-,12/05/1985,-,Girijananda Chowdhury University
+350,GCU000002,Kunki  Chowdhury,Administration,Admin,-,-,-,kunki@gcuniversity.ac.in,+91-7086096110,07/02/1998,-,Girijananda Chowdhury University
+351,GCU020148,Balin Hazarika,School of Management and Commerce,Faculty,-,Professor,02/05/2024,balin_hazarika2007@rediffmail.com,+91-9707027440,22/01/1964,Department of Commerce,Girijananda Chowdhury University
+352,GCU030175,Mrinmoy Gogoi,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,10/06/2024,mrinmoigogoi6001@gmail.com,+91-6001416450,24/06/2002,-,Girijananda Chowdhury University
+353,GCU030176,Anisha Akhter,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,13/06/2024,anishaakhter959@gmail.com,+91-8486069964,26/10/1996,-,Girijananda Chowdhury University
+354,GCU030174,Deepak  Basfor,Admin Non Teaching,Other Employee,Other Employee,-,24/03/2024,-,+91-8473987877,16/12/1990,-,Girijananda Chowdhury University
+355,GCU030177,Arijit Nath,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,14/06/2024,arijitindia599@gmail.com,+91-7099083619,01/02/2001,-,Girijananda Chowdhury University
+356,GCU030171,Jiten Das,Admin Non Teaching,Other Employee,Other Employee,Non Teaching,01/02/2024,-,+91-7896404989,01/10/1979,-,Girijananda Chowdhury University
+357,GCU020149,Bondita Baruah,School Of Humanities & Social Science,Faculty,-,Assistant Professor,15/07/2024,bondita_english@gcuniversity.ac.in,+91-8724097391,17/12/1986,Department of English & Foreign Languages,Girijananda Chowdhury University
+358,GCU020152,Tejoswita Gogoi,School Of Humanities & Social Science,Faculty,-,Assistant Professor,22/07/2024,tejoswita_psychology@gcuniversity.ac.in,+91-9405430098,10/07/1991,Department of Psychology,Girijananda Chowdhury University
+359,GCU020150,Amar Saikia,School of Natural Science,Faculty,-,Professor,15/07/2024,amar.saikia@gmail.com,+91-9864039859,01/02/1962,Department of Physics,Girijananda Chowdhury University
+360,GCU020151,Nabajyoti Kalita,School of Pharmaceutical Science - Tezpur,Faculty,-,Faculty,15/07/2024,nabakalita9212@gmail.com,+91-9365701466,07/07/1998,-,Girijananda Chowdhury University
+361,GCU020153,Ummey Rummana Barlaskar,School Of Humanities & Social Science,Faculty,-,Assistant Professor,27/07/2024,ummeyrummu@gmail.com,+91-9531050328,29/12/1991,Department of Economics,Girijananda Chowdhury University
+362,GCU020154,Chayanika Das,School of Allied Health Sciences,Faculty,-,Assistant Professor,01/08/2024,drchayanikaphysio@gmail.com,+91-7896548591,31/01/1998,-,Girijananda Chowdhury University
+363,GCU020031,Amarjyoti Pathak,School Of Engineering and Technology,Faculty,-,Assistant Professor,03/01/2011,amar_cse@gcuniversity.ac.in,+91-9401252134,15/01/1982,Department of Computer Science and Engineering,Girijananda Chowdhury University
+364,GCU020155,Pasang Drema Goiba,School of Allied Health Sciences,Faculty,-,Assistant Professor,07/08/2024,pasanggoiba3@gmail.com,+91-7005893172,03/02/1995,-,Girijananda Chowdhury University
+365,GCU020156,Monoj Rajkhowa,School of Allied Health Sciences,Faculty,-,Assistant Professor,14/08/2024,rajkhowamonoj2@gmail.com,+91-7002971331,17/02/1995,-,Girijananda Chowdhury University
+366,GCU030178,Nisha Kalita,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/08/2024,-,+91-7896053701,01/01/1995,-,Girijananda Chowdhury University
+367,GCU030179,Akash Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/08/2024,basforakash08@gmail.com,+91-7099259905,01/01/1990,-,Girijananda Chowdhury University
+368,GCU030180,Geetanjali Gogoi,School Of Engineering and Technology,Faculty,-,Lab Instructor,23/08/2024,geetanjaligogoi16@gmail.com,+91-7002922873,16/11/2000,Department of Civil Engineering,Girijananda Chowdhury University
+369,GCU020157,Dhunusmita Barman,School of Pharmaceutical Science - Tezpur,Faculty,-,Assistant Professor,19/08/2024,barmandhunusmita@gmail.com,+91-8638165081,04/09/1995,-,Girijananda Chowdhury University
+370,GCU020158,Debika Sarmah,School of Pharmaceutical Science - Tezpur,Faculty,-,Assistant Professor,19/08/2024,sarmahdebika@gmail.com,+91-7086705817,06/12/1998,-,Girijananda Chowdhury University
+371,GCU020159,Nasreen Ahmed,School of Pharmaceutical Science - Tezpur,Faculty,-,Assistant Professor,19/08/2024,nasreen.1234g@gmail.com,+91-7002297360,27/10/1995,-,Girijananda Chowdhury University
+372,GCU020160,Ajaan Anubhav Borah,School Of Engineering and Technology,Faculty,-,Assistant Professor,27/08/2024,ajaananubhav523@gmail.com,+91-9365751741,11/07/2000,Department of Electrical Engineering,Girijananda Chowdhury University
+373,GCU020162,Rashidul Alam,School Of Engineering and Technology,Faculty,-,Assistant Professor,29/08/2024,a.rashidul92@gmail.com,+91-7002291747,15/10/1992,Department of Civil Engineering,Girijananda Chowdhury University
+374,GCU020163,Subungshri Basumatary,School Of Engineering and Technology,Faculty,-,Assistant Professor,29/08/2024,subungshribasumatary92@gmail.com,+91-8638894434,19/01/1992,Department of Computer Science and Engineering,Girijananda Chowdhury University
+375,GCU020164,Gargee Chakravarty,School Of Engineering and Technology,Faculty,-,Assistant Professor,29/08/2024,chakravartygargee@gmail.com,+91-8453727810,27/02/1998,Department of Computer Science and Engineering,Girijananda Chowdhury University
+376,GCU020165,Diganta Jyoti Sarma,School of Natural Science,Faculty,-,Assistant Professor,02/09/2024,digantaofcit@gmail.com,+91-8876070877,23/05/1978,Department of Mathematics,Girijananda Chowdhury University
+377,GCU020166,Manoj Khaund,School of Management and Commerce,Faculty,-,Assistant Professor,02/09/2024,drmanojkhaund@gmail.com,+91-9613010942,21/05/1991,Department of Commerce,Girijananda Chowdhury University
+378,GCU030181,Minakshi Patowari,Admin Non Teaching,Other Employee,Other Employee,Security Guard,01/09/2024,-,+91-8812012694,01/01/1990,-,Girijananda Chowdhury University
+379,GCU020167,Nandita Chitrakar,School Of Humanities & Social Science,Faculty,-,Assistant Professor,05/09/2024,nanditachitrakar60@gmail.com,+91-9508979758,03/06/1993,-,Girijananda Chowdhury University
+380,GCU040003,Hirakjyoti Sarma,School Of Humanities & Social Science,Faculty,Guest,-,01/09/2023,hirakjo1@gmail.com,+91-8638771968,13/11/1995,-,Girijananda Chowdhury University
+381,GCU040004,Samrat Dev Sarma,School Of Humanities & Social Science,Faculty,Guest,-,01/09/2023,samrat_dsarma@rediffmail.com,+91-7002617730,25/02/2005,-,Girijananda Chowdhury University
+382,GCU040006,Girish Chandra Gogoi,School Of Humanities & Social Science,Faculty,Guest,-,01/02/2024,demo@xyz.com,+91-9706021635,01/01/1960,-,Girijananda Chowdhury University
+383,GCU040007,Rituparna Choudhury,School Of Humanities & Social Science,Faculty,Guest,-,20/08/2024,rituparnachoudhury454@gmail.com,+91-7635850802,09/09/1994,-,Girijananda Chowdhury University
+384,GCU040008,Jyoti Mishra,School Of Humanities & Social Science,Faculty,Guest,-,21/08/2024,jyoti.trophy@gmail.com,+91-8142056742,11/08/1989,-,Girijananda Chowdhury University
+385,GCU040009,Mohd Shahil Alam Ahmed,School Of Humanities & Social Science,Faculty,Guest,-,27/08/2024,shail.ahmed9200@gmail.com,+91-7002696545,16/07/1996,-,Girijananda Chowdhury University
+386,GCU040010,Sanghamitra Saharia,School of Natural Science,Faculty,Guest,-,29/08/2024,sanghamitrasaharia90@gmail.com,+91-9101662858,15/08/1992,-,Girijananda Chowdhury University
+387,GCU040011,Dimpi Moni Kalita,School of Natural Science,Faculty,Guest,-,29/08/2024,dimpimkalita@gmail.com,+91-9707075638,15/08/1992,-,Girijananda Chowdhury University
+388,GCU040012,Birina Bhuyan,School of Natural Science,Faculty,Guest,-,30/08/2024,birinabhuyan305@gmail.com,+91-9101245488,28/07/1993,-,Girijananda Chowdhury University
+389,GCU020168,Abhishek Kakati,School of Management and Commerce,Faculty,Regular,Assistant Professor,09/09/2024,akgcu15@gmail.com,+91-8134070997,15/09/1992,Department of Business Administration,Girijananda Chowdhury University
+390,GCU010026,Biraj Kr. Borgohain,Administration,Admin,-,-,09/09/2024,birajborgohain@rediffmail.com,+91-7576042295,01/01/1980,-,Girijananda Chowdhury University
+391,GCU020169,Madhusmita Ronghangpi,School of Law,Faculty,-,Assistant Professor,16/09/2024,-,+91-8402018679,28/02/1994,-,Girijananda Chowdhury University
+392,GCU030182,Siddharth Basfor,Admin Non Teaching,Other Employee,Other Employee,Cleaner,01/09/2024,sidderbasfor@gmail.com,+91-7896627678,21/05/1998,-,Girijananda Chowdhury University
+393,GCU020170,Mona Alice Marbaniang,School Of Humanities & Social Science,Faculty,Regular,-,28/09/2024,mona28marbz@gmail.com,+91-9863165872,26/02/1994,Department of Sociology & Social Work,Girijananda Chowdhury University
+394,GCU020171,Rituparna  Choudhury,School Of Humanities & Social Science,Faculty,Regular,-,01/10/2024,rituparnachoudhury454@gmail.com,+91-7635850802,09/09/1994,Department of Sociology & Social Work,Girijananda Chowdhury University
+395,GCU020172,Neelutpal  Gogoi,School of Pharmaceutical Science - Guwahati,Faculty,Regular,-,03/10/2024,neelutpalg@gmail.com,+91-8638864912,03/02/1992,Department of Pharmacognosy - Guwahati,Girijananda Chowdhury University
+396,GCU020173,Dipunja  Gohain,School of Natural Science,Faculty,Regular,-,03/10/2024,dipunjagohain94@gmail.com,+91-9365078923,01/09/1994,Department of Mathematics,Girijananda Chowdhury University
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+Generated By : GCU020057,,,,,,,,,,,,
+Powered By : Academia ERP,,,,,,,,,,,,
+On :25-10-2024 09:00:59,,,,,,,,,,,,
