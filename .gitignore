@@ -164,3 +164,7 @@ credentials.json
 token.json
 *.key
 *.pem
+
+# Keep Streamlit secrets
+!.streamlit/
+!.streamlit/secrets.toml
