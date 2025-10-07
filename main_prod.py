@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from utility import detect_screen_width, get_authorized_pages_for_role
 import login
+import os
 
 # Import modules with error handling
 try:
@@ -28,8 +29,8 @@ custom_styles = {
 }
 
 # --- Configuration ---
-DEV_MODE = False   # 🔹 Production mode - set to True for development
-# DEV_MODE = True   # 🔹 Development mode
+# Production mode - always False for deployed version
+DEV_MODE = os.getenv('DEV_MODE', 'False').lower() == 'true'
 
 # App configuration
 APP_CONFIG = {
@@ -37,7 +38,6 @@ APP_CONFIG = {
     "version": "1.0.0",
     "description": "Galgotias College University Management System"
 }
-
 
 # --- Page Rendering Logic ---
 def render_page(page_name, role):
@@ -82,7 +82,7 @@ def main():
     
     detect_screen_width()
 
-    # Development mode indicator
+    # Production mode indicator (only show in dev mode)
     if DEV_MODE:
         st.sidebar.markdown("""
         <div style='background-color: #ffeb3b; color: #000; padding: 5px; border-radius: 3px; text-align: center; margin-bottom: 10px;'>
@@ -112,6 +112,7 @@ def main():
                 st.rerun()
             st.stop()
     else:
+        # Production mode - always require authentication
         if not st.session_state.authenticated:
             st.session_state.authenticated = login.login()
             if st.session_state.authenticated:
@@ -241,4 +242,3 @@ def main():
 # --- Run the app ---
 if __name__ == "__main__":
     main()
-
