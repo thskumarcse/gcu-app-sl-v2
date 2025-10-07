@@ -121,7 +121,7 @@ dmypy.json
 .pyre/
 
 # Streamlit
-.streamlit/
+#.streamlit/
 
 # IDE
 .vscode/
