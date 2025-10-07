@@ -4,71 +4,20 @@ runtime: python39
 env_variables:
   # Set production mode
   DEV_MODE: "False"
-  # Streamlit configuration
-  STREAMLIT_SERVER_PORT: "8080"
-  STREAMLIT_SERVER_ADDRESS: "0.0.0.0"
-  STREAMLIT_SERVER_HEADLESS: "true"
-  STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
-  # Add any other environment variables you need
-  # GOOGLE_APPLICATION_CREDENTIALS: "path/to/credentials.json"
 
 # Automatic scaling configuration
 automatic_scaling:
   min_instances: 1
   max_instances: 10
   target_cpu_utilization: 0.6
-  target_throughput_utilization: 0.6
 
 # Resource allocation
 resources:
   cpu: 1
   memory_gb: 2
-  disk_size_gb: 10
-
-# Health check configuration
-readiness_check:
-  path: "/_stcore/health"
-  check_interval_sec: 5
-  timeout_sec: 4
-  failure_threshold: 2
-  success_threshold: 2
-  app_start_timeout_sec: 300
-
-liveness_check:
-  path: "/_stcore/health"
-  check_interval_sec: 30
-  timeout_sec: 4
-  failure_threshold: 4
-  success_threshold: 2
 
 # Handler for the main application
 handlers:
 - url: /.*
   script: auto
   secure: always
-
-# Skip files that shouldn't be deployed
-skip_files:
-- ^(.*/)?#.*#$
-- ^(.*/)?.*~$
-- ^(.*/)?.*\.py[co]$
-- ^(.*/)?.*/__pycache__/.*$
-- ^(.*/)?.*\.log$
-- ^(.*/)?.*\.tmp$
-- ^(.*/)?.*\.bak$
-- ^(.*/)?.*\.swp$
-- ^(.*/)?.*\.swo$
-- ^(.*/)?.*\.orig$
-- ^(.*/)?.*\.rej$
-- ^(.*/)?.*\.DS_Store$
-- ^(.*/)?.*\.git/.*$
-- ^(.*/)?.*\.gitignore$
-- ^(.*/)?.*\.env$
-- ^(.*/)?.*\.venv/.*$
-- ^(.*/)?.*/venv/.*$
-- ^(.*/)?.*/__pycache__/.*$
-- ^(.*/)?.*\.ipynb$
-- ^(.*/)?.*/output/.*$
-- ^(.*/)?.*/temp/.*$
-- ^(.*/)?.*/images/.*$
-- ^(.*/)?.*/logo_dir/.*$

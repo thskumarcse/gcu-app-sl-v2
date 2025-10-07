@@ -5,6 +5,7 @@ import pandas as pd
 import streamlit.components.v1 as components
 from datetime import datetime, date
 import re
+import os
 
 
 
@@ -39,6 +40,15 @@ def connect_gsheet():
         st.error(f"Failed to connect to Google Sheets. Error: {e}")
         st.stop()
 
+
+def get_sheet_id():
+    """
+    Get the Google Sheets ID from Streamlit secrets.
+    """
+    try:
+        return st.secrets["my_secrets"]["sheet_id"]
+    except:
+        return None
 
 # 🔹 Initialize a global gspread client when this file is imported
 
