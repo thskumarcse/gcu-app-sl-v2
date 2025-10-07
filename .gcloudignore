@@ -159,3 +159,8 @@ test_*.py
 # Documentation
 *.md
 !README.md
+
+# --- Important ---
+# Explicitly include Streamlit secrets
+!.streamlit/
+!.streamlit/secrets.toml
