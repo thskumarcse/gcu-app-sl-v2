@@ -20,6 +20,16 @@ def connect_gsheet():
     Returns a gspread client object.
     """
     try:
+        # Debug: Check if secrets are available
+        if not hasattr(st, 'secrets') or not st.secrets:
+            st.error("Streamlit secrets not found. Please check your secrets.toml configuration.")
+            st.stop()
+        
+        # Check if the specific secret exists
+        if "gcp_service_account" not in st.secrets:
+            st.error("gcp_service_account not found in secrets. Available secrets: " + str(list(st.secrets.keys())))
+            st.stop()
+            
         creds_dict = dict(st.secrets["gcp_service_account"])
 
         # fix literal "\n" if present
@@ -38,6 +48,7 @@ def connect_gsheet():
 
     except Exception as e:
         st.error(f"Failed to connect to Google Sheets. Error: {e}")
+        st.error("Debug info: Check if secrets.toml is properly configured and deployed.")
         st.stop()
 
 
@@ -256,7 +267,7 @@ def preprocess_date(value):
         cleaned_value = value.strip().replace("/", "-")
         
         # Define a list of common date formats to try
-        date_formats = ["%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y"]
+        date_formats = ["%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y", "%d-%b-%Y", "%d-%B-%Y"]
 
         for fmt in date_formats:
             try:
@@ -276,21 +287,24 @@ def get_authorized_pages_for_role(role: str):
         # Admin should get everything - ALL modules and ALL pages
         return [
             "Attendance", "Feedback",
-            "Transcript", "Mark Sheet", "Admit Card", "Results", "All Programs Results",
-            "Mentor-Mentee", "Data Input", "Reports"
+            "Transcript", "Transcript (%)", "Mark Sheet", "Admit Card", "Results", "All Programs Results",
+            "Mentor-Mentee", "Data Input", "Reports",
+            "Neural Network"
         ]
     elif role == "exam":
-        return ["Transcript", "Mark Sheet", "Admit Card", "Results", "All Programs Results"]
+        return ["Transcript", "Transcript (%)", "Mark Sheet", "Admit Card", "Results", "All Programs Results", "Neural Network"]
     elif role == "hr":
         return ["Attendance", "Feedback"]
     elif role == "mentor_admin":
-        return ["Mentor-Mentee", "Data Input", "Reports"]
+        return ["Mentor-Mentee", "Data Input", "Reports", "Neural Network"]
     elif role == "hod":
-        return ["Mentor-Mentee", "Data Input", "Reports"]
+        return ["Mentor-Mentee", "Data Input", "Reports", "Neural Network"]
     elif role == "coordinator":
-        return ["Mentor-Mentee", "Data Input", "Reports"]
+        return ["Mentor-Mentee", "Data Input", "Reports", "Neural Network"]
     elif role == "mentor":
-        return ["Mentor-Mentee", "Data Input", "Reports"]
+        return ["Mentor-Mentee", "Data Input", "Reports", "Neural Network"]
+    elif role == "guest":
+        return ["Neural Network"]
     else:
         return []
     

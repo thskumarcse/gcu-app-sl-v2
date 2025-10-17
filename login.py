@@ -64,7 +64,71 @@ def login():
     """
     fix_streamlit_layout(padding_top="0.6rem") 
     set_compact_theme()
-    st.markdown("<h2 style='color: #8b00a3; text-align: center;'>GCU</h2>", unsafe_allow_html=True)
+    
+    # Custom CSS for centered, compact login form
+    st.markdown("""
+    <style>
+    .login-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .login-header {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    .login-title {
+        color: #8b00a3;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .login-subtitle {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+    .form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .stTextInput > div > div > input {
+        border-radius: 8px;
+        border: 2px solid #e1e5e9;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+    .stTextInput > div > div > input:focus {
+        border-color: #8b00a3;
+        box-shadow: 0 0 0 3px rgba(139, 0, 163, 0.1);
+    }
+    .stButton > button {
+        background: linear-gradient(135deg, #8b00a3 0%, #6a0080 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 0, 163, 0.3);
+    }
+    .mode-selector {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
     # --- Initialize session state ---
     if "can_set_password" not in st.session_state:
@@ -95,23 +159,43 @@ def login():
     if st.session_state.get('authenticated'):
         return True
 
+    # Centered login container
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("""
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-title">GCU</div>
+                <div class="login-subtitle">Special Applications</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<p style='text-align: center; color: #666; margin: 1rem 0;'>Don't have an account? Log in as a guest (id: guest, password: Guest$123)</p>", unsafe_allow_html=True)
+    
     # --- Mode selection ---
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        mode = st.radio("Select mode:", ["Login", "Register"], horizontal=True)
+        st.markdown('<div class="mode-selector">', unsafe_allow_html=True)
+        mode = st.radio("", ["Login", "Register"], horizontal=True, label_visibility="collapsed")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # --- Login form ---
     if mode == "Login":
-        with st.form("login_form"):
-            st.markdown("<h3 style='color: #4a0072; text-align: center;'>Log-In</h3>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown('<div class="form-container">', unsafe_allow_html=True)
             
-            col1, col2 = st.columns(2)
-            with col1:
+            with st.form("login_form"):
+                st.markdown("<h3 style='color: #4a0072; text-align: center; margin-bottom: 1.5rem;'>Welcome Back</h3>", unsafe_allow_html=True)
+                
                 user_id = st.text_input("User ID", key="login_user_id", placeholder="Enter your Employee ID")
-            with col2:
                 password = st.text_input("Password", type="password", key="login_password", placeholder="Enter your password")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                submitted = st.form_submit_button("Login", use_container_width=True)
             
-            submitted = st.form_submit_button("Login", use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
             if submitted:
                 # Input validation
@@ -148,19 +232,23 @@ def login():
                         st.error("User ID not found.")
 
     elif mode == "Register":
-        with st.form("register_form"):
-            st.markdown("<h3 style='color: #4a0072; text-align: center;'>Register</h3>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown('<div class="form-container">', unsafe_allow_html=True)
             
-            col1, col2 = st.columns(2)
-            with col1:
+            with st.form("register_form"):
+                st.markdown("<h3 style='color: #4a0072; text-align: center; margin-bottom: 1.5rem;'>Create Account</h3>", unsafe_allow_html=True)
+                
                 user_id = st.text_input("User ID", key="reg_user_id", placeholder="Enter your Employee ID")
-            with col2:
                 dob = st.date_input(
                     "Date of Birth", key="reg_dob", format="YYYY-MM-DD", 
                     min_value=date(1920, 1, 1), max_value=date.today()
                 )
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                check_user_submitted = st.form_submit_button("Verify Identity", use_container_width=True)
             
-            check_user_submitted = st.form_submit_button("Verify Identity", use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
             
             if check_user_submitted:
                 # Input validation
@@ -188,28 +276,30 @@ def login():
             
             # Password setting section
             if st.session_state.get("can_set_password"):
-                st.markdown("---")
-                st.markdown("<h4 style='color: #4a0072;'>Set Your Password</h4>", unsafe_allow_html=True)
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    new_password = st.text_input("New Password", type="password", key="reg_new_password", 
-                                               placeholder="Enter a strong password")
+                col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
-                    confirm_password = st.text_input("Confirm Password", type="password", key="reg_confirm_password", 
-                                                   placeholder="Confirm your password")
-                
-                # Password strength indicator
-                if new_password:
-                    is_valid, error_msg = validate_password(new_password)
-                    if is_valid:
-                        st.success("✅ Password strength: Strong")
-                    else:
-                        st.warning(f"⚠️ {error_msg}")
-                
-                col1, col2, col3 = st.columns([1, 1, 1])
-                with col2:
-                    update_password_submitted = st.form_submit_button("Update Password", type="primary", use_container_width=True)
+                    st.markdown('<div class="form-container">', unsafe_allow_html=True)
+                    
+                    st.markdown("<h4 style='color: #4a0072; text-align: center; margin-bottom: 1.5rem;'>Set Your Password</h4>", unsafe_allow_html=True)
+                    
+                    with st.form("password_form"):
+                        new_password = st.text_input("New Password", type="password", key="reg_new_password", 
+                                                   placeholder="Enter a strong password")
+                        confirm_password = st.text_input("Confirm Password", type="password", key="reg_confirm_password", 
+                                                       placeholder="Confirm your password")
+                        
+                        # Password strength indicator
+                        if new_password:
+                            is_valid, error_msg = validate_password(new_password)
+                            if is_valid:
+                                st.success("✅ Password strength: Strong")
+                            else:
+                                st.warning(f"⚠️ {error_msg}")
+                        
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        update_password_submitted = st.form_submit_button("Update Password", type="primary", use_container_width=True)
+                    
+                    st.markdown('</div>', unsafe_allow_html=True)
 
                 if update_password_submitted:
                     if not new_password or not confirm_password:

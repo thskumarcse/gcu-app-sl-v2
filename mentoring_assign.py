@@ -25,11 +25,6 @@ def app():
         unsafe_allow_html=True
     )
     
-    # Debug: Show user information (remove this in production)
-    if st.checkbox("🔍 Debug: Show User Info", key="debug_user_info"):
-        st.write("**Current User Data:**")
-        st.json(current_user)
-        st.write("**User Role:**", user_role)
     
     try:
         # Connect to Google Sheets
@@ -56,6 +51,9 @@ def app():
         st.write(f"**Total Records:** {len(filtered_df)}")
         
         if not filtered_df.empty:
+            # Add bulk upload section
+            display_bulk_upload_section(available_mentors, gs_client)
+            
             # Display assignment interface
             display_assignment_interface(filtered_df, available_mentors, current_user, user_role, gs_client)
         else:
@@ -80,8 +78,8 @@ def filter_students_by_role(df_students, current_user, user_role):
         return df_students[df_students["Semester"] == user_semester]
     elif user_role == "mentor":
         # Mentor can see students already assigned to them
-        user_name = current_user.get("Name", "")
-        return df_students[df_students["Mentor"] == user_name]
+        user_id = current_user.get("User ID", "")
+        return df_students[df_students["Mentor User ID"] == user_id]
     else:
         return pd.DataFrame()
 
@@ -102,8 +100,9 @@ def filter_mentors_by_role(df_users, current_user, user_role):
                        (df_users["User Type"] == "mentor")]
     elif user_role == "mentor":
         # Mentor can only assign themselves
-        user_name = current_user.get("Name", "")
-        return df_users[df_users["Name"] == user_name]
+        user_id = current_user.get("User ID", "")
+        # In this system, User ID is the same as Emp Id
+        return df_users[df_users["Emp Id"] == user_id]
     else:
         return pd.DataFrame()
 
@@ -124,7 +123,9 @@ def display_filters(df_students):
         department_filter = st.selectbox("Department", department_options, key="department_filter")
     
     with col4:
-        mentor_options = ["All", "Unassigned"] + sorted(df_students["Mentor"].dropna().astype(str).unique().tolist())
+        # Get mentor names for display, but we'll work with user_ids
+        mentor_names = df_students[df_students["Mentor"].notna() & (df_students["Mentor"] != "")]["Mentor"].unique()
+        mentor_options = ["All", "Unassigned"] + sorted(mentor_names.astype(str).tolist())
         mentor_filter = st.selectbox("Current Mentor", mentor_options, key="mentor_filter")
     
     return {
@@ -154,6 +155,167 @@ def apply_filters(df_students, filters):
         filtered_df = filtered_df[filtered_df["Mentor"] == mentor_filter]
     
     return filtered_df
+
+def display_bulk_upload_section(available_mentors, gs_client):
+    """Display bulk upload section with template download and file upload"""
+    st.markdown("---")
+    st.subheader("📤 Bulk Upload Assignment")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Download template button
+        template_data = get_template_data()
+        template_df = pd.DataFrame(template_data)
+        csv = template_df.to_csv(index=False)
+        
+        st.download_button(
+            label="📥 Download Template CSV",
+            data=csv,
+            file_name="mentor_assignment_template.csv",
+            mime="text/csv",
+            use_container_width=True,
+            type="secondary"
+        )
+    
+    with col2:
+        # File uploader
+        uploaded_file = st.file_uploader(
+            "Upload CSV/Excel file",
+            type=['csv', 'xlsx', 'xls'],
+            help="Upload a file with columns: Student ID, Student Name, Mentor emp id, Mentor name"
+        )
+        
+        if uploaded_file is not None:
+            process_bulk_upload(uploaded_file, available_mentors, gs_client)
+
+def get_template_data():
+    """Get template data for bulk upload"""
+    template_data = {
+        'Student ID': ['STU001', 'STU002', 'STU003'],
+        'Student Name': ['John Doe', 'Jane Smith', 'Bob Johnson'],
+        'Mentor emp id': ['EMP001', 'EMP002', 'EMP001'],
+        'Mentor name': ['Dr. Smith', 'Prof. Brown', 'Dr. Smith']
+    }
+    return template_data
+
+def process_bulk_upload(uploaded_file, available_mentors, gs_client):
+    """Process the uploaded file for bulk assignment"""
+    try:
+        # Read the file
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+        
+        # Validate required columns
+        required_columns = ['Student ID', 'Student Name', 'Mentor emp id', 'Mentor name']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        
+        if missing_columns:
+            st.error(f"❌ Missing required columns: {missing_columns}")
+            st.write("Required columns:", required_columns)
+            return
+        
+        
+        # Create mentor mapping (emp id to user id)
+        mentor_mapping = {}
+        
+        # In this system, Emp Id is the same as User ID
+        for _, mentor in available_mentors.iterrows():
+            emp_id = str(mentor.get('Emp Id', '')).strip()
+            name = str(mentor.get('Name', '')).strip()
+            if emp_id:
+                mentor_mapping[emp_id] = {'user_id': emp_id, 'name': name}
+        
+        # Get Google Sheets data once and trim Student IDs
+        sh = gs_client.open_by_key(st.secrets["my_secrets"]["sheet_id"])
+        ws = sh.worksheet("students")
+        data = ws.get_all_records()
+        df_google = pd.DataFrame(data)
+        df_google["Student ID"] = df_google["Student ID"].astype(str).str.strip()
+        
+        # Process assignments
+        success_count = 0
+        error_count = 0
+        errors = []
+        
+        for index, row in df.iterrows():
+            try:
+                student_id = str(row['Student ID']).strip()
+                mentor_emp_id = str(row['Mentor emp id']).strip()
+                
+                
+                # Find mentor user_id (try exact match first, then case-insensitive)
+                mentor_found = False
+                mentor_user_id = None
+                mentor_name = None
+                
+                if mentor_emp_id in mentor_mapping:
+                    mentor_found = True
+                    mentor_user_id = mentor_mapping[mentor_emp_id]['user_id']
+                    mentor_name = mentor_mapping[mentor_emp_id]['name']
+                else:
+                    # Try case-insensitive matching
+                    for emp_id, mentor_info in mentor_mapping.items():
+                        if emp_id.lower() == mentor_emp_id.lower():
+                            mentor_found = True
+                            mentor_user_id = mentor_info['user_id']
+                            mentor_name = mentor_info['name']
+                            break
+                
+                if mentor_found:
+                    # Update the specific student
+                    student_mask = df_google["Student ID"] == student_id
+                    if student_mask.any():
+                        df_google.loc[student_mask, "Mentor"] = mentor_name
+                        df_google.loc[student_mask, "Mentor User ID"] = mentor_user_id
+                        success_count += 1
+                    else:
+                        errors.append(f"Student ID '{student_id}' not found")
+                        error_count += 1
+                else:
+                    errors.append(f"Mentor with emp id {mentor_emp_id} not found")
+                    error_count += 1
+                    
+            except Exception as e:
+                errors.append(f"Row {index + 1}: {str(e)}")
+                error_count += 1
+        
+        # Update Google Sheets if there were successful assignments
+        if success_count > 0:
+            # Clean the dataframe before updating to handle NaN values
+            df_google_clean = df_google.fillna("")  # Replace NaN with empty strings
+            df_google_clean = df_google_clean.replace([float('inf'), float('-inf')], "")  # Replace inf values
+            
+            # Convert to list and ensure all values are JSON serializable
+            data_to_update = [df_google_clean.columns.values.tolist()]
+            for row in df_google_clean.values:
+                clean_row = []
+                for value in row:
+                    if pd.isna(value) or value == float('inf') or value == float('-inf'):
+                        clean_row.append("")
+                    else:
+                        clean_row.append(str(value))
+                data_to_update.append(clean_row)
+            
+            ws.update(data_to_update)
+        
+        # Display results
+        if success_count > 0:
+            st.success(f"✅ Successfully assigned {success_count} students")
+        
+        if error_count > 0:
+            st.warning(f"⚠️ {error_count} assignments failed")
+            with st.expander("View Errors"):
+                for error in errors:
+                    st.write(f"• {error}")
+        
+        if success_count > 0:
+            st.rerun()
+            
+    except Exception as e:
+        st.error(f"❌ Error processing file: {e}")
 
 def display_assignment_interface(df_students, available_mentors, current_user, user_role, gs_client):
     """Display the main assignment interface"""
@@ -188,12 +350,19 @@ def display_assignment_interface(df_students, available_mentors, current_user, u
         
         with col1:
             # Mentor selection dropdown
-            mentor_options = {mentor["Name"]: mentor["Name"] for _, mentor in available_mentors.iterrows()}
-            selected_mentor = st.selectbox(
+            mentor_options = {}
+            for _, mentor in available_mentors.iterrows():
+                name = mentor.get("Name", "")
+                emp_id = mentor.get("Emp Id", "")
+                if name and emp_id:
+                    mentor_options[name] = emp_id
+            
+            selected_mentor_name = st.selectbox(
                 "Select Mentor to Assign:",
                 options=list(mentor_options.keys()),
                 key="mentor_selection"
             )
+            selected_mentor_emp_id = mentor_options[selected_mentor_name] if selected_mentor_name else None
         
         with col2:
             st.write("")  # Spacing
@@ -204,7 +373,7 @@ def display_assignment_interface(df_students, available_mentors, current_user, u
             
             with col_assign:
                 if st.button("✅ Assign Mentor", type="primary", use_container_width=True):
-                    assign_mentor(selected_rows, selected_mentor, gs_client)
+                    assign_mentor(selected_rows, selected_mentor_emp_id, gs_client)
             
             with col_unassign:
                 if st.button("❌ Unassign Mentor", use_container_width=True):
@@ -213,7 +382,7 @@ def display_assignment_interface(df_students, available_mentors, current_user, u
     # Display mentor statistics
     display_mentor_statistics(df_students, available_mentors)
 
-def assign_mentor(selected_students, mentor_name, gs_client):
+def assign_mentor(selected_students, mentor_emp_id, gs_client):
     """Assign selected students to the specified mentor"""
     try:
         sh = gs_client.open_by_key(st.secrets["my_secrets"]["sheet_id"])
@@ -223,15 +392,43 @@ def assign_mentor(selected_students, mentor_name, gs_client):
         data = ws.get_all_records()
         df_google = pd.DataFrame(data)
         
+        # Get mentor info from users sheet
+        users_ws = sh.worksheet("users")
+        users_data = users_ws.get_all_records()
+        df_users = pd.DataFrame(users_data)
+        
+        mentor_info = df_users[df_users["Emp Id"] == mentor_emp_id]
+        if mentor_info.empty:
+            st.error("❌ Mentor not found")
+            return
+        
+        mentor_name = mentor_info.iloc[0]["Name"]
+        mentor_user_id = mentor_info.iloc[0]["Emp Id"]  # Emp Id is the User ID in this system
+        
         # Update selected students
         updated_count = 0
         for _, row in selected_students.iterrows():
             student_id = row["Student ID"]
             df_google.loc[df_google["Student ID"] == student_id, "Mentor"] = mentor_name
+            df_google.loc[df_google["Student ID"] == student_id, "Mentor User ID"] = mentor_user_id
             updated_count += 1
         
-        # Push back to Google Sheets
-        ws.update([df_google.columns.values.tolist()] + df_google.values.tolist())
+        # Push back to Google Sheets - clean data first
+        df_google_clean = df_google.fillna("")
+        df_google_clean = df_google_clean.replace([float('inf'), float('-inf')], "")
+        
+        # Convert to list and ensure all values are JSON serializable
+        data_to_update = [df_google_clean.columns.values.tolist()]
+        for row in df_google_clean.values:
+            clean_row = []
+            for value in row:
+                if pd.isna(value) or value == float('inf') or value == float('-inf'):
+                    clean_row.append("")
+                else:
+                    clean_row.append(str(value))
+            data_to_update.append(clean_row)
+        
+        ws.update(data_to_update)
         
         st.success(f"✅ Assigned {mentor_name} as mentor for {updated_count} students.")
         st.rerun()
@@ -254,10 +451,25 @@ def unassign_mentor(selected_students, gs_client):
         for _, row in selected_students.iterrows():
             student_id = row["Student ID"]
             df_google.loc[df_google["Student ID"] == student_id, "Mentor"] = ""
+            df_google.loc[df_google["Student ID"] == student_id, "Mentor User ID"] = ""
             updated_count += 1
         
-        # Push back to Google Sheets
-        ws.update([df_google.columns.values.tolist()] + df_google.values.tolist())
+        # Push back to Google Sheets - clean data first
+        df_google_clean = df_google.fillna("")
+        df_google_clean = df_google_clean.replace([float('inf'), float('-inf')], "")
+        
+        # Convert to list and ensure all values are JSON serializable
+        data_to_update = [df_google_clean.columns.values.tolist()]
+        for row in df_google_clean.values:
+            clean_row = []
+            for value in row:
+                if pd.isna(value) or value == float('inf') or value == float('-inf'):
+                    clean_row.append("")
+                else:
+                    clean_row.append(str(value))
+            data_to_update.append(clean_row)
+        
+        ws.update(data_to_update)
         
         st.success(f"✅ Unassigned mentors for {updated_count} students.")
         st.rerun()

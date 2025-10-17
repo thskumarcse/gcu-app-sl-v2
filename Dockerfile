@@ -19,8 +19,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p .streamlit
+# Ensure .streamlit directory exists and has proper permissions
+RUN mkdir -p .streamlit && \
+    chmod 755 .streamlit
+
+# Create .streamlit directories and copy secrets.toml to the correct locations
+RUN mkdir -p /root/.streamlit && \
+    if [ -f .streamlit/secrets.toml ]; then \
+        cp .streamlit/secrets.toml /root/.streamlit/secrets.toml && \
+        chmod 600 /root/.streamlit/secrets.toml; \
+    fi
 
 # Expose port
 EXPOSE 8080

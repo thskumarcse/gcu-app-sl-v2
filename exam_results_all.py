@@ -89,12 +89,8 @@ class NumberedCanvas(canvas.Canvas):
 
 def fix_streamlit_layout():
     """Fix Streamlit layout issues"""
-    st.set_page_config(
-        page_title="Exam Results System - All Programs",
-        page_icon="📊",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
+    # Page config is handled by main.py
+    pass
 
 def set_compact_theme():
     """Set compact theme for better UI"""

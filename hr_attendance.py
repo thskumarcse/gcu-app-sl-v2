@@ -12,12 +12,8 @@ from utility import connect_gsheet, get_dataframe, preprocess_date
 
 def fix_streamlit_layout():
     """Fix Streamlit layout issues"""
-    st.set_page_config(
-        page_title="HR Attendance System",
-        page_icon="📊",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
+    # Page config is handled by main.py
+    pass
 
 def set_compact_theme():
     """Set compact theme for better UI"""

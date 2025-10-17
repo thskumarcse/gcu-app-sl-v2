@@ -191,7 +191,7 @@ def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
     canvas.setFont("Times-Roman", 18)
     canvas.drawCentredString(width / 2, height - 60, "Girijananda Chowdhury University")
     canvas.setFont("Times-Roman", 14)
-    canvas.drawCentredString(width / 2, height - 85, "TRANSCRIPT")
+    canvas.drawCentredString(width / 2, height - 85, "TRANSCRIPT (PERCENTAGE)")
     canvas.setFont("Times-Roman", 12)
     canvas.drawCentredString(width / 2, height - 100, course_name)
     canvas.drawCentredString(width / 2, height - 115, "2023-2025")
@@ -266,10 +266,19 @@ def format_subject_name(text, max_len=45):
         subject_style.fontSize = 9
     return Paragraph(str(text), subject_style)
 
+def calculate_percentage_from_grade_points(grade_points, max_grade_points=10):
+    """Convert grade points to percentage (assuming 10-point scale)"""
+    try:
+        if pd.isna(grade_points) or grade_points == 0:
+            return 0
+        return round((float(grade_points) / max_grade_points) * 100, 2)
+    except Exception:
+        return 0
+
 def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, photo_dir):
-    """Generate PDF transcript for a student."""
+    """Generate PDF transcript for a student with percentage grading."""
     width, height = A4
-    filename = os.path.join(output_dir, f"Transcript_{student_data.iloc[0]['CNAME']}.pdf")
+    filename = os.path.join(output_dir, f"Transcript_Percentage_{student_data.iloc[0]['CNAME']}.pdf")
     doc = BaseDocTemplate(filename, pagesize=A4)
     doc.showFooter = True
 
@@ -335,7 +344,7 @@ def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, p
             elements.append(NextPageTemplate('MiddlePages'))
 
         # Build table rows
-        data = [["Sub Code", "Subject/Papers", "Credit", "Grade", "Grade Points", "Credit Points"]]
+        data = [["Sub Code", "Subject/Papers", "Credit", "Grade", "Grade Points", "Percentage"]]
 
         for _, row in sem_data.iterrows():
             if row[["SUB_CODE","SUB_NAME","CREDIT","GRADE","GRADE_POINTS","CREDIT_POINTS"]].isna().all():
@@ -343,31 +352,33 @@ def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, p
 
             sub_code = str(row.get("SUB_CODE", "")).replace("/", "_")
             sub_name = format_subject_name(row.get("SUB_NAME", ""))
+            grade_points = safe_number(row.get("GRADE_POINTS", 0))
+            percentage = calculate_percentage_from_grade_points(grade_points)
 
             data.append([
                 escape(sub_code),
                 sub_name,
                 safe_number(row.get("CREDIT", 0)),
                 escape(str(row.get("GRADE", ""))),
-                safe_number(row.get("GRADE_POINTS", 0)),
-                safe_number(row.get("CREDIT_POINTS", 0))
+                safe_number(grade_points),
+                f"{percentage}%"
             ])
 
         if len(data) == 1:
             continue
 
-        # SGPA row
+        # Semester percentage row
         total_credits = safe_number(sem_data["CREDIT"].sum())
         total_credit_points = safe_number(sem_data["CREDIT_POINTS"].sum())
-        sgpa = round(total_credit_points / total_credits, 2) if total_credits else 0
+        semester_percentage = calculate_percentage_from_grade_points(total_credit_points / total_credits if total_credits else 0)
 
         total_row = [
             Paragraph("Total", bold_subject_style),
-            Paragraph(f"SGPA : {sgpa}", bold_subject_style),
+            Paragraph(f"Semester % : {semester_percentage}%", bold_subject_style),
             safe_number(total_credits),
             "",
             "",
-            safe_number(total_credit_points)
+            f"{semester_percentage}%"
         ]
         data.append(total_row)
 
@@ -386,15 +397,16 @@ def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, p
     except Exception:
         cgpa = 0.0
 
-    percentage = round(cgpa * 10, 2)
+    # Calculate overall percentage from CGPA
+    overall_percentage = round(cgpa * 10, 2)
     total_credit_points = safe_number(student_data["CREDIT_POINTS"].sum())
     total_credit = safe_number(student_data["CREDIT"].sum())
     result = escape(str(student_data.iloc[0].get("RESULT", "")))
 
     summary_data = [
         ["RESULT", f": {result}", "", "Grand Total Credit Points", f": {total_credit_points}"],
-        ["CGPA", f": {cgpa}", "", "Grand Total Credit", f": {total_credit}"],
-        ["Percentage", f": {percentage}", "", "", ""]
+        ["Overall Percentage", f": {overall_percentage}%", "", "Grand Total Credit", f": {total_credit}"],
+        ["CGPA", f": {cgpa}", "", "", ""]
     ]
 
     usable_width = width - doc.leftMargin - doc.rightMargin
@@ -423,9 +435,9 @@ def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, p
         return None
 
 def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir):
-    """Generate single-page PDF transcript."""
+    """Generate single-page PDF transcript with percentage grading."""
     width, height = A4
-    filename = os.path.join(output_dir, f"Transcript_{student_data.iloc[0]['CNAME']}_onepage.pdf")
+    filename = os.path.join(output_dir, f"Transcript_Percentage_{student_data.iloc[0]['CNAME']}_onepage.pdf")
     doc = BaseDocTemplate(filename, pagesize=A4)
 
     # Styles
@@ -473,11 +485,14 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
     elements = []
 
     for sem, sem_data in student_data.groupby("SEM"):
-        data = [["Sub Code", "Subject/Papers", "Credit", "Grade", "Grade Points", "Credit Points"]]
+        data = [["Sub Code", "Subject/Papers", "Credit", "Grade", "Grade Points", "Percentage"]]
 
         for _, row in sem_data.iterrows():
             if row[["SUB_CODE", "SUB_NAME", "CREDIT", "GRADE", "GRADE_POINTS", "CREDIT_POINTS"]].isna().all():
                 continue
+
+            grade_points = safe_number(row.get("GRADE_POINTS", 0))
+            percentage = calculate_percentage_from_grade_points(grade_points)
 
             data.append([
                 row.get("SUB_CODE", ""),
@@ -485,7 +500,7 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
                 row.get("CREDIT", 0) or 0,
                 row.get("GRADE", ""),
                 row.get("GRADE_POINTS", 0) or 0,
-                row.get("CREDIT_POINTS", 0) or 0
+                f"{percentage}%"
             ])
 
         if len(data) == 1:
@@ -493,12 +508,12 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
 
         total_credits = sem_data["CREDIT"].sum()
         total_credit_points = sem_data["CREDIT_POINTS"].sum()
-        sgpa = round(total_credit_points / total_credits, 2) if total_credits else 0
+        semester_percentage = calculate_percentage_from_grade_points(total_credit_points / total_credits if total_credits else 0)
 
         data.append([
             Paragraph("Total", bold_subject_style),
-            Paragraph(f"SGPA : {sgpa}", bold_subject_style),
-            total_credits, "", "", total_credit_points
+            Paragraph(f"Semester % : {semester_percentage}%", bold_subject_style),
+            total_credits, "", "", f"{semester_percentage}%"
         ])
 
         table = Table(data, colWidths=[65, 220, 45, 45, 70, 65], repeatRows=1)
@@ -522,15 +537,15 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
         cgpa = round(student_data["CGPA"].iloc[-1], 2)
     except Exception:
         cgpa = 0
-    percentage = round(cgpa * 10, 2)
+    overall_percentage = round(cgpa * 10, 2)
     total_credit_points = int(student_data["CREDIT_POINTS"].sum())
     total_credit = int(student_data["CREDIT"].sum())
     result = student_data.iloc[0].get("RESULT", "")
 
     summary_data = [
         ["RESULT", f": {result}", "", "Grand Total Credit Points", f": {total_credit_points}"],
-        ["CGPA", f": {cgpa}", "", "Grand Total Credit", f": {total_credit}"],
-        ["Percentage", f": {percentage}", "", "", ""]
+        ["Overall Percentage", f": {overall_percentage}%", "", "Grand Total Credit", f": {total_credit}"],
+        ["CGPA", f": {cgpa}", "", "", ""]
     ]
 
     colWidths = [0.12 * (width - doc.leftMargin - doc.rightMargin),
@@ -573,12 +588,12 @@ def app():
     fix_streamlit_layout()
     set_compact_theme()
     
-    st.header("📄 Transcript Generation System")
+    st.header("📄 Transcript Generation System (Percentage)")
     
     # File upload section
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.info("📁 Upload your files to generate transcripts")
+        st.info("📁 Upload your files to generate transcripts with percentage grading")
         
         # Data file upload
         data_file = st.file_uploader(
@@ -603,7 +618,7 @@ def app():
         )
         
         # Generate button
-        if st.button("🚀 Generate Transcripts", type="primary"):
+        if st.button("🚀 Generate Transcripts (Percentage)", type="primary"):
             if data_file is not None and images_zip is not None:
                 try:
                     # Create temporary directories
@@ -694,9 +709,9 @@ def app():
                             # Download button
                             st.success(f"✅ Generated {len(generated_files)} transcripts successfully!")
                             st.download_button(
-                                label="📥 Download Transcripts (ZIP)",
+                                label="📥 Download Transcripts (Percentage) (ZIP)",
                                 data=zip_buffer.getvalue(),
-                                file_name=f"transcripts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
+                                file_name=f"transcripts_percentage_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
                                 mime="application/zip"
                             )
                             
@@ -720,7 +735,7 @@ def app():
             else:
                 st.warning("⚠️ Please upload both data file and images ZIP file.")
         else:
-            st.info("📋 Please upload the required files to generate transcripts")
+            st.info("📋 Please upload the required files to generate transcripts with percentage grading")
 
 if __name__ == "__main__":
     app()

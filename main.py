@@ -7,8 +7,9 @@ import os
 # Import modules with error handling
 try:
     import hr_attendance, hr_feedback
-    import exam_transcript, exam_marksheet, exam_admitcard, exam_results, exam_results_all
+    import exam_transcript, exam_transcript_p, exam_marksheet, exam_admitcard, exam_results, exam_results_all
     import mentoring_assign, mentoring_mentoring, mentoring_reports
+    import solver_nn
 except ImportError as e:
     st.error(f"Failed to import required modules: {e}")
     st.stop()
@@ -46,6 +47,7 @@ def render_page(page_name, role):
         "Attendance": hr_attendance.app,
         "Feedback": hr_feedback.app,
         "Transcript": exam_transcript.app,
+        "Transcript (%)": exam_transcript_p.app,
         "Mark Sheet": exam_marksheet.app,
         "Admit Card": exam_admitcard.app,
         "Results": exam_results.app,
@@ -53,6 +55,7 @@ def render_page(page_name, role):
         "Mentor-Mentee": mentoring_assign.app,
         "Data Input": mentoring_mentoring.app,
         "Reports": mentoring_reports.app,
+        "Neural Network": solver_nn.app,
     }
 
     authorized_pages = get_authorized_pages_for_role(role)
@@ -126,9 +129,11 @@ def main():
     all_menus = {
         "HR Dept": {"icon": "people", "submenu": {"Attendance": "Attendance", "Feedback": "Feedback"}},
         "Examinations": {"icon": "book", "submenu": {
-            "Transcript": "Transcript", "Mark Sheet": "Mark Sheet", "Admit Card": "Admit Card", "Results": "Results", "All Programs Results": "All Programs Results"}},
+            "Transcript": "Transcript", "Transcript (%)": "Transcript (%)", "Mark Sheet": "Mark Sheet", "Admit Card": "Admit Card", "Results": "Results", "All Programs Results": "All Programs Results"}},
         "Mentoring": {"icon": "clipboard", "submenu": {
-            "Mentor-Mentee": "Mentor-Mentee", "Data Input": "Data Input", "Reports": "Reports"}}
+            "Mentor-Mentee": "Mentor-Mentee", "Data Input": "Data Input", "Reports": "Reports"}},
+        "Solver": {"icon": "calculator", "submenu": {
+            "Neural Network": "Neural Network"}}
     }
 
     # Role-based menu filtering
@@ -154,6 +159,8 @@ def main():
         filtered_menus = {"Examinations": all_menus["Examinations"]}
     elif role == "hr":
         filtered_menus = {"HR Dept": all_menus["HR Dept"]}
+    elif role == "guest":
+        filtered_menus = {"Solver": all_menus["Solver"]}
     else:
         st.error(f"No modules available for role '{role}'. Please contact admin.")
         st.stop()

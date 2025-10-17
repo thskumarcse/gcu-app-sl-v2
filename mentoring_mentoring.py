@@ -47,27 +47,17 @@ def app():
         # Fetch data from students sheet
         df_students = get_dataframe(gs_client, st.secrets["my_secrets"]["sheet_id"], "students")
         
-        # Filter students based on user role
-        available_students = filter_students_by_role(df_students, current_user, user_role)
+        # Filter students to show only mentees of the logged-in person
+        mentees = get_mentees_for_user(df_students, current_user, user_role)
         
-        if available_students.empty:
-            st.warning("⚠️ No students available for mentoring based on your role.")
+        if mentees.empty:
+            st.warning("⚠️ No mentees assigned to you.")
             return
         
-        # Display filters and get selected values
-        filters = display_filters(available_students, current_user, user_role)
-        
-        # Apply filters
-        filtered_students = apply_filters(available_students, filters)
-        
-        st.write(f"**Total Students Available:** {len(filtered_students)}")
-        
-        if filtered_students.empty:
-            st.warning("No students match your filter criteria.")
-            return
+        st.write(f"**Your Mentees:** {len(mentees)}")
         
         # Display the data input form
-        display_mentoring_form(filtered_students, current_user, user_role, gs_client)
+        display_mentoring_form(mentees, current_user, user_role, gs_client)
         
         # Display recent mentoring records
         display_recent_records(gs_client)
@@ -76,75 +66,27 @@ def app():
         st.error(f"An error occurred: {e}")
         return
 
-def filter_students_by_role(df_students, current_user, user_role):
-    """Filter students based on user role and permissions"""
-    if user_role == "admin" or user_role == "mentor_admin":
-        # Admin and Mentor admin can see all students
+def get_mentees_for_user(df_students, current_user, user_role):
+    """Get mentees assigned to the logged-in user"""
+    if user_role == "mentor":
+        # For mentors, get students assigned to them by name
+        user_name = current_user.get("Name", "")
+        return df_students[df_students["Mentor"] == user_name]
+    elif user_role in ["admin", "mentor_admin"]:
+        # For admin/mentor_admin, they can see all students as their mentees
         return df_students
     elif user_role == "hod":
-        # HOD can see students from their department
+        # For HOD, get students from their department
         user_dept = current_user.get("Department", "")
         return df_students[df_students["Department"] == user_dept]
     elif user_role == "coordinator":
-        # Coordinator can see students from their semester
+        # For coordinator, get students from their semester
         user_semester = current_user.get("Semester", "")
         return df_students[df_students["Semester"] == user_semester]
-    elif user_role == "mentor":
-        # Mentor can see students assigned to them
-        user_name = current_user.get("Name", "")
-        return df_students[df_students["Mentor"] == user_name]
     else:
         return pd.DataFrame()
 
-def display_filters(available_students, current_user, user_role):
-    """Display filter options based on user role"""
-    st.markdown("---")
-    st.subheader("🔍 Filter Students")
-    
-    # Determine which filters to show based on role
-    show_department = user_role in ["admin", "mentor_admin"]
-    show_semester = user_role in ["admin", "mentor_admin", "coordinator"]
-    show_program = True  # All roles can filter by program
-    
-    col1, col2, col3 = st.columns(3)
-    filters = {}
-    
-    with col1:
-        if show_department:
-            department_options = ["All"] + sorted(available_students["Department"].astype(str).unique().tolist())
-            filters["department_filter"] = st.selectbox("Department", department_options, key="dept_filter")
-        else:
-            filters["department_filter"] = "All"
-    
-    with col2:
-        if show_semester:
-            semester_options = ["All"] + sorted(available_students["Semester"].astype(str).unique().tolist())
-            filters["semester_filter"] = st.selectbox("Semester", semester_options, key="sem_filter")
-        else:
-            filters["semester_filter"] = "All"
-    
-    with col3:
-        program_options = ["All"] + sorted(available_students["Program"].astype(str).unique().tolist())
-        filters["program_filter"] = st.selectbox("Program", program_options, key="prog_filter")
-    
-    return filters
-
-def apply_filters(available_students, filters):
-    """Apply selected filters to the dataframe"""
-    filtered_df = available_students.copy()
-    
-    if filters["department_filter"] != "All":
-        filtered_df = filtered_df[filtered_df["Department"] == filters["department_filter"]]
-    
-    if filters["semester_filter"] != "All":
-        filtered_df = filtered_df[filtered_df["Semester"] == filters["semester_filter"]]
-    
-    if filters["program_filter"] != "All":
-        filtered_df = filtered_df[filtered_df["Program"] == filters["program_filter"]]
-    
-    return filtered_df
-
-def display_mentoring_form(filtered_students, current_user, user_role, gs_client):
+def display_mentoring_form(mentees, current_user, user_role, gs_client):
     """Display the mentoring data input form"""
     st.markdown("---")
     st.subheader("📋 Add New Mentoring Interaction")
@@ -154,27 +96,43 @@ def display_mentoring_form(filtered_students, current_user, user_role, gs_client
         col1, col2 = st.columns(2)
         
         with col1:
+            # Semester dropdown - first dropdown
+            semester_options = ["All"] + sorted(mentees["Semester"].astype(str).unique().tolist())
+            selected_semester = st.selectbox(
+                "Semester",
+                options=semester_options,
+                help="Select the semester to filter students"
+            )
+            
+            # Filter students based on selected semester
+            if selected_semester == "All":
+                filtered_mentees = mentees
+            else:
+                filtered_mentees = mentees[mentees["Semester"] == selected_semester]
+            
+            # Student dropdown - dependent on semester selection
+            student_options = {}
+            for _, student in filtered_mentees.iterrows():
+                student_id = student.get("Student ID", "")
+                student_name = student.get("Student Name", "")
+                program = student.get("Program", "")
+                semester = student.get("Semester", "")
+                display_name = f"{student_name} ({student_id}) - {program} Sem {semester}"
+                student_options[display_name] = student_id
+            
+            selected_student_display = st.selectbox(
+                "Students",
+                options=list(student_options.keys()),
+                help="Choose your mentee for this mentoring interaction"
+            )
+            selected_student_id = student_options[selected_student_display]
+            
             # Date selector
             interaction_date = st.date_input(
                 "Date of Interaction",
                 value=date.today(),
                 help="Select the date when the interaction took place"
             )
-            
-            # Student dropdown
-            student_options = {}
-            for _, student in filtered_students.iterrows():
-                student_id = student.get("Student ID", "")
-                student_name = student.get("Student Name", "")
-                display_name = f"{student_name} ({student_id})"
-                student_options[display_name] = student_id
-            
-            selected_student_display = st.selectbox(
-                "Select Student",
-                options=list(student_options.keys()),
-                help="Choose the student for this mentoring interaction"
-            )
-            selected_student_id = student_options[selected_student_display]
         
         with col2:
             # Issue dropdown
