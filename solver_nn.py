@@ -198,12 +198,6 @@ def calculate_accuracy(student_output, correct_output, tolerance=0.01):
         return 0.0
 
 def app():
-    st.set_page_config(
-        page_title="Neural Network Solver",
-        page_icon="🧠",
-        layout="wide"
-    )
-    
     st.header("🧠 Neural Network Problem Solver")
     st.markdown("---")
     
