@@ -3,16 +3,13 @@ from streamlit_option_menu import option_menu
 from utility import detect_screen_width, get_authorized_pages_for_role
 import login
 import os
+#import hr_attendance, hr_feedback
+import hr_feedback
+import exam_transcript, exam_transcript_p, exam_marksheet, exam_admitcard, exam_results, exam_results_all
+import solver_nn
 
-# Import modules with error handling
-try:
-    import hr_attendance, hr_feedback
-    import exam_transcript, exam_transcript_p, exam_marksheet, exam_admitcard, exam_results, exam_results_all
-    import mentoring_assign, mentoring_mentoring, mentoring_reports
-    import solver_nn
-except ImportError as e:
-    st.error(f"Failed to import required modules: {e}")
-    st.stop()
+# Import modules - error handling moved to main() function
+
 
 # --- Custom CSS for violet theme ---
 custom_styles = {
@@ -39,22 +36,20 @@ APP_CONFIG = {
     "version": "1.0.0",
     "description": "Galgotias College University Management System"
 }
+# Page config will be set in main() function
 
 # --- Page Rendering Logic ---
 def render_page(page_name, role):
     """Render the correct page based on menu selection and user role."""
     page_map = {
-        "Attendance": hr_attendance.app,
+        #"Attendance": hr_attendance.app,
+        "Attendance": hr_feedback.app,
         "Feedback": hr_feedback.app,
         "Transcript": exam_transcript.app,
-        "Transcript (%)": exam_transcript_p.app,
-        "Mark Sheet": exam_marksheet.app,
+        "Marksheet": exam_transcript_p.app,
         "Admit Card": exam_admitcard.app,
         "Results": exam_results.app,
         "All Programs Results": exam_results_all.app,
-        "Mentor-Mentee": mentoring_assign.app,
-        "Data Input": mentoring_mentoring.app,
-        "Reports": mentoring_reports.app,
         "Neural Network": solver_nn.app,
     }
 
@@ -73,15 +68,17 @@ def render_page(page_name, role):
         st.info("Please select an option from the sidebar.")
 
 
+
 # --- Main App ---
 def main():
-    # Set page config
+    # Set page config - must be first Streamlit command
     st.set_page_config(
         page_title=APP_CONFIG["title"],
         page_icon="🎓",
         layout="wide",
         initial_sidebar_state="expanded"
     )
+    
     
     detect_screen_width()
 
@@ -129,9 +126,7 @@ def main():
     all_menus = {
         "HR Dept": {"icon": "people", "submenu": {"Attendance": "Attendance", "Feedback": "Feedback"}},
         "Examinations": {"icon": "book", "submenu": {
-            "Transcript": "Transcript", "Transcript (%)": "Transcript (%)", "Mark Sheet": "Mark Sheet", "Admit Card": "Admit Card", "Results": "Results", "All Programs Results": "All Programs Results"}},
-        "Mentoring": {"icon": "clipboard", "submenu": {
-            "Mentor-Mentee": "Mentor-Mentee", "Data Input": "Data Input", "Reports": "Reports"}},
+            "Transcript": "Transcript", "Marksheet": "Marksheet", "Admit Card": "Admit Card", "Results": "Results", "All Programs Results": "All Programs Results"}},
         "Solver": {"icon": "calculator", "submenu": {
             "Neural Network": "Neural Network"}}
     }
@@ -140,21 +135,6 @@ def main():
     filtered_menus = {}
     if role == "admin":
         filtered_menus = all_menus
-    elif role == "mentor_admin":
-        # Mentor-admin has access to both Mentoring and Examinations
-        filtered_menus = {
-            "Mentoring": all_menus["Mentoring"],
-            "Examinations": all_menus["Examinations"]
-        }
-    elif role == "hod":
-        # HOD has access to Mentoring module
-        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
-    elif role == "coordinator":
-        # Coordinator has access to Mentoring module
-        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
-    elif role == "mentor":
-        # Mentor has access to Mentoring module
-        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
     elif role == "exam":
         filtered_menus = {"Examinations": all_menus["Examinations"]}
     elif role == "hr":

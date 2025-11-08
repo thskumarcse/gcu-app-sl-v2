@@ -20,6 +20,8 @@ from datetime import date
 # This function is cached to prevent re-running on every page reload.
 #DEV_MODE = True
 DEV_MODE = False   # toggle here for testing
+HOLIDAY_LIST = ['29-sep-2025','30-sep-2025','01-oct-2025','02-oct-2025','03-oct-2025','06-oct-2025','18-oct-2025',\
+                '20-oct-2025','21-oct-2025','04-nov-2025','25-dec-2025']
 
 # ----------------- helpers -----------------
 def clean_columns(df: pd.DataFrame) -> pd.DataFrame:

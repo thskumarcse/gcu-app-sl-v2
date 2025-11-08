@@ -1,6 +1,6 @@
 # GCU Management System
 
-A comprehensive Streamlit-based management system for Galgotias College University (GCU) that handles HR operations, examination management, and mentoring programs.
+A comprehensive Streamlit-based management system for Galgotias College University (GCU) that handles HR operations and examination management.
 
 ## 🎓 Features
 
@@ -13,11 +13,6 @@ A comprehensive Streamlit-based management system for Galgotias College Universi
 - **Mark Sheet Creation**: Create and manage mark sheets
 - **Admit Card Generation**: Generate examination admit cards
 - **Results Management**: Handle examination results and all programs results
-
-### Mentoring System
-- **Mentor-Mentee Assignment**: Assign mentors to students
-- **Data Input**: Input and manage mentoring data
-- **Reports**: Generate comprehensive mentoring reports
 
 ## 🚀 Getting Started
 
@@ -87,7 +82,6 @@ gcu-app-sl/
 ├── hr_attendance.py      # HR attendance management
 ├── hr_feedback.py        # HR feedback system
 ├── exam_*.py             # Examination modules
-├── mentoring_*.py        # Mentoring system modules
 └── *.ipynb               # Jupyter notebooks for analysis
 ```
 
@@ -96,12 +90,9 @@ gcu-app-sl/
 The system supports multiple user roles with different access levels:
 
 - **Admin**: Full access to all modules
-- **Mentor Admin**: Access to mentoring and examination modules
-- **HOD**: Access to mentoring module
-- **Coordinator**: Access to mentoring module
-- **Mentor**: Access to mentoring module
 - **Exam**: Access to examination modules
 - **HR**: Access to HR modules
+- **Guest**: Limited access to specific modules
 
 ## 🛠️ Development
 
@@ -141,7 +132,7 @@ For support and questions, please contact the development team or create an issu
 
 ## 🔄 Version History
 
-- **v1.0.0** - Initial release with HR, Examination, and Mentoring modules
+- **v1.0.0** - Initial release with HR and Examination modules
 
 ---
 

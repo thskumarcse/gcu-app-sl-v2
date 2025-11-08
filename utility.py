@@ -287,22 +287,13 @@ def get_authorized_pages_for_role(role: str):
         # Admin should get everything - ALL modules and ALL pages
         return [
             "Attendance", "Feedback",
-            "Transcript", "Transcript (%)", "Mark Sheet", "Admit Card", "Results", "All Programs Results",
-            "Mentor-Mentee", "Data Input", "Reports",
+            "Transcript", "Marksheet", "Admit Card", "Results", "All Programs Results",
             "Neural Network"
         ]
     elif role == "exam":
-        return ["Transcript", "Transcript (%)", "Mark Sheet", "Admit Card", "Results", "All Programs Results", "Neural Network"]
+        return ["Transcript", "Marksheet", "Admit Card", "Results", "All Programs Results", "Neural Network"]
     elif role == "hr":
         return ["Attendance", "Feedback"]
-    elif role == "mentor_admin":
-        return ["Mentor-Mentee", "Data Input", "Reports", "Neural Network"]
-    elif role == "hod":
-        return ["Mentor-Mentee", "Data Input", "Reports", "Neural Network"]
-    elif role == "coordinator":
-        return ["Mentor-Mentee", "Data Input", "Reports", "Neural Network"]
-    elif role == "mentor":
-        return ["Mentor-Mentee", "Data Input", "Reports", "Neural Network"]
     elif role == "guest":
         return ["Neural Network"]
     else:
@@ -433,3 +424,34 @@ def set_compact_theme():
         """,
         unsafe_allow_html=True
     )
+    
+
+def clean_course_name(name: str) -> str:
+    """Clean course names:
+    - Normalize all dash types to '-'
+    - Keep first descriptor (e.g., 'Lecture', 'Practical')
+    - Preserve 'Assignment' descriptors
+    - Remove special characters except letters, digits, spaces, and '-'
+    - Remove redundant right-side descriptor and its preceding dash
+    """
+    if not isinstance(name, str):
+        return name
+
+    # Normalize all dash types (– — − → -)
+    name = re.sub(r"[–—−]", "-", name)
+
+    # Remove all special characters except A–Z, a–z, 0–9, spaces, and '-'
+    name = re.sub(r"[^A-Za-z0-9\s\-]", "", name)
+
+    # Preserve "Assignment" if it exists
+    if re.search(r'\bAssignment\b', name, flags=re.IGNORECASE):
+        return re.sub(r'\s*[-–—−]\s*Assignment.*', ' - Assignment', name, flags=re.IGNORECASE)
+
+    # Remove any right-side descriptor like '– Theory', '– Practical' etc.
+    name = re.sub(r'\s*[-–—−]\s*(Theory|Practical)\b.*', '', name, flags=re.IGNORECASE)
+
+    # Clean double spaces and stray dashes
+    name = re.sub(r'\s*-\s*$', '', name)      # remove trailing '-'
+    name = re.sub(r'\s{2,}', ' ', name).strip()
+
+    return name

@@ -52,16 +52,6 @@ def test_imports():
         import exam_results_all
         print("✅ exam_results_all imported successfully")
         
-        # Test mentoring modules
-        import mentoring_assign
-        print("✅ mentoring_assign imported successfully")
-        
-        import mentoring_mentoring
-        print("✅ mentoring_mentoring imported successfully")
-        
-        import mentoring_reports
-        print("✅ mentoring_reports imported successfully")
-        
         print("\n🎉 All imports successful!")
         return True
         

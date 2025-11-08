@@ -10,6 +10,7 @@ from datetime import datetime
 import warnings
 import re
 from xml.sax.saxutils import escape
+from utility import clean_course_name
 
 # ReportLab imports
 from reportlab.pdfgen import canvas
@@ -44,7 +45,7 @@ def set_compact_theme():
     </style>
     """, unsafe_allow_html=True)
 
-# Helper functions from notebook
+# Helper functions
 def safe_round(value, ndigits=2, default=0):
     try:
         return round(float(value), ndigits)
@@ -96,6 +97,8 @@ def safe_number(x):
 
 def find_photo(photo_dir, enrollment_no):
     """Find the student's photo file based on enrollment number."""
+    if photo_dir is None or not os.path.exists(photo_dir):
+        return None
     extensions = ["jpg", "jpeg", "png"]
     for ext in extensions:
         candidate = os.path.join(photo_dir, f"{enrollment_no}.{ext}")
@@ -103,69 +106,123 @@ def find_photo(photo_dir, enrollment_no):
             return candidate
     return None
 
-def expand_student_rows(df):
-    """Convert each row (student with multiple subjects) into multiple rows."""
-    subject_nums = sorted({col[3] for col in df.columns if col.startswith("SUB") and col[3].isdigit()})
-    all_rows = []
+def process_course(df: pd.DataFrame, df_courses: pd.DataFrame) -> pd.DataFrame:
+   
+    df = df.copy()
+    rename_map = {}
 
-    for _, row in df.iterrows():
-        for num in subject_nums:
-            new_row = {
-                "ORG_NAME": row["ORG_NAME"],
-                "ORG_PIN": row["ORG_PIN"],
-                "ACADEMIC_COURSE_ID": row["ACADEMIC_COURSE_ID"],
-                "COURSE_NAME": row["COURSE_NAME"],
-                "ADMISSION_YEAR": row["ADMISSION_YEAR"],
-                "DEPARTMENT": row["DEPARTMENT"],
-                "STREAM": row["STREAM"],
-                "SESSION": row["SESSION"],
-                "ABC_ACCOUNT_ID": row["ABC_ACCOUNT_ID"],
-                "DOB": row["DOB"],
-                "GENDER": row["GENDER"],
-                "MRKS_REC_STATUS": row["MRKS_REC_STATUS"],
-                "CNAME": row["CNAME"],
-                "YEAR": row["YEAR"],
-                "MONTH": row["MONTH"],
-                "SEM": row["SEM"],
-                "RROLL": row["RROLL"],
-                "REGN_NO": row["REGN_NO"],
-                "TOT_GRADE": row["TOT_GRADE"],
-                "TOT_CREDIT": row["TOT_CREDIT"],
-                "TOT_CREDIT_POINTS": row["TOT_CREDIT_POINTS"],
-                "TOT_GRADE_POINTS": row["TOT_GRADE_POINTS"],
-                "PERCENT": row["PERCENT"],
-                "CGPA": row["CGPA"],
-                "SGPA": row["SGPA"],
-                "GRAND_TOT_CREDIT_POINTS": row["GRAND_TOT_CREDIT_POINTS"],
-                "GRAND_TOT_CREDIT": row["GRAND_TOT_CREDIT"],
-                "RESULT": row["RESULT"],
-                "REMARKS": row["REMARKS"],
-                "DOI": row["DOI"],
-                "NCRF_LEVEL": row["NCRF_LEVEL"],
-                "SUB_NAME": row[f"SUB{num}NM"],
-                "SUB_CODE": row[f"SUB{num}"],
-                "GRADE": row[f"SUB{num}_GRADE"],
-                "GRADE_POINTS": row[f"SUB{num}_GRADE_POINTS"],
-                "CREDIT": row[f"SUB{num}_CREDIT"],
-                "CREDIT_POINTS": row[f"SUB{num}_CREDIT_POINTS"]
-            }
-            all_rows.append(new_row)
+    # Get the list of course codes
+    course_codes = df_courses["course code"].tolist()
 
-    return pd.DataFrame(all_rows)
+    # Base patterns for the first course (no suffix)
+    base_patterns = [
+        ("Formative (20)", "Formative"),
+        ("Summative (80)", "Summative"),
+        ("Total Marks", "Total Marks")
+    ]
+
+    # Handle the first set (no .1 suffix)
+    if len(course_codes) > 0:
+        code = str(course_codes[0])
+        for old, new_base in base_patterns:
+            new_name = f"{new_base} {code}"
+            if old in df.columns:
+                rename_map[old] = new_name
+
+    # Handle subsequent sets (with .1, .2, etc.)
+    for i, code in enumerate(course_codes[1:], start=1):
+        suffix = f".{i}"
+        for old, new_base in base_patterns:
+            old_col = f"{old}{suffix}"
+            new_col = f"{new_base} {code}"
+            if old_col in df.columns:
+                rename_map[old_col] = new_col
+
+    # Rename columns
+    df = df.rename(columns=rename_map)
+    return df
+
+def process_marks_long_format(df, df_courses=None):
+    """
+    Convert wide-format student marks DataFrame into long-format.
+    Merges with df_courses to include course details like 'year', 'course name', etc.
+    """
+
+    # Identify base student info columns
+    id_vars = ['Student Code', 'Student Name', 'APAAR ID', 'Serial Number', 'Program Name', 'Batch Name']
+    existing_id_vars = [col for col in id_vars if col in df.columns]
+    
+    # --- Clean numeric-like ID fields ---
+    for col in existing_id_vars:
+        if df[col].dtype in ['float64', 'int64']:
+            df[col] = df[col].astype('Int64').astype(str)
+        else:
+            df[col] = df[col].astype(str)
+
+        # Remove trailing .0 if present (e.g., 2313022001.0 → 2313022001)
+        df[col] = df[col].str.replace(r'\.0$', '', regex=True).str.strip()
+    
+
+    # Melt to long format
+    df_long = df.melt(id_vars=existing_id_vars, var_name='Assessment', value_name='Marks')
+
+    # --- Extract Course Code dynamically ---
+    def extract_course_code(row):
+        prog = str(row.get('Program Name', '')).strip()
+        assess = str(row['Assessment'])
+        if prog == 'B.Pharm (Practice)':
+            match = re.search(r'(\d+\.\d+)', assess)
+        else:
+            match = re.search(r'(ER\d{2}-\d{2}[A-Z]?)', assess)
+        return match.group(1) if match else None
+
+    df_long['Course Code'] = df_long.apply(extract_course_code, axis=1)
+
+    # --- Extract Assessment Type ---
+    df_long['Assessment Type'] = df_long['Assessment'].apply(
+        lambda x: 'Formative' if 'Formative' in str(x)
+        else ('Summative' if 'Summative' in str(x)
+        else ('Total Marks' if 'Total Marks' in str(x) else None))
+    )
+
+    # Keep only valid rows
+    df_long = df_long.dropna(subset=['Course Code', 'Assessment Type'])
+
+    # Merge with df_courses if provided
+    if df_courses is not None and not df_courses.empty:
+        df_long['Course Code'] = df_long['Course Code'].astype(str).str.strip()
+        df_courses['course code'] = df_courses['course code'].astype(str).str.strip()
+
+        # Perform merge on matching course code
+        df_long = df_long.merge(
+            df_courses,
+            left_on='Course Code',
+            right_on='course code',
+            how='left'
+        )
+
+    # Reorder columns
+    base_cols = existing_id_vars + ['Course Code', 'Assessment Type', 'Marks']
+    if df_courses is not None:
+        merged_cols = [col for col in ['year', 'course name', 'formative', 'summative'] if col in df_long.columns]
+        final_columns = base_cols + merged_cols
+    else:
+        final_columns = base_cols
+
+    return df_long[final_columns]
 
 def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
     """Draw header with logo and student photo."""
     width, height = A4
     usable_width = width - doc.leftMargin - doc.rightMargin
-
-    enrollment_no = safe_text(student_data.iloc[0].get("RROLL", ""))
-    student_name = safe_text(student_data.iloc[0].get("CNAME", ""))
-    apaar_id = safe_number_text(student_data.iloc[0].get("ABC_ACCOUNT_ID", ""))
-    serial_no = safe_number_text(student_data.iloc[0].get("REGN_NO", ""))
-    course_name = safe_text(student_data.iloc[0].get("COURSE_NAME", ""))
-    level = safe_text(student_data.iloc[0].get("NCRF_LEVEL", ""))
-
-    # Logo
+    
+    enrollment_no = safe_text(student_data.iloc[0].get("Student Code", ""))
+    student_name = safe_text(student_data.iloc[0].get("Student Name", ""))
+    apaar_id = safe_text(student_data.iloc[0].get("APAAR ID", "")) if "APAAR ID" in student_data.columns else "0"
+    serial_no = safe_text(student_data.iloc[0].get("Serial Number", "")) if "Serial Number" in student_data.columns else "0"
+    program_name = safe_text(student_data.iloc[0].get("Program Name", ""))
+    level = safe_text(student_data.iloc[0].get("NCrF Level", "")) if "NCrF Level" in student_data.columns else ""
+    
     try:
         if logo_path and os.path.exists(logo_path):
             canvas.drawImage(logo_path, 50, height - 140, width=80, height=80, mask='auto')
@@ -181,7 +238,6 @@ def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
         if photo_file:
             canvas.drawImage(photo_file, 450, height - 140, width=70, height=80, mask='auto')
         else:
-            # Debug: Print when photo is not found
             print(f"⚠️ No photo found for {student_name} ({enrollment_no}) in {photo_dir}")
     except Exception as e:
         print(f"❌ Error drawing photo for {enrollment_no}: {e}")
@@ -191,17 +247,17 @@ def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
     canvas.setFont("Times-Roman", 18)
     canvas.drawCentredString(width / 2, height - 60, "Girijananda Chowdhury University")
     canvas.setFont("Times-Roman", 14)
-    canvas.drawCentredString(width / 2, height - 85, "TRANSCRIPT (PERCENTAGE)")
+    canvas.drawCentredString(width / 2, height - 85, "MARKSHEET")
     canvas.setFont("Times-Roman", 12)
-    canvas.drawCentredString(width / 2, height - 100, course_name)
+    canvas.drawCentredString(width / 2, height - 100, program_name)
     canvas.drawCentredString(width / 2, height - 115, "2023-2025")
-
+    canvas.translate(0, -30)
     # Student data table
     std_data = [
-        ["APAAR ID", ":", apaar_id, "Serial Number : " + serial_no],
+        ["APAAR ID", ":", apaar_id, f"Serial Number : {serial_no}"],
         ["Enrollment No.", ":", enrollment_no, ""],
         ["Name", ":", student_name, ""],
-        ["NCrF/NHEQF Level", ":", level, ""],
+        #["NCrF/NHEQF Level", ":", level, ""],
     ]
     std_table = Table(std_data, colWidths=[120, 10, 200, 150])
     std_table.setStyle(TableStyle([
@@ -214,14 +270,15 @@ def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
     ]))
     table_width, table_height = std_table.wrap(0, 0)
     std_table.drawOn(canvas, 50, height - 150 - table_height)
+    canvas.translate(0, -30)
 
 def draw_footer(canvas, doc, date_value):
     """Draw footer with date and signature."""
     width, height = A4
     canvas.setFont("Helvetica", 10)
-    canvas.drawString(50, 60, f"Date : {date_value}")
-    canvas.drawRightString(width - 55, 70, "Controller of Examination")
-    canvas.drawRightString(width - 40, 60, "Girijananda Chowdhury University")
+    canvas.drawString(50, 100, f"Date : {date_value}")
+    canvas.drawRightString(width - 55, 110, "Controller of Examination")
+    canvas.drawRightString(width - 40, 100, "Girijananda Chowdhury University")
 
 class NumberedCanvas(canvas.Canvas):
     """Custom canvas for page numbering."""
@@ -253,41 +310,31 @@ def format_subject_name(text, max_len=45):
     styles = getSampleStyleSheet()
     subject_style = styles["Normal"]
     subject_style.fontName = "Times-Roman"
-    subject_style.leading = 11
+    subject_style.leading = 9  # Reduced from 11
     subject_style.alignment = TA_LEFT
 
     if len(str(text)) > max_len:  
-        subject_style.fontSize = 8
-        subject_style.leading = 10
+        subject_style.fontSize = 7  # Reduced from 8
+        subject_style.leading = 8  # Reduced from 10
     elif len(str(text)) > max_len * 1.5:  
-        subject_style.fontSize = 7
-        subject_style.leading = 9
+        subject_style.fontSize = 6  # Reduced from 7
+        subject_style.leading = 7  # Reduced from 9
     else:
-        subject_style.fontSize = 9
+        subject_style.fontSize = 8  # Reduced from 9
     return Paragraph(str(text), subject_style)
 
-def calculate_percentage_from_grade_points(grade_points, max_grade_points=10):
-    """Convert grade points to percentage (assuming 10-point scale)"""
-    try:
-        if pd.isna(grade_points) or grade_points == 0:
-            return 0
-        return round((float(grade_points) / max_grade_points) * 100, 2)
-    except Exception:
-        return 0
-
-def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, photo_dir):
-    """Generate PDF transcript for a student with percentage grading."""
+def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir, suffix=""):
+    """Generate single-page PDF transcript with marks (ABC format)."""
     width, height = A4
-    filename = os.path.join(output_dir, f"Transcript_Percentage_{student_data.iloc[0]['CNAME']}.pdf")
+    filename = os.path.join(output_dir, f"Transcript_Marks_{student_data.iloc[0]['Student Name']}_onepage{suffix}.pdf")
     doc = BaseDocTemplate(filename, pagesize=A4)
-    doc.showFooter = True
 
-    # Styles
+    # Styles - reduced for single page
     styles = getSampleStyleSheet()
     subject_style = styles["Normal"]
     subject_style.fontName = "Times-Roman"
-    subject_style.fontSize = 9
-    subject_style.leading = 11
+    subject_style.fontSize = 8  # Reduced from 9
+    subject_style.leading = 9  # Reduced from 11
     subject_style.alignment = TA_LEFT
 
     bold_subject_style = ParagraphStyle(
@@ -299,166 +346,23 @@ def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, p
         alignment=subject_style.alignment
     )
 
-    left_sem_style = ParagraphStyle(
-        name="LeftSemesterHeading",
-        parent=styles['Heading4'],
-        alignment=TA_LEFT,
-        leftIndent=-30,
-        fontName="Helvetica"
-    )
-
-    # Frames
-    frame_first = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height - 140, id='first_frame')
-    frame_later = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height + 50, id='later_frame')
-
-    # Page templates
-    first_page_template = PageTemplate(
-        id='FirstPage',
-        frames=[frame_first],
-        onPage=lambda c, d: draw_header_with_photo(c, d, student_data, logo_path, photo_dir)
-    )
-    
-    middle_page_template = PageTemplate(
-        id='MiddlePages',
-        frames=[frame_later],
-        onPageEnd=lambda c, d: draw_footer(c, d, report_date)
-    )
-    
-    doc.addPageTemplates([first_page_template, middle_page_template])
-
-    # Table style
-    table_style = TableStyle([
-        ("GRID", (0,0), (-1,-1), 0.5, colors.grey),
-        ("FONTNAME", (0,0), (-1,-1), "Times-Roman"),
-        ("FONTSIZE", (0,0), (-1,-1), 9),
-        ("FONTNAME", (0,0), (-1,0), "Times-Bold"),
-        ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
-        ("ALIGN", (2,1), (-1,-1), "CENTER"),
-    ])
-
-    elements = []
-
-    # Group by SEM
-    for i, (sem, sem_data) in enumerate(student_data.groupby("SEM")):
-        if i == 1:
-            elements.append(NextPageTemplate('MiddlePages'))
-
-        # Build table rows
-        data = [["Sub Code", "Subject/Papers", "Credit", "Grade", "Grade Points", "Percentage"]]
-
-        for _, row in sem_data.iterrows():
-            if row[["SUB_CODE","SUB_NAME","CREDIT","GRADE","GRADE_POINTS","CREDIT_POINTS"]].isna().all():
-                continue
-
-            sub_code = str(row.get("SUB_CODE", "")).replace("/", "_")
-            sub_name = format_subject_name(row.get("SUB_NAME", ""))
-            grade_points = safe_number(row.get("GRADE_POINTS", 0))
-            percentage = calculate_percentage_from_grade_points(grade_points)
-
-            data.append([
-                escape(sub_code),
-                sub_name,
-                safe_number(row.get("CREDIT", 0)),
-                escape(str(row.get("GRADE", ""))),
-                safe_number(grade_points),
-                f"{percentage}%"
-            ])
-
-        if len(data) == 1:
-            continue
-
-        # Semester percentage row
-        total_credits = safe_number(sem_data["CREDIT"].sum())
-        total_credit_points = safe_number(sem_data["CREDIT_POINTS"].sum())
-        semester_percentage = calculate_percentage_from_grade_points(total_credit_points / total_credits if total_credits else 0)
-
-        total_row = [
-            Paragraph("Total", bold_subject_style),
-            Paragraph(f"Semester % : {semester_percentage}%", bold_subject_style),
-            safe_number(total_credits),
-            "",
-            "",
-            f"{semester_percentage}%"
-        ]
-        data.append(total_row)
-
-        colWidths = [65, 220, 45, 45, 70, 65]
-        heading = Paragraph(f"<b>Semester {sem}</b>", left_sem_style)
-
-        table = Table(data, colWidths=colWidths, repeatRows=1)
-        table.setStyle(table_style)
-
-        elements.append(KeepTogether([heading, Spacer(1, 6), table]))
-        elements.append(Spacer(1, 12))
-
-    # Summary section
-    try:
-        cgpa = round(float(student_data["CGPA"].iloc[-1]), 2)
-    except Exception:
-        cgpa = 0.0
-
-    # Calculate overall percentage from CGPA
-    overall_percentage = round(cgpa * 10, 2)
-    total_credit_points = safe_number(student_data["CREDIT_POINTS"].sum())
-    total_credit = safe_number(student_data["CREDIT"].sum())
-    result = escape(str(student_data.iloc[0].get("RESULT", "")))
-
-    summary_data = [
-        ["RESULT", f": {result}", "", "Grand Total Credit Points", f": {total_credit_points}"],
-        ["Overall Percentage", f": {overall_percentage}%", "", "Grand Total Credit", f": {total_credit}"],
-        ["CGPA", f": {cgpa}", "", "", ""]
-    ]
-
-    usable_width = width - doc.leftMargin - doc.rightMargin
-    colWidths = [0.12 * usable_width, 0.12 * usable_width, 0.30 * usable_width,
-                 0.28 * usable_width, 0.28 * usable_width]
-
-    summary_table = Table(summary_data, colWidths=colWidths, hAlign='LEFT')
-    summary_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (1, 0), (1, -1), 'Helvetica-Bold'),
-        ('FONTNAME', (4, 0), (4, -1), 'Helvetica-Bold'),
-    ]))
-
-    elements.append(summary_table)
-    elements.append(Spacer(1, 20))
-
-    # Build
-    elements = [x for x in elements if x not in [None, "", []]]
-    try:
-        doc.build(elements, canvasmaker=NumberedCanvas)
-        return filename
-    except Exception as e:
-        st.error(f"❌ PDF build failed: {e}")
-        return None
-
-def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir):
-    """Generate single-page PDF transcript with percentage grading."""
-    width, height = A4
-    filename = os.path.join(output_dir, f"Transcript_Percentage_{student_data.iloc[0]['CNAME']}_onepage.pdf")
-    doc = BaseDocTemplate(filename, pagesize=A4)
-
-    # Styles
-    styles = getSampleStyleSheet()
-    subject_style = styles["Normal"]
-    subject_style.fontName = "Times-Roman"
-    subject_style.fontSize = 9
-    subject_style.leading = 11
-    subject_style.alignment = TA_LEFT
-
-    bold_subject_style = ParagraphStyle(
-        name="SubjectBold",
+    # Center-aligned style for Total Marks values
+    center_style = ParagraphStyle(
+        name="CenterStyle",
         parent=subject_style,
-        fontName="Times-Bold",
+        alignment=TA_CENTER,
         fontSize=subject_style.fontSize,
-        leading=subject_style.leading,
-        alignment=subject_style.alignment
+        leading=subject_style.leading
+    )
+    
+    bold_center_style = ParagraphStyle(
+        name="BoldCenterStyle",
+        parent=bold_subject_style,
+        alignment=TA_CENTER
     )
 
-    left_sem_style = ParagraphStyle(
-        name="LeftSemesterHeading",
+    left_year_style = ParagraphStyle(
+        name="LeftYearHeading",
         parent=styles['Heading4'],
         alignment=TA_LEFT,
         leftIndent=-30,
@@ -480,91 +384,211 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
         onPageEnd=lambda c, d: draw_footer(c, d, report_date)
     )
     doc.addPageTemplates([single_page_template])
+    
 
     # Elements
     elements = []
 
-    for sem, sem_data in student_data.groupby("SEM"):
-        data = [["Sub Code", "Subject/Papers", "Credit", "Grade", "Grade Points", "Percentage"]]
+    # Group by year
+    if "year" not in student_data.columns:
+        student_data = student_data.copy()
+        student_data["year"] = 1
 
-        for _, row in sem_data.iterrows():
-            if row[["SUB_CODE", "SUB_NAME", "CREDIT", "GRADE", "GRADE_POINTS", "CREDIT_POINTS"]].isna().all():
+    for year, year_data in student_data.groupby("year"):
+        courses = year_data["Course Code"].unique()
+        
+        # Two-row header: First row with merged cells, second row with sub-columns
+        # Row 0: Main header - must have 7 columns, with empty cells where merging happens
+        # Row 1: Sub-columns showing Formative and Summative under Max Marks and Max Obtained
+        # Create a style for header text with wrapping
+        header_style = ParagraphStyle(
+            name="HeaderStyle",
+            parent=styles["Normal"],
+            fontName="Times-Bold",
+            fontSize=8,
+            leading=9,
+            alignment=TA_CENTER
+        )
+        header_row_0 = [
+            "Sub Code", 
+            "Subject/Papers", 
+            "Max Marks", 
+            "", 
+            "Mark Obtained", 
+            "", 
+            Paragraph("Total Marks", header_style)  # Wrap Total Marks header
+        ]
+        header_row_1 = [
+            "Sub Code", 
+            "Subject/Papers", 
+            "Formative", 
+            "Summative", 
+            "Formative", 
+            "Summative", 
+            Paragraph("Total Marks", header_style)  # Wrap Total Marks header
+        ]
+        
+        data = [header_row_0, header_row_1]
+
+        for course_code in courses:
+            course_rows = year_data[year_data["Course Code"] == course_code]
+            
+            course_name = ""
+            if "course name" in course_rows.columns:
+                course_name = safe_text(course_rows.iloc[0].get("course name", ""))
+            
+            # Get marks obtained by student
+            formative_marks_obtained = ""
+            summative_marks_obtained = ""
+            total_marks = ""
+            
+            # Get max marks from course details (if available)
+            formative_max = ""
+            summative_max = ""
+            if "formative" in course_rows.columns:
+                formative_max = safe_number(course_rows.iloc[0].get("formative", ""))
+            if "summative" in course_rows.columns:
+                summative_max = safe_number(course_rows.iloc[0].get("summative", ""))
+            
+            for _, row in course_rows.iterrows():
+                assessment_type = row.get("Assessment Type", "")
+                marks = safe_number(row.get("Marks", 0))
+                
+                if assessment_type == "Formative":
+                    formative_marks_obtained = marks
+                elif assessment_type == "Summative":
+                    summative_marks_obtained = marks
+                elif assessment_type == "Total Marks":
+                    total_marks = marks
+
+            if not course_name and not course_code:
                 continue
 
-            grade_points = safe_number(row.get("GRADE_POINTS", 0))
-            percentage = calculate_percentage_from_grade_points(grade_points)
-
+            # Calculate total marks obtained (formative + summative)
+            total_marks_obtained = safe_number(formative_marks_obtained) + safe_number(summative_marks_obtained)
+            
             data.append([
-                row.get("SUB_CODE", ""),
-                safe_paragraph(row.get("SUB_NAME", ""), subject_style),
-                row.get("CREDIT", 0) or 0,
-                row.get("GRADE", ""),
-                row.get("GRADE_POINTS", 0) or 0,
-                f"{percentage}%"
+                safe_text(course_code),
+                safe_paragraph(course_name, subject_style),
+                safe_number(formative_max),
+                safe_number(summative_max),
+                safe_number(formative_marks_obtained),
+                safe_number(summative_marks_obtained),
+                Paragraph(str(total_marks_obtained), center_style)  # Wrap Total Marks in Paragraph with center alignment
             ])
 
-        if len(data) == 1:
+        if len(data) == 2:  # Only headers, no data
             continue
 
-        total_credits = sem_data["CREDIT"].sum()
-        total_credit_points = sem_data["CREDIT_POINTS"].sum()
-        semester_percentage = calculate_percentage_from_grade_points(total_credit_points / total_credits if total_credits else 0)
+        total_formative_obtained = safe_number(year_data[year_data["Assessment Type"] == "Formative"]["Marks"].sum())
+        total_summative_obtained = safe_number(year_data[year_data["Assessment Type"] == "Summative"]["Marks"].sum())
+        total_marks_obtained_year = total_formative_obtained + total_summative_obtained
+        
+        # Calculate totals for max marks: need to sum unique course values (one per course)
+        total_formative_max = 0
+        total_summative_max = 0
+        if "formative" in year_data.columns and "Course Code" in year_data.columns:
+            # Group by course code and take first row (all rows for same course have same max marks)
+            unique_courses = year_data.groupby("Course Code").first()
+            total_formative_max = safe_number(unique_courses["formative"].sum())
+        if "summative" in year_data.columns and "Course Code" in year_data.columns:
+            unique_courses = year_data.groupby("Course Code").first()
+            total_summative_max = safe_number(unique_courses["summative"].sum())
 
         data.append([
-            Paragraph("Total", bold_subject_style),
-            Paragraph(f"Semester % : {semester_percentage}%", bold_subject_style),
-            total_credits, "", "", f"{semester_percentage}%"
+            "",  # Empty first cell
+            Paragraph("Total", bold_subject_style),  # Second cell with just "Total"
+            safe_number(total_formative_max),
+            safe_number(total_summative_max),
+            safe_number(total_formative_obtained),
+            safe_number(total_summative_obtained),
+            Paragraph(str(total_marks_obtained_year), bold_center_style)  # Wrap Total Marks in Paragraph with center alignment
         ])
 
-        table = Table(data, colWidths=[65, 220, 45, 45, 70, 65], repeatRows=1)
-        table.setStyle(TableStyle([
+        table = Table(data, colWidths=[50, 220, 50, 50, 50, 50, 38], repeatRows=2)  # Reduced Sub Code and Total Marks
+        
+        # Enhanced table style with merged cells for header - reduced font and padding
+        enhanced_table_style = TableStyle([
             ("GRID", (0,0), (-1,-1), 0.5, colors.grey),
             ("FONTNAME", (0,0), (-1,-1), "Times-Roman"),
-            ("FONTSIZE", (0,0), (-1,-1), 9),
-            ("FONTNAME", (0,0), (-1,0), "Times-Bold"),
-            ("FONTNAME", (0,-1), (-1,-1), "Times-Bold"),
-            ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
-            ("ALIGN", (2,1), (-1,-1), "CENTER"),
-        ]))
+            ("FONTSIZE", (0,0), (-1,-1), 8),  # Reduced from 9
+            ("FONTNAME", (0,0), (-1,0), "Times-Bold"),  # Bold first header row
+            ("FONTNAME", (0,1), (-1,1), "Times-Bold"),  # Bold second header row
+            ("FONTNAME", (0,-1), (-1,-1), "Times-Bold"),  # Bold total row
+            ("BACKGROUND", (0,0), (-1,1), colors.lightgrey),  # Background for both header rows
+            ("ALIGN", (0,0), (1,1), "LEFT"),  # Left align Sub Code and Subject/Papers
+            ("ALIGN", (2,0), (-1,1), "CENTER"),  # Center align header text
+            ("ALIGN", (2,2), (5,-1), "CENTER"),  # Center align data columns 2-5
+            ("ALIGN", (6,2), (6,-1), "CENTER"),  # Center align Total Marks column (column 6)
+            ("VALIGN", (0,0), (-1,-1), "MIDDLE"),  # Vertical center alignment
+            ("TOPPADDING", (0,0), (-1,-1), 2),  # Reduced padding for compact rows
+            ("BOTTOMPADDING", (0,0), (-1,-1), 2),  # Reduced padding for compact rows
+            ("LEFTPADDING", (0,0), (-1,-1), 3),
+            ("RIGHTPADDING", (0,0), (-1,-1), 3),
+            # Merge cells vertically for first two columns
+            ("SPAN", (0, 0), (0, 1)),  # Merge "Sub Code" across rows 0 and 1
+            ("SPAN", (1, 0), (1, 1)),  # Merge "Subject/Papers" across rows 0 and 1
+            # Merge cells horizontally in row 0
+            ("SPAN", (2, 0), (3, 0)),  # Merge "Max Marks" cells (columns 2-3) in row 0
+            ("SPAN", (4, 0), (5, 0)),  # Merge "Max Obtained" cells (columns 4-5) in row 0
+            # Merge cells vertically for Total Marks
+            ("SPAN", (6, 0), (6, 1)),  # Merge "Total Marks" across rows 0 and 1
+        ])
+        
+        table.setStyle(enhanced_table_style)
 
-        elements.append(Paragraph(f"<b>Semester {sem}</b>", left_sem_style))
-        elements.append(Spacer(1, 6))
+        elements.append(Paragraph(f"<b>Part {year}</b>", left_year_style))
+        elements.append(Spacer(1, 15))  # Reduced spacing
         elements.append(table)
-        elements.append(Spacer(1, 12))
+        elements.append(Spacer(1, 15))  # Reduced spacing
 
-    # Summary
-    try:
-        cgpa = round(student_data["CGPA"].iloc[-1], 2)
-    except Exception:
-        cgpa = 0
-    overall_percentage = round(cgpa * 10, 2)
-    total_credit_points = int(student_data["CREDIT_POINTS"].sum())
-    total_credit = int(student_data["CREDIT"].sum())
-    result = student_data.iloc[0].get("RESULT", "")
-
+    # Summary - Calculate across all years
+    # Total Marks Obtained = Sum of formative + summative obtained across all years
+    total_formative_obtained_all = safe_number(student_data[student_data["Assessment Type"] == "Formative"]["Marks"].sum())
+    total_summative_obtained_all = safe_number(student_data[student_data["Assessment Type"] == "Summative"]["Marks"].sum())
+    total_marks_obtained_all = total_formative_obtained_all + total_summative_obtained_all
+    
+    # Total Marks (Max) = Sum of formative + summative max marks across all years (unique courses)
+    total_formative_max_all = 0
+    total_summative_max_all = 0
+    if "formative" in student_data.columns and "Course Code" in student_data.columns:
+        unique_courses_all = student_data.groupby("Course Code").first()
+        total_formative_max_all = safe_number(unique_courses_all["formative"].sum())
+    if "summative" in student_data.columns and "Course Code" in student_data.columns:
+        unique_courses_all = student_data.groupby("Course Code").first()
+        total_summative_max_all = safe_number(unique_courses_all["summative"].sum())
+    
+    total_marks_max_all = total_formative_max_all + total_summative_max_all
+    
+    # Calculate percentage: (obtained / max) * 100
+    percentage = 0.0
+    if total_marks_max_all > 0:
+        percentage = round((total_marks_obtained_all / total_marks_max_all) * 100, 2)
+    
     summary_data = [
-        ["RESULT", f": {result}", "", "Grand Total Credit Points", f": {total_credit_points}"],
-        ["Overall Percentage", f": {overall_percentage}%", "", "Grand Total Credit", f": {total_credit}"],
-        ["CGPA", f": {cgpa}", "", "", ""]
+        ["RESULT", ": Cleared", "", "Total Marks", f": {total_marks_max_all}"],
+        ["Percentage", f": {percentage}%", "", "Total Marks Obtained", f": {total_marks_obtained_all}"],
     ]
 
-    colWidths = [0.12 * (width - doc.leftMargin - doc.rightMargin),
-                 0.12 * (width - doc.leftMargin - doc.rightMargin),
-                 0.30 * (width - doc.leftMargin - doc.rightMargin),
-                 0.28 * (width - doc.leftMargin - doc.rightMargin),
-                 0.28 * (width - doc.leftMargin - doc.rightMargin)]
+    colWidths = [0.20 * (width - doc.leftMargin - doc.rightMargin),
+                 0.15 * (width - doc.leftMargin - doc.rightMargin),
+                 0.20 * (width - doc.leftMargin - doc.rightMargin),
+                 0.25 * (width - doc.leftMargin - doc.rightMargin),
+                 0.20 * (width - doc.leftMargin - doc.rightMargin)]
 
     summary_table = Table(summary_data, colWidths=colWidths, hAlign='LEFT')
     summary_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),  # Reduced from 10
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (1, 0), (1, -1), 'Helvetica-Bold'),
         ('FONTNAME', (4, 0), (4, -1), 'Helvetica-Bold'),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),  # Reduced padding
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),  # Reduced padding
     ]))
 
     elements.append(summary_table)
-    elements.append(Spacer(1, 20))
+    elements.append(Spacer(1, 10))  # Reduced spacing
 
     # Build
     elements = [x for x in elements if x not in [None, "", []]]
@@ -575,39 +599,38 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
         st.error(f"❌ PDF build failed: {e}")
         return None
 
-def generate_pdf_auto(student_id, student_data, report_date, output_dir, logo_path, photo_dir):
-    """Automatically choose one-page or multipage PDF generation."""
-    total_subjects = student_data[["SUB_CODE", "SUB_NAME"]].notna().sum().max()
-    
-    if total_subjects <= 15:
-        return generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir)
-    else:
-        return generate_pdf(student_id, student_data, report_date, output_dir, logo_path, photo_dir)
-
 def app():
     fix_streamlit_layout()
     set_compact_theme()
     
-    st.header("📄 Transcript Generation System (Percentage)")
+    st.header("📄 Transcript Generation System (Marks - ABC Format)")
     
     # File upload section
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.info("📁 Upload your files to generate transcripts with percentage grading")
+        st.info("📁 Upload your files to generate transcripts with marks (ABC format)")
         
+        # Course details file upload (optional)
+        course_file = st.file_uploader(
+            "📚 Upload Course Details (Excel/CSV) - Optional",
+            type=['xlsx', 'xls', 'csv'],
+            help="Upload course details file with columns: 'year', 'course code', 'course name', 'formative', 'summative'"
+        )
+        
+             
         # Data file upload
         data_file = st.file_uploader(
             "📊 Upload Student Data (Excel/CSV)",
             type=['xlsx', 'xls', 'csv'],
-            help="Upload the student data file with course information"
+            help="Upload the student data file with marks information (Formative, Summative, Total Marks columns)"
         )
         
-        # Images zip file upload
+        # Images zip file upload (optional)
         st.markdown("---")
         images_zip = st.file_uploader(
-            "📷 Upload Student Photos (ZIP file)",
+            "📷 Upload Student Photos (ZIP file) - Optional",
             type=['zip'],
-            help="Upload a ZIP file containing student photos (named by enrollment number)"
+            help="Upload a ZIP file containing student photos (named by Student Code/enrollment number). Photos will be added later if not uploaded now."
         )
         
         # Report date input
@@ -618,55 +641,83 @@ def app():
         )
         
         # Generate button
-        if st.button("🚀 Generate Transcripts (Percentage)", type="primary"):
-            if data_file is not None and images_zip is not None:
+        if st.button("🚀 Generate Transcripts (Marks)", type="primary"):
+            if data_file is not None:
                 try:
                     # Create temporary directories
                     with tempfile.TemporaryDirectory() as temp_dir:
-                        # Extract images
+                        # Extract images if provided
                         images_dir = os.path.join(temp_dir, "images")
                         os.makedirs(images_dir, exist_ok=True)
                         
-                        with zipfile.ZipFile(images_zip, 'r') as zip_ref:
-                            zip_ref.extractall(images_dir)
+                        if images_zip is not None:
+                            with zipfile.ZipFile(images_zip, 'r') as zip_ref:
+                                zip_ref.extractall(images_dir)
+                            
+                            # Copy images to current directory for processing
+                            current_images_dir = os.path.join(os.getcwd(), "images")
+                            if os.path.exists(current_images_dir):
+                                shutil.rmtree(current_images_dir)
+                            shutil.copytree(images_dir, current_images_dir)
+                            
+                            # Debug: Show what images are available
+                            st.info(f"📁 Images extracted to: {images_dir}")
+                            if os.path.exists(images_dir):
+                                image_files = [f for f in os.listdir(images_dir) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+                                st.write(f"📷 Found {len(image_files)} image files: {image_files[:10]}{'...' if len(image_files) > 10 else ''}")
+                        else:
+                            st.info("ℹ️ No photos uploaded - transcripts will be generated without student photos (you can add photos later)")
                         
-                        # Copy images to current directory for processing
-                        current_images_dir = os.path.join(os.getcwd(), "images")
-                        if os.path.exists(current_images_dir):
-                            shutil.rmtree(current_images_dir)
-                        shutil.copytree(images_dir, current_images_dir)
+                        # Process course details file if provided
+                        df_courses = None
+                        if course_file is not None:
+                            try:
+                                if course_file.name.endswith('.csv'):
+                                    df_courses = pd.read_csv(course_file, encoding='latin1')
+                                else:
+                                    df_courses = pd.read_excel(course_file)
+                                
+                                df_courses.columns = df_courses.columns.str.strip()
+                                
+                                # Clean course names if needed
+                                if "course name" in df_courses.columns:
+                                    df_courses["course name"] = df_courses["course name"].apply(clean_course_name)
+                                
+                                st.success(f"✅ Loaded {len(df_courses)} course details")
+                            except Exception as e:
+                                st.warning(f"⚠️ Could not load course details file: {str(e)}")
                         
-                        # Debug: Show what images are available
-                        st.info(f"📁 Images extracted to: {images_dir}")
-                        if os.path.exists(images_dir):
-                            image_files = [f for f in os.listdir(images_dir) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
-                            st.write(f"📷 Found {len(image_files)} image files: {image_files[:10]}{'...' if len(image_files) > 10 else ''}")
-                        
+                        #st.write(df_courses)
                         # Process data file
                         if data_file.name.endswith('.csv'):
-                            df = pd.read_csv(data_file, skiprows=6, encoding='windows-1252')
+                            df = pd.read_csv(data_file, encoding='latin1')
                         else:
                             df = pd.read_excel(data_file)
                         
                         # Clean column names
                         df.columns = df.columns.str.strip()
                         
-                        # Add NCRF_LEVEL if missing
-                        if "NCRF_LEVEL" not in df.columns:  
-                            df["NCRF_LEVEL"] = ""
-                        df["NCRF_LEVEL"] = df["NCRF_LEVEL"].fillna(" ")
+                        # Remove unnamed columns
+                        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
                         
-                        # Expand student rows
-                        df_processed = expand_student_rows(df)
-                        df_processed = df_processed.dropna(subset=['SUB_NAME', 'SUB_CODE'], how='all')
+                        # Process course columns if course file is provided
+                        #if df_courses is not None:
+                        #    df = process_course(df, df_courses)
                         
+                        # Process to long format
+                        df_long = process_marks_long_format(df, df_courses)
+                        
+                        # Drop rows with no marks
+                        df_long = df_long.dropna(subset=['Course Code', 'Assessment Type', 'Marks'], how='all')
+                        
+                        #st.write(df_long.head())
                         # Create output directory
                         output_dir = os.path.join(temp_dir, "transcripts")
                         os.makedirs(output_dir, exist_ok=True)
                         
                         # Logo path - look for logo.png in logo_dir
                         logo_dir = os.path.join(os.getcwd(), "logo_dir")
-                        os.makedirs(logo_dir, exist_ok=True)  # Create logo_dir if it doesn't exist
+                        os.makedirs(logo_dir, exist_ok=True)
                         logo_path = os.path.join(logo_dir, "logo.png")
                         if not os.path.exists(logo_path):
                             st.warning("⚠️ Logo file not found at logo_dir/logo.png")
@@ -678,22 +729,46 @@ def app():
                         # Generate PDFs
                         generated_files = []
                         progress_bar = st.progress(0)
-                        total_students = len(df_processed.groupby("RROLL"))
+                        total_students = len(df_long.groupby("Student Code"))
                         
-                        for i, (student_id, student_data) in enumerate(df_processed.groupby("RROLL")):
+                        for i, (student_id, student_data) in enumerate(df_long.groupby("Student Code")):
+     
+                            student_data_year1 = student_data[student_data['year']==1]
                             try:
-                                filename = generate_pdf_auto(
+                                filename = generate_pdf_onepage(
                                     student_id, 
-                                    student_data, 
+                                    student_data_year1, 
                                     report_date.strftime("%d-%m-%Y"), 
                                     output_dir, 
                                     logo_path,
-                                    images_dir
+                                    images_dir,
+                                    suffix="_1"
                                 )
                                 if filename:
                                     generated_files.append(filename)
                             except Exception as e:
                                 st.warning(f"Failed to generate transcript for student {student_id}: {str(e)}")
+                                import traceback
+                                st.write(traceback.format_exc())
+                            
+                            student_data_year2 = student_data[student_data['year']==2]
+                            
+                            try:
+                                filename = generate_pdf_onepage(
+                                    student_id, 
+                                    student_data_year2, 
+                                    report_date.strftime("%d-%m-%Y"), 
+                                    output_dir, 
+                                    logo_path,
+                                    images_dir,
+                                    suffix="_2"
+                                )
+                                if filename:
+                                    generated_files.append(filename)
+                            except Exception as e:
+                                st.warning(f"Failed to generate transcript for student {student_id}: {str(e)}")
+                                import traceback
+                                st.write(traceback.format_exc())
                             
                             progress_bar.progress((i + 1) / total_students)
                         
@@ -709,21 +784,22 @@ def app():
                             # Download button
                             st.success(f"✅ Generated {len(generated_files)} transcripts successfully!")
                             st.download_button(
-                                label="📥 Download Transcripts (Percentage) (ZIP)",
+                                label="📥 Download Transcripts (Marks) (ZIP)",
                                 data=zip_buffer.getvalue(),
-                                file_name=f"transcripts_percentage_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
+                                file_name=f"transcripts_marks_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
                                 mime="application/zip"
                             )
                             
-                            # Clean up images after download
-                            if os.path.exists(current_images_dir):
-                                # Delete all student photos (logo is in separate logo_dir)
-                                for file in os.listdir(current_images_dir):
-                                    try:
-                                        os.remove(os.path.join(current_images_dir, file))
-                                    except:
-                                        pass
-                                st.info("🧹 Student photos cleaned up (logo preserved in logo_dir)")
+                            # Clean up images after download (if photos were uploaded)
+                            if images_zip is not None:
+                                current_images_dir = os.path.join(os.getcwd(), "images")
+                                if os.path.exists(current_images_dir):
+                                    for file in os.listdir(current_images_dir):
+                                        try:
+                                            os.remove(os.path.join(current_images_dir, file))
+                                        except:
+                                            pass
+                                    st.info("🧹 Student photos cleaned up (logo preserved in logo_dir)")
                             
                         else:
                             st.error("❌ No transcripts were generated successfully.")
@@ -733,9 +809,9 @@ def app():
                     import traceback
                     st.write(traceback.format_exc())
             else:
-                st.warning("⚠️ Please upload both data file and images ZIP file.")
+                st.warning("⚠️ Please upload the data file. Photos are optional and can be added later.")
         else:
-            st.info("📋 Please upload the required files to generate transcripts with percentage grading")
+            st.info("📋 Please upload the data file to generate transcripts with marks (ABC format). Photos are optional.")
 
 if __name__ == "__main__":
     app()

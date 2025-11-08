@@ -8,7 +8,6 @@ import os
 try:
     import hr_attendance, hr_feedback
     import exam_transcript, exam_marksheet, exam_admitcard, exam_results, exam_results_all
-    import mentoring_assign, mentoring_mentoring, mentoring_reports
 except ImportError as e:
     st.error(f"Failed to import required modules: {e}")
     st.stop()
@@ -50,9 +49,6 @@ def render_page(page_name, role):
         "Admit Card": exam_admitcard.app,
         "Results": exam_results.app,
         "All Programs Results": exam_results_all.app,
-        "Mentor-Mentee": mentoring_assign.app,
-        "Data Input": mentoring_mentoring.app,
-        "Reports": mentoring_reports.app,
     }
 
     authorized_pages = get_authorized_pages_for_role(role)
@@ -126,30 +122,13 @@ def main():
     all_menus = {
         "HR Dept": {"icon": "people", "submenu": {"Attendance": "Attendance", "Feedback": "Feedback"}},
         "Examinations": {"icon": "book", "submenu": {
-            "Transcript": "Transcript", "Mark Sheet": "Mark Sheet", "Admit Card": "Admit Card", "Results": "Results", "All Programs Results": "All Programs Results"}},
-        "Mentoring": {"icon": "clipboard", "submenu": {
-            "Mentor-Mentee": "Mentor-Mentee", "Data Input": "Data Input", "Reports": "Reports"}}
+            "Transcript": "Transcript", "Mark Sheet": "Mark Sheet", "Admit Card": "Admit Card", "Results": "Results", "All Programs Results": "All Programs Results"}}
     }
 
     # Role-based menu filtering
     filtered_menus = {}
     if role == "admin":
         filtered_menus = all_menus
-    elif role == "mentor_admin":
-        # Mentor-admin has access to both Mentoring and Examinations
-        filtered_menus = {
-            "Mentoring": all_menus["Mentoring"],
-            "Examinations": all_menus["Examinations"]
-        }
-    elif role == "hod":
-        # HOD has access to Mentoring module
-        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
-    elif role == "coordinator":
-        # Coordinator has access to Mentoring module
-        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
-    elif role == "mentor":
-        # Mentor has access to Mentoring module
-        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
     elif role == "exam":
         filtered_menus = {"Examinations": all_menus["Examinations"]}
     elif role == "hr":

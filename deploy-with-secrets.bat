@@ -1,11 +1,13 @@
 @echo off
 REM Deploy script for GCU App with proper secrets handling
+
 echo 🚀 Deploying GCU App to Google Cloud...
 
 REM Check if secrets.toml exists
 if not exist ".streamlit\secrets.toml" (
     echo ❌ Error: .streamlit\secrets.toml not found!
     echo Please ensure your secrets.toml file is in the .streamlit directory.
+    pause
     exit /b 1
 )
 
@@ -15,16 +17,15 @@ REM Deploy to App Engine
 echo 📦 Deploying to App Engine...
 gcloud app deploy app.yaml --quiet
 
-if %errorlevel% equ 0 (
+if %ERRORLEVEL% EQU 0 (
     echo ✅ Deployment successful!
-    echo 🌐 Your app should be available at: https://%PROJECT_ID%.appspot.com
+    echo 🌐 Your app is available at:
+    gcloud app browse
 ) else (
     echo ❌ Deployment failed. Check the logs above for details.
+    pause
     exit /b 1
 )
 
-
-
-
-
+pause
 

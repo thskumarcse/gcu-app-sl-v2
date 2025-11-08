@@ -190,6 +190,9 @@ def merge_files(df_in, df_out, no_working_days):
 
         morning_abs = list(morning_set - set(day_abs))
         afternoon_abs = list(afternoon_set - set(day_abs))
+        
+        # Remove full-day absences from half_day_flags
+        half_day_flags = [date for date in half_day_flags if date not in day_abs]
 
         merged_data.append({
             'Emp Id': emp_id,
@@ -218,7 +221,7 @@ def merge_files(df_in, df_out, no_working_days):
     df['Present'] = no_working_days - df['Absent']
     df['Working Days'] = no_working_days 
     return df
-
+"""
 def merge_files_staffs(df_in, df_out, official_working_days):
     # Calculate the total number of official working days from the list
     #no_official_working_days = calculate_total_official_working_days(official_working_days)
@@ -443,6 +446,7 @@ def merge_files_staffs(df_in, df_out, official_working_days):
     df['Working Days'] = no_official_working_days
     
     return df
+"""
 
 def split_file(df):
     dates = calculate_date_month(df)
@@ -1188,4 +1192,380 @@ def preprocess_date(value):
                 continue
     
     return None
+
+import pandas as pd
+
+def pad_month_in_columns(df, prefix):
+    """
+    Pads the month part of column names with a leading zero (e.g., '9_18' to '09_18')
+    for columns starting with a specified prefix.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to modify.
+        prefix (str): The starting string of the columns to be renamed 
+                      (e.g., 'clock_in_', 'clock_out_').
+
+    Returns:
+        pd.DataFrame: The DataFrame with renamed columns.
+    """
+    # --- Step 1: remove columns with Unnamed.........
+    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+
+    # -- Step 2: do padding for mm_dd
+    rename_map = {}
+    
+    # Ensure the prefix ends with an underscore for easier splitting, e.g., 'clock_in' -> 'clock_in_'
+    if not prefix.endswith('_'):
+        search_prefix = prefix + '_'
+    else:
+        search_prefix = prefix
+
+    for old_col in df.columns:
+        if old_col.startswith(search_prefix):
+            # The part after the prefix will be the date: '9_18'
+            date_part = old_col[len(search_prefix):] 
+            
+            # Split the date part: '9_18' -> ['9', '18']
+            parts = date_part.split('_')
+            
+            # We expect exactly two parts: month and day
+            if len(parts) == 2:
+                month = parts[0] # '9'
+                day = parts[1]   # '18'
+                
+                # Pad the month with a leading zero (e.g., '9' becomes '09')
+                padded_month = month.zfill(2)
+                padded_day = day.zfill(2)
+                
+                # Reconstruct the new column name
+                new_col = f"{search_prefix}{padded_month}_{padded_day}"
+
+                # Add to the rename map if the name has actually changed
+                if old_col != new_col:
+                    rename_map[old_col] = new_col
+
+    # Rename the columns in the DataFrame in place
+    df.rename(columns=rename_map, inplace=True)
+    # print(f"DEBUG: pad_month_in_columns renamed {len(rename_map)} columns with prefix '{search_prefix}'. Examples: {list(rename_map.items())[:3]}")
+ 
+    return df
+def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_working_days="", verbose=True):
+    """
+    Detect holidays for staff attendance data.
+
+    Rules:
+    - Sundays and 1st & 3rd Saturdays are holidays.
+    - misc_holidays (list[str]) are *always* treated as holidays if they fall within attendance period.
+    - misc_working_days override everything and are *always* working days.
+
+    Parameters
+    ----------
+    df_clock_in : pd.DataFrame
+        Clock-in dataframe with columns like 'clock_in_09_10', 'clock_in_09_11', etc.
+    year : int, optional
+        Year of attendance period (default = current year).
+    misc_holidays : list[str], optional
+        List of manual holidays (e.g., ['29-sep-2024', '30-sep-2024']).
+    misc_working_days : str
+        Comma-separated list of dates to force as working days.
+    verbose : bool
+        Whether to print debug info.
+
+    Returns
+    -------
+    list[str]
+        List of column names (e.g., ['clock_in_09_06', 'clock_in_09_07', ...]) that are holidays.
+    """
+
+    clock_in_cols = [c for c in df_clock_in.columns if c.startswith("clock_in_")]
+    if not clock_in_cols:
+        if verbose:
+            print("⚠️ No 'clock_in_' columns found.")
+        return []
+
+    current_year = year or datetime.now().year
+    misc_holidays = misc_holidays or []
+
+    # ---------- Helper functions ----------
+    def try_parse_date(s):
+        s = s.strip()
+        for fmt in ("%d-%b-%Y", "%d-%B-%Y", "%d-%m-%Y"):
+            try:
+                return datetime.strptime(s, fmt)
+            except ValueError:
+                continue
+        raise ValueError(f"Invalid date format: {s}")
+
+    def col_variants(d):
+        """Generate possible clock_in column name formats for a given date"""
+        m, day = d.month, d.day
+        return {
+            f"clock_in_{m}_{day}",
+            f"clock_in_{m:02d}_{day}",
+            f"clock_in_{m}_{day:02d}",
+            f"clock_in_{m:02d}_{day:02d}",
+        }
+
+    def parse_misc_list(txt):
+        if not txt.strip():
+            return []
+        return [try_parse_date(x) for x in txt.split(",") if x.strip()]
+
+    def find_matching_cols(dates):
+        matched = set()
+        for d in dates:
+            for variant in col_variants(d):
+                if variant in clock_in_cols:
+                    matched.add(variant)
+                    break
+        return matched
+
+    # ---------- Determine attendance date range ----------
+    date_objs = []
+    for col in clock_in_cols:
+        try:
+            parts = col.split("_")
+            m, d = int(parts[-2]), int(parts[-1])
+            date_objs.append(datetime(current_year, m, d))
+        except Exception:
+            continue
+
+    if not date_objs:
+        if verbose:
+            print("⚠️ No valid clock-in date columns found.")
+        return []
+
+    start_date, end_date = min(date_objs), max(date_objs)
+
+    # ---------- Filter misc_holidays within date range ----------
+    misc_holiday_dates = []
+    for h in misc_holidays:
+        try:
+            dt = try_parse_date(h)
+            if start_date <= dt <= end_date:
+                misc_holiday_dates.append(dt)
+        except Exception as e:
+            if verbose:
+                print(f"⚠️ Skipping invalid misc holiday '{h}': {e}")
+
+    misc_holiday_cols = find_matching_cols(misc_holiday_dates)
+    misc_working_cols = find_matching_cols(parse_misc_list(misc_working_days))
+
+    # ---------- Calendar-based holidays ----------
+    calendar_based = set()
+    for col in clock_in_cols:
+        try:
+            parts = col.split("_")
+            month, day = int(parts[-2]), int(parts[-1])
+            date_obj = datetime(current_year, month, day)
+            weekday = date_obj.weekday()  # Mon=0 ... Sun=6
+            week_num = (date_obj.day - 1) // 7 + 1
+            if weekday == 6 or (weekday == 5 and week_num in [1, 3]):
+                calendar_based.add(col)
+        except Exception:
+            continue
+
+    # ---------- Combine all ----------
+    holidays = set(calendar_based)
+    holidays.update(misc_holiday_cols)
+    holidays.difference_update(misc_working_cols)
+
+    # ---------- Normalize column names ----------
+    normalized_holidays = []
+    for col in holidays:
+        parts = col.split("_")
+        if len(parts) >= 4:
+            try:
+                m, d = int(parts[-2]), int(parts[-1])
+                normalized_holidays.append(f"clock_in_{m:02d}_{d:02d}")
+            except:
+                normalized_holidays.append(col)
+        else:
+            normalized_holidays.append(col)
+
+    all_holidays = sorted(set(normalized_holidays))
+
+    if verbose:
+        print(f"📅 Attendance period: {start_date.strftime('%d-%b-%Y')} → {end_date.strftime('%d-%b-%Y')}")
+        print(f"📆 Calendar holidays: {sorted(calendar_based)}")
+        print(f"➕ Manual holidays (within range): {sorted(misc_holiday_cols)}")
+        print(f"➖ Manual working days: {sorted(misc_working_cols)}")
+        print(f"🎯 Final holidays: {all_holidays}")
+
+    return all_holidays
+
+# this is final
+def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
+                       misc_holidays="", misc_working_days=""):
+    """
+    Merge IN/OUT attendance data with employee details and compute daily & summary flags.
+
+    Automatically detects the year from date columns (e.g. 'clock_in_9_17').
+
+    Parameters
+    ----------
+    df_admin_in : pd.DataFrame
+        DataFrame containing clock-in times (columns like 'clock_in_9_10', ...).
+    df_admin_out : pd.DataFrame
+        DataFrame containing clock-out times (columns like 'clock_out_9_10', ...).
+    emp_df : pd.DataFrame
+        Employee details with columns ['Emp ID', 'Name', 'Designation', 'Department'].
+    no_working_days : int
+        Total number of working days in the period.
+    misc_holidays : str
+        Comma-separated list of extra holidays (dd-mmm-yyyy).
+    misc_working_days : str
+        Comma-separated list of days that should be treated as working even if normally holidays.
+
+    Returns
+    -------
+    pd.DataFrame
+        Summary attendance report per employee.
+    """
+    # --- Step 2: Identify date columns ---
+    clock_in_cols = [c for c in df_admin_in.columns if c.startswith('clock_in_')]
+    clock_out_cols = [c for c in df_admin_out.columns if c.startswith('clock_out_')]
+
+    if not clock_in_cols or not clock_out_cols:
+        raise ValueError("No clock_in_ or clock_out_ columns found in input dataframes.")
+
+    # --- Step 3: Infer year automatically ---
+    # Pick the middle date column, e.g. 'clock_in_9_17'
+    sample_col = clock_in_cols[len(clock_in_cols)//2]
+    parts = sample_col.split("_")
+    month, day = int(parts[-2]), int(parts[-1])
+    today = datetime.now()
+    inferred_year = today.year
+    # optional heuristic: if month ahead of current month (e.g., data for past year)
+    if month > today.month + 1:
+        inferred_year -= 1
+
+    # --- Step 4: Merge IN/OUT data ---
+    df_admin_in.rename(columns={'Names': 'Name'}, inplace=True)
+    emp_df.rename(columns={'Name': 'Name'}, inplace=True)
+
+    df = pd.merge(df_admin_in[['Emp Id', 'Name'] + clock_in_cols],
+                  df_admin_out[['Emp Id'] + clock_out_cols],
+                  on='Emp Id',
+                  how='outer')
+
+    # --- Step 5: Merge employee details ---
+    df = pd.merge(df, emp_df[['Emp Id', 'Designation', 'Department']],
+                  on='Emp Id', how='left')
+
+    # --- Step 6: Detect holidays (including misc overrides) ---
+    """ --- this has been removed
+    holiday_cols = detect_holidays_staffs(
+        df[clock_in_cols],
+        year=inferred_year,
+        misc_holidays=misc_holidays,
+        misc_working_days=misc_working_days,
+        verbose=False
+    )
+    """
+    # --- Step 7: Compute late/early flags ---
+    late_flags_df = calculate_late(df, clock_in_cols)
+    early_flags_df = calculate_early(df, clock_out_cols)
+
+    results = []
+
+    # --- Step 8: Process each employee ---
+    for idx, row in df.iterrows():
+        emp_id = row['Emp Id']
+        name = row['Name']
+        desig = str(row.get('Designation', '')).strip().lower()
+
+        late_flags, early_flags = [], []
+        am_abs, pm_abs = [], []
+        full_abs_dates, half_day_dates = [], []
+
+        for col_in, col_out in zip(clock_in_cols, clock_out_cols):
+            dd_mm = col_in.replace('clock_in_', '')
+            #if col_in in holiday_cols:
+            #    continue  # skip processing for holidays
+
+            val_in = str(row[col_in])
+            val_out = str(row[col_out])
+
+            # Full day absent
+            if val_in == '0' and val_out == '0':
+                full_abs_dates.append(dd_mm)
+                continue
+
+            # Half-day absent
+            # Check if one is '0' (absent) and the other has a time value (present)
+            if val_in == '0' and val_out != '0':
+                # Present in PM only (clock_out has value)
+                half_day_dates.append(dd_mm)
+                am_abs.append(dd_mm)
+            elif val_in != '0' and val_out == '0':
+                # Present in AM only (clock_in has value)
+                half_day_dates.append(dd_mm)
+                pm_abs.append(dd_mm)
+            elif val_in != '0' and val_out != '0':
+                # Both have values - check for late arrival or early departure
+                # Check if clock_in is after 10:30 AM (late arrival = AM absence)
+                try:
+                    clock_in_time = datetime.strptime(val_in, '%H:%M:%S').time()
+                    if clock_in_time > datetime.strptime('10:30:00', '%H:%M:%S').time():
+                        half_day_dates.append(dd_mm)
+                        am_abs.append(dd_mm)
+                except (ValueError, TypeError):
+                    pass
+                
+                # Check if clock_out is between 12:15 PM and 3:30 PM (early departure = PM absence)
+                try:
+                    clock_out_time = datetime.strptime(val_out, '%H:%M:%S').time()
+                    out_low = datetime.strptime('12:15:00', '%H:%M:%S').time()
+                    out_high = datetime.strptime('15:30:00', '%H:%M:%S').time()
+                    if out_low <= clock_out_time < out_high:
+                        half_day_dates.append(dd_mm)
+                        pm_abs.append(dd_mm)
+                except (ValueError, TypeError):
+                    pass
+
+            # Late and early flags
+            if late_flags_df.loc[idx, col_in] == 'Late':
+                late_flags.append(dd_mm)
+            if early_flags_df.loc[idx, col_out] == 'Early Leave':
+                early_flags.append(dd_mm)
+
+            # Driver exception rule
+            if 'driver' in desig:
+                if (val_in != '0') or (val_out != '0'):
+                    continue
+                else:
+                    full_abs_dates.append(dd_mm)
+
+        # --- Step 9: Calculate totals ---
+        # Separate full-day absences from half-day absences
+        # Count unique half-days by combining am_abs and pm_abs into a set
+        half_day_set = set(am_abs) | set(pm_abs)
+        total_abs_days = len(full_abs_dates) + 0.5 * len(half_day_set)
+
+        results.append({
+            'Emp Id': emp_id,
+            'Name': name,
+            'Designation': row.get('Designation', ''),
+            'Department': row.get('Department', ''),
+            'late_flags': ', '.join(late_flags),
+            'early_flags': ', '.join(early_flags),
+            'half_day_flags': ', '.join(half_day_dates),
+            'AM_abs': ', '.join(am_abs),
+            'PM_abs': ', '.join(pm_abs),
+            'days_abs': ', '.join(full_abs_dates),
+            'No_of_AM_abs': len(am_abs),
+            'No_of_PM_abs': len(pm_abs),
+            'actual_No_of_late': len(late_flags),
+            'actual_half_day': len(half_day_dates),
+            'actual_full_day': len(full_abs_dates),
+            'Working Days': no_working_days,
+            'Present': no_working_days - total_abs_days,
+            'Absent': total_abs_days
+          })
+
+    if not results:
+        raise ValueError("No employee records processed.")
+
+    return pd.DataFrame(results)
 
