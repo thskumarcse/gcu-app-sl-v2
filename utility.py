@@ -438,7 +438,7 @@ def clean_course_name(name: str) -> str:
         return name
 
     # Normalize all dash types (– — − → -)
-    name = re.sub(r"[–—−]", "-", name)
+    #name = re.sub(r"[–—−]", "-", name)
 
     # Remove all special characters except A–Z, a–z, 0–9, spaces, and '-'
     name = re.sub(r"[^A-Za-z0-9\s\-]", "", name)
@@ -448,7 +448,7 @@ def clean_course_name(name: str) -> str:
         return re.sub(r'\s*[-–—−]\s*Assignment.*', ' - Assignment', name, flags=re.IGNORECASE)
 
     # Remove any right-side descriptor like '– Theory', '– Practical' etc.
-    name = re.sub(r'\s*[-–—−]\s*(Theory|Practical)\b.*', '', name, flags=re.IGNORECASE)
+    #name = re.sub(r'\s*[-–—−]\s*(Theory|Practical)\b.*', '', name, flags=re.IGNORECASE)
 
     # Clean double spaces and stray dashes
     name = re.sub(r'\s*-\s*$', '', name)      # remove trailing '-'

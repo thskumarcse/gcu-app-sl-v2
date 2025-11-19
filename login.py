@@ -64,6 +64,8 @@ def login():
     """
     fix_streamlit_layout(padding_top="0.6rem") 
     set_compact_theme()
+    if "authenticated" not in st.session_state:
+            st.session_state.authenticated = False
     
     # Custom CSS for centered, compact login form
     st.markdown("""
@@ -182,6 +184,7 @@ def login():
 
     # --- Login form ---
     if mode == "Login":
+        
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.markdown('<div class="form-container">', unsafe_allow_html=True)
@@ -230,6 +233,7 @@ def login():
                     else:
                         st.session_state.login_attempts += 1
                         st.error("User ID not found.")
+        
 
     elif mode == "Register":
         col1, col2, col3 = st.columns([1, 2, 1])
@@ -320,10 +324,14 @@ def login():
                                 password_col_index = df_users.columns.get_loc('Password') + 1
                                 gs_ws.update_cell(gs_row_number, password_col_index, hashed_password)
                                 
+                                
                                 st.success("🎉 Password updated successfully! You can now log in.")
                                 reset_registration_state()
+                                st.session_state.authenticated = False  # ensure clean state
                                 st.rerun()
+                                
                             except Exception as e:
                                 st.error(f"Failed to update password: {e}")
 
     return st.session_state.get('authenticated', False)
+    

@@ -4,7 +4,7 @@ from utility import detect_screen_width, get_authorized_pages_for_role
 import login
 import os
 #import hr_attendance, hr_feedback
-import hr_feedback
+import hr_attendance, hr_feedback
 import exam_transcript, exam_transcript_p, exam_marksheet, exam_admitcard, exam_results, exam_results_all
 import solver_nn
 
@@ -43,7 +43,7 @@ def render_page(page_name, role):
     """Render the correct page based on menu selection and user role."""
     page_map = {
         #"Attendance": hr_attendance.app,
-        "Attendance": hr_feedback.app,
+        "Attendance": hr_attendance.app,
         "Feedback": hr_feedback.app,
         "Transcript": exam_transcript.app,
         "Marksheet": exam_transcript_p.app,

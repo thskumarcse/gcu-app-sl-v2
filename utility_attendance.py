@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np  
 from typing import List
 from datetime import datetime, timedelta, date
+from streamlit import progress
 
 
 # Set of special employee IDs allowed till 9:25
@@ -48,11 +49,10 @@ def stepwise_file_upload(labels=None, key_prefix="attendance"):
     st.markdown("---")
     
     # Balanced uploader size with progress bar
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        # Compact progress indicator - same width as uploader
-        progress = (current_index) / len(labels)
-        st.progress(progress, text=f"Progress: {current_index}/{len(labels)}")
+    col = st.container()
+    with col:
+        progress_value = current_index / len(labels)
+        st.progress(progress_value, text=f"Progress: {current_index}/{len(labels)}")
         st.markdown(f"**📁 {label} File**")
         uploaded_file = st.file_uploader(
             f"Choose {label} file",
