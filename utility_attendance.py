@@ -4,7 +4,8 @@ import numpy as np
 from typing import List
 from datetime import datetime, timedelta, date
 from streamlit import progress
-
+import io
+import time
 
 # Set of special employee IDs allowed till 9:25
 LATE_ALLOWED_IDS = {'GCU010013', 'GCU010017', 'GCU010025', 'GCU030010', 'GCU010005', 'GCU020004'}
@@ -24,75 +25,152 @@ def stepwise_file_upload(labels=None, key_prefix="attendance"):
 
     dfs_key = f"{key_prefix}_dfs"
     idx_key = f"{key_prefix}_index"
+    bytes_key = f"{key_prefix}_bytes"
 
     # Reset button
     if st.button("🔄 Reset Uploads"):
         st.session_state.pop(dfs_key, None)
         st.session_state.pop(idx_key, None)
+        st.session_state.pop(bytes_key, None)
         st.rerun()
 
     # Initialize session state
     if dfs_key not in st.session_state:
         st.session_state[dfs_key] = {}
         st.session_state[idx_key] = 0
+    if bytes_key not in st.session_state:
+        st.session_state[bytes_key] = {}
 
     current_index = st.session_state[idx_key]
 
     # If all files done → return
     if current_index >= len(labels):
-        # All files uploaded successfully
         return st.session_state[dfs_key]
 
     label = labels[current_index]
 
-    # Compact file uploader
+    # UI
     st.markdown("---")
-    
-    # Balanced uploader size with progress bar
     col = st.container()
     with col:
         progress_value = current_index / len(labels)
         st.progress(progress_value, text=f"Progress: {current_index}/{len(labels)}")
-        st.markdown(f"**📁 {label} File**")
+        st.markdown(f"** Upload {label} File**")
+
         uploaded_file = st.file_uploader(
             f"Choose {label} file",
             type=["csv", "xlsx", "xls"],
             key=f"{key_prefix}_uploader_{current_index}",
-            help=f"Upload {label} attendance file",
+            help=f"Upload {label} file",
             label_visibility="collapsed"
         )
-        
-        # Compact status messages
-        if current_index > 0:
-            st.success(f"✅ {labels[current_index-1]}")
-        
-        if current_index < len(labels) - 1:
-            st.caption(f"Next: {labels[current_index+1]}")
 
+        #if current_index > 0:
+        #    st.success(f"✅ {labels[current_index-1]}")
+        #if current_index < len(labels) - 1:
+        #    st.caption(f"Next: {labels[current_index+1]}")
+
+    # Handle upload
     if uploaded_file:
         try:
-            # Example special rule for LEAVE file
+            # --- Store file bytes permanently ---
+            file_bytes = uploaded_file.read()
+            st.session_state[bytes_key][label] = file_bytes
+
+            bio = io.BytesIO(file_bytes)
+
+            # --- Read based on type ---
             if label == "LEAVE":
-                df = pd.read_csv(uploaded_file, skiprows=6, encoding="windows-1252")
+                df = pd.read_csv(bio, skiprows=6, encoding="windows-1252")
             elif uploaded_file.name.lower().endswith(".csv"):
                 try:
-                    df = pd.read_csv(uploaded_file, encoding="utf-8")
+                    df = pd.read_csv(bio, encoding="utf-8")
                 except UnicodeDecodeError:
-                    df = pd.read_csv(uploaded_file, encoding="latin-1")
+                    df = pd.read_csv(bio, encoding="latin-1")
             else:
-                df = pd.read_excel(uploaded_file)
+                df = pd.read_excel(bio)
 
-            # Save and move to next step
+            # Save DF
             st.session_state[dfs_key][label] = df
+
+            # Move to next step
             st.session_state[idx_key] += 1
-            st.write(f"✅ {label} file uploaded successfully! Shape: {df.shape}")
-            st.write(f"Current upload progress: {st.session_state[idx_key]}/{len(labels)}")
+
+            #st.success(f"✅ {label} file uploaded successfully! Shape: {df.shape}")
+            # upload progress message removed to avoid debug output
+
             st.rerun()
 
         except Exception as e:
+            # Detect common Streamlit rerun-control exceptions (RerunData, RerunException, etc.)
+            def _is_rerun_exc(ex):
+                try:
+                    if getattr(ex, "is_fragment_scoped_rerun", False):
+                        return True
+                except Exception:
+                    pass
+                # Type name heuristics
+                tname = type(ex).__name__
+                if "Rerun" in tname or "rerun" in tname.lower():
+                    return True
+                # Some reprs include RerunData
+                try:
+                    if "RerunData" in repr(ex) or "rerun" in repr(ex).lower():
+                        return True
+                except Exception:
+                    pass
+                # Module-based heuristic
+                try:
+                    mod = getattr(type(ex), "__module__", "")
+                    if mod and "streamlit" in mod:
+                        return True
+                except Exception:
+                    pass
+                return False
+
+            if _is_rerun_exc(e):
+                raise
+
             st.error(f"❌ Failed to read {uploaded_file.name}: {e}")
 
     return st.session_state[dfs_key]
+
+
+def read_session_bytes_with_retry(bytes_key: str, attempts: int = 3, delay: float = 0.1):
+    """Read bytes stored in `st.session_state[bytes_key]` with retries.
+
+    This helper handles transient Streamlit rerun-control exceptions by
+    re-raising them (so Streamlit can manage reruns) and retrying on other
+    transient failures. Returns bytes if available, or raises the last
+    exception if attempts are exhausted.
+    """
+    last_exc = None
+    for attempt in range(1, attempts + 1):
+        try:
+            if bytes_key not in st.session_state:
+                raise KeyError(f"{bytes_key} not in session_state")
+            data = st.session_state[bytes_key]
+            if data is None:
+                raise ValueError(f"{bytes_key} is None in session_state")
+            return data
+        except Exception as ex:
+            # If this is a Streamlit rerun-control exception, re-raise it.
+            try:
+                if getattr(ex, "is_fragment_scoped_rerun", False):
+                    raise
+            except Exception:
+                pass
+
+            tname = type(ex).__name__
+            if "Rerun" in tname or "rerun" in tname.lower() or "RerunData" in repr(ex):
+                raise
+
+            last_exc = ex
+            if attempt < attempts:
+                time.sleep(delay)
+                continue
+            raise last_exc
+
 
 def merge_files(df_in, df_out, no_working_days):
     total_days = len(calculate_working_days(df_in))

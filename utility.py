@@ -61,13 +61,34 @@ def get_sheet_id():
     except:
         return None
 
-# 🔹 Initialize a global gspread client when this file is imported
+# 🔹 Lazy-initialized global gspread client helper
 
-try:
-    gs_client = connect_gsheet()
-except Exception as e:
-    gs_client = None
-    st.error(f"Global gs_client not initialized: {e}")
+# Do NOT connect to Google Sheets at import time. Instead provide a
+# getter that initializes the client on first use. This prevents
+# Streamlit UI from being rendered during module import (which may
+# happen when pages are imported by `main.py`).
+gs_client = None
+
+def get_gs_client(silent: bool = True):
+    """
+    Return a cached gspread client. If not initialized, attempt to
+    connect using `connect_gsheet()` and cache the result.
+
+    Args:
+        silent: if False, surface Streamlit errors when connection fails.
+    """
+    global gs_client
+    if gs_client is not None:
+        return gs_client
+
+    try:
+        gs_client = connect_gsheet()
+        return gs_client
+    except Exception as e:
+        gs_client = None
+        if not silent:
+            st.error(f"Global gs_client not initialized: {e}")
+        return None
 
 
 # this is old one without create_if_missing
@@ -455,3 +476,29 @@ def clean_course_name(name: str) -> str:
     name = re.sub(r'\s{2,}', ' ', name).strip()
 
     return name
+
+def convert_date_format(date_string):
+    """
+    Converts a date string from DD-MM-YYYY to YYYY-MM-DD format.
+
+    """
+    if not date_string or pd.isna(date_string):
+        return pd.NaT
+    try:
+        return datetime.strptime(str(date_string), "%d-%m-%Y").date()
+    except ValueError:
+        try:
+            # fallback for YYYY-MM-DD or mixed formats
+            return pd.to_datetime(date_string, dayfirst=True, errors="coerce").date()
+        except Exception:
+            return pd.NaT
+
+
+# Fallback: ensure `detect_screen_width` exists even if earlier import-time code didn't define it.
+# Some environments (Streamlit runtime) may partially import modules during reruns,
+# so provide a minimal safe implementation as a fallback.
+if "detect_screen_width" not in globals():
+    def detect_screen_width():
+        if "screen_width" not in st.session_state:
+            st.session_state["screen_width"] = 1024
+        return st.session_state["screen_width"]

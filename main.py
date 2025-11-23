@@ -3,13 +3,38 @@ from streamlit_option_menu import option_menu
 from utility import detect_screen_width, get_authorized_pages_for_role
 import login
 import os
-#import hr_attendance, hr_feedback
-import hr_attendance, hr_feedback
-import exam_transcript, exam_transcript_p, exam_marksheet, exam_admitcard, exam_results, exam_results_all
-import solver_nn
 
-# Import modules - error handling moved to main() function
 
+def _is_rerun_exc(ex):
+    try:
+        if getattr(ex, "is_fragment_scoped_rerun", False):
+            return True
+    except Exception:
+        pass
+    tname = type(ex).__name__
+    if "Rerun" in tname or "rerun" in tname.lower():
+        return True
+    try:
+        if "RerunData" in repr(ex) or "rerun" in repr(ex).lower():
+            return True
+    except Exception:
+        pass
+    try:
+        mod = getattr(type(ex), "__module__", "")
+        if mod and "streamlit" in mod:
+            return True
+    except Exception:
+        pass
+    return False
+
+# Import modules with error handling
+try:
+    import hr_attendance
+    import exam_transcript, exam_transcript_p, exam_marksheet, exam_admitcard, exam_results, exam_results_all
+    import solver_nn
+except ImportError as e:
+    st.error(f"Failed to import required modules: {e}")
+    st.stop()
 
 # --- Custom CSS for violet theme ---
 custom_styles = {
@@ -36,21 +61,38 @@ APP_CONFIG = {
     "version": "1.0.0",
     "description": "Galgotias College University Management System"
 }
-# Page config will be set in main() function
+
+def _resolve_app(module_name: str, display_name: str = None):
+    """Return the `app` callable from a module if available, otherwise return a stub.
+
+    This prevents import-time or missing-module errors when menu items reference
+    modules that aren't present in the workspace.
+    """
+    mod = globals().get(module_name)
+    if mod and hasattr(mod, "app"):
+        return getattr(mod, "app")
+
+    def _stub():
+        st.error(f"Page '{display_name or module_name}' is not available.")
+
+    return _stub
 
 # --- Page Rendering Logic ---
 def render_page(page_name, role):
     """Render the correct page based on menu selection and user role."""
     page_map = {
-        #"Attendance": hr_attendance.app,
-        "Attendance": hr_attendance.app,
-        "Feedback": hr_feedback.app,
-        "Transcript": exam_transcript.app,
-        "Marksheet": exam_transcript_p.app,
-        "Admit Card": exam_admitcard.app,
-        "Results": exam_results.app,
-        "All Programs Results": exam_results_all.app,
-        "Neural Network": solver_nn.app,
+        "Attendance": _resolve_app('hr_attendance', 'Attendance'),
+        "Feedback": _resolve_app('hr_feedback', 'Feedback'),
+        "Transcript": _resolve_app('exam_transcript', 'Transcript'),
+        "Transcript (%)": _resolve_app('exam_transcript_p', 'Transcript (%)'),
+        "Mark Sheet": _resolve_app('exam_marksheet', 'Mark Sheet'),
+        "Admit Card": _resolve_app('exam_admitcard', 'Admit Card'),
+        "Results": _resolve_app('exam_results', 'Results'),
+        "All Programs Results": _resolve_app('exam_results_all', 'All Programs Results'),
+        "Mentor-Mentee": _resolve_app('mentoring_assign', 'Mentor-Mentee'),
+        "Data Input": _resolve_app('mentoring_mentoring', 'Data Input'),
+        "Reports": _resolve_app('mentoring_reports', 'Reports'),
+        "Neural Network": _resolve_app('solver_nn', 'Neural Network'),
     }
 
     authorized_pages = get_authorized_pages_for_role(role)
@@ -62,16 +104,19 @@ def render_page(page_name, role):
         try:
             page_map[page_name]()
         except Exception as e:
+            # If this is a Streamlit rerun-control exception, re-raise so
+            # Streamlit can handle the rerun instead of showing a raw error.
+            if _is_rerun_exc(e):
+                raise
             st.error(f"Error loading {page_name} page: {e}")
             st.info("Please try refreshing the page or contact support if the issue persists.")
     else:
         st.info("Please select an option from the sidebar.")
 
 
-
 # --- Main App ---
 def main():
-    # Set page config - must be first Streamlit command
+    # Set page config
     st.set_page_config(
         page_title=APP_CONFIG["title"],
         page_icon="🎓",
@@ -79,8 +124,16 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    
     detect_screen_width()
+
+    # Defensive: On first run in this browser session, remove any stale auth keys
+    # that might cause the app to skip the login screen. We only do this once
+    # per session to avoid disrupting a legitimately logged-in user after login.
+    if "_auth_cleared_once" not in st.session_state:
+        for k in ["authenticated", "current_user", "user_id", "role", "dev_logged_out"]:
+            if k in st.session_state:
+                del st.session_state[k]
+        st.session_state["_auth_cleared_once"] = True
 
     # Production mode indicator (only show in dev mode)
     if DEV_MODE:
@@ -94,39 +147,30 @@ def main():
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
 
-    if DEV_MODE:
-        # 🔹 Bypass login during development (unless explicitly logged out)
-        if not st.session_state.get("dev_logged_out", False):
-            st.session_state.authenticated = True
-            st.session_state["role"] = "admin"
-            st.session_state["current_user"] = {
-                "Name": "Development User",
-                "Designation": "System Administrator",
-                "Department": "IT Department"
-            }
-        else:
-            # Show login page even in dev mode if logged out
-            st.session_state.authenticated = login.login()
-            if st.session_state.authenticated:
-                st.session_state.dev_logged_out = False  # Reset logout flag
-                st.rerun()
-            st.stop()
-    else:
-        # Production mode - always require authentication
-        if not st.session_state.authenticated:
-            st.session_state.authenticated = login.login()
-            if st.session_state.authenticated:
-                st.rerun()
-            st.stop()
+    # Defensive: If `authenticated` is True but no user context exists, treat as not authenticated.
+    # This handles persisted session_state from earlier runs or accidental dev-auto-logins.
+    if st.session_state.get("authenticated"):
+        if not st.session_state.get("current_user") and not st.session_state.get("user_id"):
+            st.session_state.authenticated = False
+
+    # Always require authentication (both dev and production).
+    if not st.session_state.authenticated:
+        st.session_state.authenticated = login.login()
+        if st.session_state.authenticated:
+            st.rerun()
+        st.stop()
 
     # Get user role
     role = st.session_state.get("role", "guest")
 
+    # Debug view removed for production: session_state / role prints deleted
     # --- Menus ---
     all_menus = {
         "HR Dept": {"icon": "people", "submenu": {"Attendance": "Attendance", "Feedback": "Feedback"}},
         "Examinations": {"icon": "book", "submenu": {
-            "Transcript": "Transcript", "Marksheet": "Marksheet", "Admit Card": "Admit Card", "Results": "Results", "All Programs Results": "All Programs Results"}},
+            "Transcript": "Transcript", "Transcript (%)": "Transcript (%)", "Mark Sheet": "Mark Sheet", "Admit Card": "Admit Card", "Results": "Results", "All Programs Results": "All Programs Results"}},
+        "Mentoring": {"icon": "clipboard", "submenu": {
+            "Mentor-Mentee": "Mentor-Mentee", "Data Input": "Data Input", "Reports": "Reports"}},
         "Solver": {"icon": "calculator", "submenu": {
             "Neural Network": "Neural Network"}}
     }
@@ -135,6 +179,21 @@ def main():
     filtered_menus = {}
     if role == "admin":
         filtered_menus = all_menus
+    elif role == "mentor_admin":
+        # Mentor-admin has access to both Mentoring and Examinations
+        filtered_menus = {
+            "Mentoring": all_menus["Mentoring"],
+            "Examinations": all_menus["Examinations"]
+        }
+    elif role == "hod":
+        # HOD has access to Mentoring module
+        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
+    elif role == "coordinator":
+        # Coordinator has access to Mentoring module
+        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
+    elif role == "mentor":
+        # Mentor has access to Mentoring module
+        filtered_menus = {"Mentoring": all_menus["Mentoring"]}
     elif role == "exam":
         filtered_menus = {"Examinations": all_menus["Examinations"]}
     elif role == "hr":
