@@ -20,8 +20,8 @@ def stepwise_file_upload(labels=None, key_prefix="attendance"):
     Returns a dict {label: DataFrame}.
     """
 
-    if labels is None:
-        labels = ["File1", "File2"]
+    #if labels is None:
+    #    labels = ["File1", "File2"]
 
     dfs_key = f"{key_prefix}_dfs"
     idx_key = f"{key_prefix}_index"
@@ -29,9 +29,9 @@ def stepwise_file_upload(labels=None, key_prefix="attendance"):
 
     # Reset button
     if st.button("🔄 Reset Uploads"):
-        st.session_state.pop(dfs_key, None)
-        st.session_state.pop(idx_key, None)
-        st.session_state.pop(bytes_key, None)
+        for k in [dfs_key, idx_key, bytes_key]:
+            if k in st.session_state:
+                del st.session_state[k]
         st.rerun()
 
     # Initialize session state
@@ -53,9 +53,9 @@ def stepwise_file_upload(labels=None, key_prefix="attendance"):
     st.markdown("---")
     col = st.container()
     with col:
-        progress_value = current_index / len(labels)
+        progress_value = current_index / max(len(labels), 1)
         st.progress(progress_value, text=f"Progress: {current_index}/{len(labels)}")
-        st.markdown(f"** Upload {label} File**")
+        st.markdown(f"**Upload {label} File**")
 
         uploaded_file = st.file_uploader(
             f"Choose {label} file",
@@ -90,6 +90,8 @@ def stepwise_file_upload(labels=None, key_prefix="attendance"):
             else:
                 df = pd.read_excel(bio)
 
+            
+            bio.close()
             # Save DF
             st.session_state[dfs_key][label] = df
 
@@ -98,7 +100,6 @@ def stepwise_file_upload(labels=None, key_prefix="attendance"):
 
             #st.success(f"✅ {label} file uploaded successfully! Shape: {df.shape}")
             # upload progress message removed to avoid debug output
-
             st.rerun()
 
         except Exception as e:
