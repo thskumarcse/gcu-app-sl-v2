@@ -15,7 +15,7 @@ from datetime import datetime
 
 # Import helpers from utility modules
 from utility_attendance import (
-    stepwise_file_upload, read_session_bytes_with_retry, process_exempted_leaves,
+    stepwise_file_upload, read_session_bytes_with_retry, process_exempted_leaves,_is_rerun_exc,
     split_file, pad_month_in_columns, detect_holidays_staffs, calculate_working_days,
     merge_files_staffs, calculate_leave_summary_with_wd_leaves, weighted_sum_and_replace_columns
 )
@@ -31,29 +31,6 @@ HOLIDAY_LIST = ['29-sep-2025','30-sep-2025','01-oct-2025','02-oct-2025','03-oct-
                 '17-sep-2026','02-oct-2026','19-oct-2026','20-oct-2026','21-oct-2026',
                 '22-oct-2026','23-oct-2026','24-oct-2026','25-oct-2026','08-nov-2026',
                 '24-nov-2026','25-dec-2026','26-dec-2026']
-
-
-def _is_rerun_exc(ex):
-    try:
-        if getattr(ex, "is_fragment_scoped_rerun", False):
-            return True
-    except Exception:
-        pass
-    tname = type(ex).__name__
-    if "Rerun" in tname or "rerun" in tname.lower():
-        return True
-    try:
-        if "RerunData" in repr(ex) or "rerun" in repr(ex).lower():
-            return True
-    except Exception:
-        pass
-    try:
-        mod = getattr(type(ex), "__module__", "")
-        if mod and "streamlit" in mod:
-            return True
-    except Exception:
-        pass
-    return False
 
 
 def app():

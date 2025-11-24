@@ -11,30 +11,40 @@ import time
 LATE_ALLOWED_IDS = {'GCU010013', 'GCU010017', 'GCU010025', 'GCU030010', 'GCU010005', 'GCU020004'}
 
 
-def stepwise_file_upload(labels=None, key_prefix="attendance"):
+def stepwise_file_upload(
+    upload_labels, 
+    key_prefix=None,
+    dfs_key=None,
+    idx_key=None
+):
     """
     Step-by-step uploader: only one uploader visible at a time.
-    Once uploaded, it disappears and the next uploader shows.
-    Stores results in st.session_state.
-    
-    Returns a dict {label: DataFrame}.
+    Supports:
+        - stepwise_file_upload(labels, key_prefix="attendance")
+        - stepwise_file_upload(labels, dfs_key="x", idx_key="y")
+        - stepwise_file_upload(labels)
     """
 
-    #if labels is None:
-    #    labels = ["File1", "File2"]
+    # --- Resolve storage keys ---
+    if key_prefix is not None:
+        dfs_key = f"{key_prefix}_dfs"
+        idx_key = f"{key_prefix}_index"
+        bytes_key = f"{key_prefix}_bytes"
+    else:
+        dfs_key = dfs_key or "uploaded_dfs"
+        idx_key = idx_key or "upload_index"
+        bytes_key = f"{dfs_key}_bytes"
 
-    dfs_key = f"{key_prefix}_dfs"
-    idx_key = f"{key_prefix}_index"
-    bytes_key = f"{key_prefix}_bytes"
+    labels = upload_labels
 
-    # Reset button
+    # --- Reset button ---
     if st.button("🔄 Reset Uploads"):
         for k in [dfs_key, idx_key, bytes_key]:
             if k in st.session_state:
                 del st.session_state[k]
         st.rerun()
 
-    # Initialize session state
+    # --- Initialize session state ---
     if dfs_key not in st.session_state:
         st.session_state[dfs_key] = {}
         st.session_state[idx_key] = 0
@@ -43,98 +53,62 @@ def stepwise_file_upload(labels=None, key_prefix="attendance"):
 
     current_index = st.session_state[idx_key]
 
-    # If all files done → return
+    # --- All uploads done ---
     if current_index >= len(labels):
         return st.session_state[dfs_key]
 
     label = labels[current_index]
 
-    # UI
     st.markdown("---")
-    col = st.container()
-    with col:
-        progress_value = current_index / max(len(labels), 1)
-        st.progress(progress_value, text=f"Progress: {current_index}/{len(labels)}")
-        st.markdown(f"**Upload {label} File**")
+    st.subheader(f"Upload {label} File")
 
-        uploaded_file = st.file_uploader(
-            f"Choose {label} file",
-            type=["csv", "xlsx", "xls"],
-            key=f"{key_prefix}_uploader_{current_index}",
-            help=f"Upload {label} file",
-            label_visibility="collapsed"
-        )
+    uploaded_file = st.file_uploader(
+        f"Choose {label}",
+        type=["csv", "xlsx", "xls"],
+        key=f"{dfs_key}_uploader_{current_index}",
+    )
 
-        #if current_index > 0:
-        #    st.success(f"✅ {labels[current_index-1]}")
-        #if current_index < len(labels) - 1:
-        #    st.caption(f"Next: {labels[current_index+1]}")
-
-    # Handle upload
+    # --- When a file is uploaded ---
     if uploaded_file:
         try:
-            # --- Store file bytes permanently ---
             file_bytes = uploaded_file.read()
             st.session_state[bytes_key][label] = file_bytes
 
             bio = io.BytesIO(file_bytes)
 
-            # --- Read based on type ---
+            # Special case for LEAVE CSV
             if label == "LEAVE":
                 df = pd.read_csv(bio, skiprows=6, encoding="windows-1252")
+
             elif uploaded_file.name.lower().endswith(".csv"):
                 try:
                     df = pd.read_csv(bio, encoding="utf-8")
                 except UnicodeDecodeError:
                     df = pd.read_csv(bio, encoding="latin-1")
+
             else:
                 df = pd.read_excel(bio)
 
-            
             bio.close()
-            # Save DF
-            st.session_state[dfs_key][label] = df
 
-            # Move to next step
+            st.session_state[dfs_key][label] = df
             st.session_state[idx_key] += 1
 
-            #st.success(f"✅ {label} file uploaded successfully! Shape: {df.shape}")
-            # upload progress message removed to avoid debug output
-            st.rerun()
+            #st.rerun()
 
         except Exception as e:
-            # Detect common Streamlit rerun-control exceptions (RerunData, RerunException, etc.)
-            def _is_rerun_exc(ex):
-                try:
-                    if getattr(ex, "is_fragment_scoped_rerun", False):
-                        return True
-                except Exception:
-                    pass
-                # Type name heuristics
-                tname = type(ex).__name__
-                if "Rerun" in tname or "rerun" in tname.lower():
-                    return True
-                # Some reprs include RerunData
-                try:
-                    if "RerunData" in repr(ex) or "rerun" in repr(ex).lower():
-                        return True
-                except Exception:
-                    pass
-                # Module-based heuristic
-                try:
-                    mod = getattr(type(ex), "__module__", "")
-                    if mod and "streamlit" in mod:
-                        return True
-                except Exception:
-                    pass
-                return False
-
-            if _is_rerun_exc(e):
+            # If it is NOT a rerun-related exception, show it
+            if not _is_rerun_exc(e):
+                st.error(f"❌ Failed to read {uploaded_file.name}: {e}")
+            # Always rethrow rerun exceptions so Streamlit handles them
+            else:
                 raise
 
-            st.error(f"❌ Failed to read {uploaded_file.name}: {e}")
+        # IMPORTANT: rerun must be OUTSIDE the try/except
+        st.rerun()
 
     return st.session_state[dfs_key]
+
 
 
 def read_session_bytes_with_retry(bytes_key: str, attempts: int = 3, delay: float = 0.1):
@@ -1648,3 +1622,24 @@ def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
 
     return pd.DataFrame(results)
 
+def _is_rerun_exc(ex):
+    try:
+        if getattr(ex, "is_fragment_scoped_rerun", False):
+            return True
+    except Exception:
+        pass
+    tname = type(ex).__name__
+    if "Rerun" in tname or "rerun" in tname.lower():
+        return True
+    try:
+        if "RerunData" in repr(ex) or "rerun" in repr(ex).lower():
+            return True
+    except Exception:
+        pass
+    try:
+        mod = getattr(type(ex), "__module__", "")
+        if mod and "streamlit" in mod:
+            return True
+    except Exception:
+        pass
+    return False
