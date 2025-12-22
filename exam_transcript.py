@@ -11,6 +11,12 @@ import warnings
 import re
 from xml.sax.saxutils import escape
 
+"""
+this generates transcripts for programs like M.Pharm, M.Tech, etc. 
+with two years/4 semesters of study. The result is of 2-page per student.
+It is based on CGPA/SGPA calculation.
+"""
+
 # ReportLab imports
 from reportlab.pdfgen import canvas
 from reportlab.platypus import (

@@ -2,14 +2,130 @@ import streamlit as st
 import pandas as pd
 import bcrypt
 import re
-from utility import connect_gsheet, get_dataframe, get_worksheet, \
-                    preprocess_date, verify_dob, fix_streamlit_layout, set_compact_theme
+import json
+from pathlib import Path
+from utility import verify_dob, fix_streamlit_layout, set_compact_theme
 from datetime import datetime, date
 
 # ==================== WARNING: DO NOT USE PLAIN-TEXT PASSWORDS IN PRODUCTION ====================
-# This code now uses bcrypt for password hashing, which is a significant security improvement.
-# Ensure that your `utility.py` functions correctly correctly handle the connection.
+# Authentication now uses a local `.streamlit/users.json` file instead of Google Sheets
+# or any Google Cloud resources. Passwords are stored as bcrypt hashes.
 # ===============================================================================================
+
+USERS_FILE = Path(__file__).resolve().parent / ".streamlit" / "users.json"
+
+
+def _load_users_from_file():
+    """
+    Load users from the local JSON file into a DataFrame compatible with the
+    previous Google Sheets-based structure.
+
+    Returns:
+        df_users (pd.DataFrame): DataFrame with columns like 'User ID',
+                                 'Password', 'User Type', 'Name',
+                                 'Date of Birth', etc.
+        None: If loading fails (no longer calls st.stop() to allow menu navigation).
+    """
+    try:
+        if not USERS_FILE.exists():
+            st.error(f"User database file not found at: {USERS_FILE}")
+            return None
+
+        with USERS_FILE.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        if not isinstance(data, list):
+            st.error("Invalid users.json format: expected a list of user objects.")
+            return None
+
+        df_users = pd.DataFrame(data)
+
+        # Basic column normalisation to match the old sheet-based schema
+        # Original JSON keys: emp_id, name, school, designation, email_id,
+        # mobile_no, date_of_birth, department, password, user_type
+        if "emp_id" not in df_users.columns:
+            st.error("users.json is missing required field 'emp_id'.")
+            return None
+
+        # Create compatibility columns used by the login logic
+        df_users["User ID"] = df_users["emp_id"].astype(str).str.strip()
+
+        if "password" in df_users.columns:
+            df_users["Password"] = df_users["password"]
+        else:
+            df_users["Password"] = ""
+
+        if "user_type" in df_users.columns:
+            df_users["User Type"] = df_users["user_type"]
+        else:
+            df_users["User Type"] = "guest"
+
+        if "name" in df_users.columns:
+            df_users["Name"] = df_users["name"]
+        else:
+            df_users["Name"] = ""
+
+        if "date_of_birth" in df_users.columns:
+            df_users["Date of Birth"] = df_users["date_of_birth"]
+        else:
+            df_users["Date of Birth"] = None
+
+        if "designation" in df_users.columns:
+            df_users["Designation"] = df_users["designation"]
+
+        if "department" in df_users.columns:
+            df_users["Department"] = df_users["department"]
+
+        return df_users
+    except Exception as e:
+        st.error(f"Failed to load users from local file. Error: {e}")
+        return None
+
+
+def _update_user_password_in_file(user_id: str, hashed_password: str) -> bool:
+    """
+    Update the bcrypt-hashed password for a given user in users.json.
+
+    Args:
+        user_id: Employee ID (emp_id) as used for login.
+        hashed_password: New bcrypt hash (utf-8 string).
+
+    Returns:
+        bool: True if the user was found and updated, False otherwise.
+    """
+    try:
+        if not USERS_FILE.exists():
+            st.error(f"User database file not found at: {USERS_FILE}")
+            return False
+
+        with USERS_FILE.open("r", encoding="utf-8") as f:
+            users = json.load(f)
+
+        if not isinstance(users, list):
+            st.error("Invalid users.json format: expected a list of user objects.")
+            return False
+
+        updated = False
+        lookup_id = str(user_id).strip()
+
+        for user in users:
+            emp = str(user.get("emp_id", "")).strip()
+            if emp == lookup_id:
+                user["password"] = hashed_password
+                updated = True
+                break
+
+        if not updated:
+            st.error("User ID not found in local users database.")
+            return False
+
+        with USERS_FILE.open("w", encoding="utf-8") as f:
+            json.dump(users, f, indent=2, ensure_ascii=False)
+
+        return True
+    except Exception as e:
+        st.error(f"Failed to update password in users.json: {e}")
+        return False
 
 def validate_password(password):
     """
@@ -59,7 +175,7 @@ def reset_registration_state():
 
 def login():
     """
-    Handles user login and registration with a Google Sheets backend.
+    Handles user login and registration using a local JSON file backend.
     Returns True if the user is authenticated, False otherwise.
     """
     fix_streamlit_layout(padding_top="0.6rem") 
@@ -137,23 +253,15 @@ def login():
     if "login_attempts" not in st.session_state:
         st.session_state.login_attempts = 0
 
-    try:
-        gs_client = connect_gsheet()
-        df_users = get_dataframe(gs_client, st.secrets["my_secrets"]["sheet_id"], "users")
-        
-        df_users.rename(columns={"Emp Id": "User ID"}, inplace=True)
-        df_users["User ID"] = df_users["User ID"].astype(str).str.strip()
+    # Load user database from local JSON file instead of Google Sheets
+    df_users = _load_users_from_file()
+    
+    # If loading failed, return False to prevent login (but don't stop the app)
+    if df_users is None:
+        return False
 
-        # Normalize DOB properly
-        df_users['Date of Birth'] = df_users['Date of Birth'].apply(preprocess_date)
-        df_users['DOB_normalized'] = pd.to_datetime(df_users['Date of Birth'])
-
-        # ✅ Store in session_state for other pages
-        st.session_state["df_users"] = df_users
-
-    except Exception as e:
-        st.error(f"Failed to connect to user database. Please check credentials. Error: {e}")
-        st.stop()
+    # Store in session_state for other pages
+    st.session_state["df_users"] = df_users
 
     # --- If already logged in ---
     if st.session_state.get('authenticated'):
@@ -177,7 +285,13 @@ def login():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.markdown('<div class="mode-selector">', unsafe_allow_html=True)
-        mode = st.radio("", ["Login", "Register"], horizontal=True, label_visibility="collapsed")
+        # Provide a non-empty label to avoid accessibility warnings; hide visually
+        mode = st.radio(
+            "Authentication mode",
+            ["Login", "Register"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
         st.markdown('</div>', unsafe_allow_html=True)
 
     # --- Login form ---
@@ -312,17 +426,20 @@ def login():
                             st.error(error_msg)
                         else:
                             try:
-                                hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                                hashed_password = bcrypt.hashpw(
+                                    new_password.encode('utf-8'),
+                                    bcrypt.gensalt()
+                                ).decode('utf-8')
+
                                 user_id = st.session_state.get("verified_user_id", user_id)
-                                row_index = df_users[df_users['User ID'].astype(str) == user_id].index[0]
-                                gs_ws = get_worksheet(gs_client, st.secrets["my_secrets"]["sheet_id"], "users")
-                                gs_row_number = row_index + 2
-                                password_col_index = df_users.columns.get_loc('Password') + 1
-                                gs_ws.update_cell(gs_row_number, password_col_index, hashed_password)
-                                
-                                st.success("🎉 Password updated successfully! You can now log in.")
-                                reset_registration_state()
-                                st.rerun()
+
+                                # Persist the new password to the local users.json file
+                                if _update_user_password_in_file(user_id, hashed_password):
+                                    st.success("🎉 Password updated successfully! You can now log in.")
+                                    reset_registration_state()
+                                    st.rerun()
+                                else:
+                                    st.error("Failed to update password in local user database.")
                             except Exception as e:
                                 st.error(f"Failed to update password: {e}")
 

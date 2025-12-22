@@ -17,18 +17,19 @@ import os
 def connect_gsheet():
     """
     Connects to Google Sheets using Streamlit secrets.
-    Returns a gspread client object.
+    Returns a gspread client object, or None if connection fails.
+    IMPORTANT: This function no longer calls st.stop() to allow menu navigation to continue.
     """
     try:
         # Debug: Check if secrets are available
         if not hasattr(st, 'secrets') or not st.secrets:
             st.error("Streamlit secrets not found. Please check your secrets.toml configuration.")
-            st.stop()
+            return None
         
         # Check if the specific secret exists
         if "gcp_service_account" not in st.secrets:
             st.error("gcp_service_account not found in secrets. Available secrets: " + str(list(st.secrets.keys())))
-            st.stop()
+            return None
             
         creds_dict = dict(st.secrets["gcp_service_account"])
 
@@ -49,7 +50,7 @@ def connect_gsheet():
     except Exception as e:
         st.error(f"Failed to connect to Google Sheets. Error: {e}")
         st.error("Debug info: Check if secrets.toml is properly configured and deployed.")
-        st.stop()
+        return None
 
 
 def get_sheet_id():
@@ -93,21 +94,28 @@ def get_gs_client(silent: bool = True):
 
 # this is old one without create_if_missing
 def get_worksheet_old(client, sheet_id, worksheet_name):
+    """
+    Returns a specific worksheet object from the client connection.
+    Includes error handling for missing spreadsheets or worksheets.
     
-    #Returns a specific worksheet object from the client connection.
-    #Includes error handling for missing spreadsheets or worksheets.
+    Returns:
+        Worksheet object or None if error occurs (no longer calls st.stop()).
+    """
+    if client is None:
+        st.error("Google Sheets client is not available. Cannot access worksheet.")
+        return None
     
     try:
         return client.open_by_key(sheet_id).worksheet(worksheet_name)
     except gspread.exceptions.WorksheetNotFound:
         st.error(f"Worksheet '{worksheet_name}' not found. Please check the worksheet name.")
-        st.stop()
+        return None
     except gspread.exceptions.SpreadsheetNotFound:
         st.error(f"Spreadsheet with key '{sheet_id}' not found. Please check the sheet ID.")
-        st.stop()
+        return None
     except Exception as e:
         st.error(f"An unexpected error occurred while accessing the sheet: {e}")
-        st.stop()
+        return None
 
         
 def get_worksheet(client, sheet_id, worksheet_name, create_if_missing=False, header=None):
@@ -121,7 +129,14 @@ def get_worksheet(client, sheet_id, worksheet_name, create_if_missing=False, hea
         worksheet_name (str): Name of the worksheet/tab.
         create_if_missing (bool): If True, creates the worksheet if not found.
         header (list): If provided, adds this header row when creating a new worksheet.
+    
+    Returns:
+        Worksheet object or None if error occurs (no longer calls st.stop()).
     """
+    if client is None:
+        st.error("Google Sheets client is not available. Cannot access worksheet.")
+        return None
+    
     try:
         return client.open_by_key(sheet_id).worksheet(worksheet_name)
     except gspread.exceptions.WorksheetNotFound:
@@ -134,13 +149,13 @@ def get_worksheet(client, sheet_id, worksheet_name, create_if_missing=False, hea
             return ws
         else:
             st.error(f"Worksheet '{worksheet_name}' not found. Please check the name.")
-            st.stop()
+            return None
     except gspread.exceptions.SpreadsheetNotFound:
         st.error(f"Spreadsheet with key '{sheet_id}' not found. Please check the sheet ID.")
-        st.stop()
+        return None
     except Exception as e:
         st.error(f"An unexpected error occurred while accessing the sheet: {e}")
-        st.stop()
+        return None
 
         
 
@@ -308,11 +323,11 @@ def get_authorized_pages_for_role(role: str):
         # Admin should get everything - ALL modules and ALL pages
         return [
             "Attendance", "Feedback",
-            "Transcript", "Marksheet", "Admit Card", "Results", "All Programs Results",
+            "Transcript", "Transcript (%)", "Mark Sheet", "Admit Card", "Results", "All Programs Results",
             "Neural Network"
         ]
     elif role == "exam":
-        return ["Transcript", "Marksheet", "Admit Card", "Results", "All Programs Results", "Neural Network"]
+        return ["Transcript", "Transcript (%)", "Mark Sheet", "Admit Card", "Results", "All Programs Results", "Neural Network"]
     elif role == "hr":
         return ["Attendance", "Feedback"]
     elif role == "guest":
