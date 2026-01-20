@@ -19,22 +19,27 @@ def connect_gsheet():
     Connects to Google Sheets using Streamlit secrets.
     Returns a gspread client object, or None if connection fails.
     IMPORTANT: This function no longer calls st.stop() to allow menu navigation to continue.
+    Returns None silently if Google Sheets authentication is not configured or invalid.
     """
     try:
-        # Debug: Check if secrets are available
+        # Check if secrets are available
         if not hasattr(st, 'secrets') or not st.secrets:
-            st.error("Streamlit secrets not found. Please check your secrets.toml configuration.")
             return None
         
         # Check if the specific secret exists
         if "gcp_service_account" not in st.secrets:
-            st.error("gcp_service_account not found in secrets. Available secrets: " + str(list(st.secrets.keys())))
             return None
-            
-        creds_dict = dict(st.secrets["gcp_service_account"])
+        
+        # Check if the secret has required fields
+        try:
+            creds_dict = dict(st.secrets["gcp_service_account"])
+            if not creds_dict or "private_key" not in creds_dict:
+                return None
+        except (KeyError, TypeError, AttributeError):
+            return None
 
         # fix literal "\n" if present
-        if "\\n" in creds_dict["private_key"]:
+        if "\\n" in creds_dict.get("private_key", ""):
             creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
 
         creds = Credentials.from_service_account_info(
@@ -48,8 +53,8 @@ def connect_gsheet():
         return client
 
     except Exception as e:
-        st.error(f"Failed to connect to Google Sheets. Error: {e}")
-        st.error("Debug info: Check if secrets.toml is properly configured and deployed.")
+        # Silently return None for any authentication errors (JWT signature, invalid grant, etc.)
+        # This allows the app to continue running even if Google Sheets is not configured
         return None
 
 

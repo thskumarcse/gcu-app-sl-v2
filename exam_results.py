@@ -4,7 +4,6 @@ import numpy as np
 import os
 from datetime import datetime
 import io
-from utility import connect_gsheet
 
 # ReportLab imports
 from reportlab.pdfgen import canvas
