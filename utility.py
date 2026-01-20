@@ -5,6 +5,12 @@ from datetime import datetime, date
 import re
 import os
 
+# Disable Google Cloud default credential detection if environment variable is set
+if os.getenv("GSPREAD_DISABLE_DEFAULT_CREDENTIALS", "").lower() == "true":
+    # Clear GOOGLE_APPLICATION_CREDENTIALS to prevent default credential detection
+    if "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
+        del os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+
 # Conditionally import Google Sheets libraries only if needed
 # This prevents import errors if gspread is not properly configured
 try:
