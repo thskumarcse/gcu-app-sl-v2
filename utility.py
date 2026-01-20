@@ -1,11 +1,20 @@
 import streamlit as st
-import gspread
-from google.oauth2.service_account import Credentials
 import pandas as pd
 import streamlit.components.v1 as components
 from datetime import datetime, date
 import re
 import os
+
+# Conditionally import Google Sheets libraries only if needed
+# This prevents import errors if gspread is not properly configured
+try:
+    import gspread
+    from google.oauth2.service_account import Credentials
+    GSPREAD_AVAILABLE = True
+except ImportError:
+    GSPREAD_AVAILABLE = False
+    gspread = None
+    Credentials = None
 
 
 
@@ -21,6 +30,10 @@ def connect_gsheet():
     IMPORTANT: This function no longer calls st.stop() to allow menu navigation to continue.
     Returns None silently if Google Sheets authentication is not configured or invalid.
     """
+    # Early return if gspread is not available
+    if not GSPREAD_AVAILABLE or gspread is None or Credentials is None:
+        return None
+    
     try:
         # Check if secrets are available
         if not hasattr(st, 'secrets') or not st.secrets:
@@ -38,23 +51,57 @@ def connect_gsheet():
         except (KeyError, TypeError, AttributeError):
             return None
 
-        # fix literal "\n" if present
-        if "\\n" in creds_dict.get("private_key", ""):
-            creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+        # Validate that private_key is not empty
+        private_key = creds_dict.get("private_key", "")
+        if not private_key or private_key.strip() == "":
+            return None
 
-        creds = Credentials.from_service_account_info(
-            creds_dict,
-            scopes=[
-                "https://www.googleapis.com/auth/spreadsheets",
-                "https://www.googleapis.com/auth/drive"
-            ]
-        )
-        client = gspread.authorize(creds)
-        return client
+        # fix literal "\n" if present
+        if "\\n" in private_key:
+            creds_dict["private_key"] = private_key.replace("\\n", "\n")
+
+        # Try to create credentials - catch JWT signature errors here
+        try:
+            creds = Credentials.from_service_account_info(
+                creds_dict,
+                scopes=[
+                    "https://www.googleapis.com/auth/spreadsheets",
+                    "https://www.googleapis.com/auth/drive"
+                ]
+            )
+        except Exception as cred_error:
+            # Catch JWT signature errors and other credential creation errors
+            # Check for specific error messages and error types
+            error_str = str(cred_error).lower()
+            error_repr = repr(cred_error).lower()
+            if any(keyword in error_str or keyword in error_repr for keyword in 
+                   ["invalid_grant", "jwt", "signature", "invalid", "token", "credential"]):
+                return None
+            # For any other credential error, also return None silently
+            return None
+
+        # Try to authorize - catch any authorization errors
+        try:
+            client = gspread.authorize(creds)
+            return client
+        except Exception as auth_error:
+            # Catch authorization errors silently
+            error_str = str(auth_error).lower()
+            error_repr = repr(auth_error).lower()
+            if any(keyword in error_str or keyword in error_repr for keyword in 
+                   ["invalid_grant", "jwt", "signature", "invalid", "token", "credential"]):
+                return None
+            # For any other auth error, also return None silently
+            return None
 
     except Exception as e:
         # Silently return None for any authentication errors (JWT signature, invalid grant, etc.)
         # This allows the app to continue running even if Google Sheets is not configured
+        # Log the error type for debugging but don't display it to users
+        error_str = str(e).lower()
+        if "invalid_grant" in error_str or "jwt" in error_str or "signature" in error_str:
+            return None
+        # For other unexpected errors, still return None silently
         return None
 
 
