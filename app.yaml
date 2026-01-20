@@ -7,6 +7,10 @@ env_variables:
   # Ensure Streamlit can find secrets
   STREAMLIT_SERVER_HEADLESS: "true"
   STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
+  # Disable Google Cloud default credential detection to prevent JWT errors
+  GOOGLE_APPLICATION_CREDENTIALS: ""
+  # Prevent gspread from using default credentials
+  GSPREAD_DISABLE_DEFAULT_CREDENTIALS: "true"
 
 # Automatic scaling configuration
 automatic_scaling:
