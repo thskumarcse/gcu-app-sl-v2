@@ -120,6 +120,18 @@ def app():
             df_gimt_all, df_gimt_in, df_gimt_out = split_file(df_gimt)
             df_gips_all, df_gips_in, df_gips_out = split_file(df_gips)
             df_admin_all, df_admin_in, df_admin_out = split_file(df_admin)
+            
+            # Verify that 'Emp Id' column exists in split dataframes
+            for name, df_in, df_out in [('GIMT', df_gimt_in, df_gimt_out), 
+                                        ('GIPS', df_gips_in, df_gips_out), 
+                                        ('ADMIN', df_admin_in, df_admin_out)]:
+                if 'Emp Id' not in df_in.columns:
+                    available_cols = list(df_in.columns)[:10]  # Show first 10 columns
+                    st.error(f"❌ 'Emp Id' column not found in {name} IN dataframe. Available columns: {available_cols}")
+                    raise KeyError(f"'Emp Id' column not found in {name} IN dataframe")
+                if 'Emp Id' not in df_out.columns:
+                    st.error(f"❌ 'Emp Id' column not found in {name} OUT dataframe.")
+                    raise KeyError(f"'Emp Id' column not found in {name} OUT dataframe")
 
             df_gimt_in = pad_month_in_columns(df_gimt_in, 'clock_in')
             df_gips_in = pad_month_in_columns(df_gips_in, 'clock_in')
@@ -139,7 +151,9 @@ def app():
                 if misc_holidays_list:
                     all_holidays.extend(misc_holidays_list)
 
-                holidays = detect_holidays_staffs(df_gimt_in, year=datetime.now().year, misc_holidays=all_holidays, misc_working_days=misc_working_days, verbose=False)
+                # Let detect_holidays_staffs automatically infer year(s) from date columns
+                # This handles cross-year ranges like Dec 2025 to Jan 2026 correctly
+                holidays = detect_holidays_staffs(df_gimt_in, year=None, misc_holidays=all_holidays, misc_working_days=misc_working_days, verbose=False)
 
                 cols_to_delete_in = holidays
                 cols_to_delete_out = [c.replace('clock_in', 'clock_out') for c in holidays]
@@ -157,8 +171,61 @@ def app():
 
                 # Merge with ERP employee master
                 emp_df = pd.read_csv('./data/2015_10_27_employee_list.csv', skiprows=6, encoding='windows-1252')
-                emp_df = emp_df[['Employee ID','Name','Designation','Department']]
-                emp_df = emp_df.rename(columns={'Employee ID':'Emp Id'})
+                
+                # Normalize column names (strip whitespace, handle variations)
+                emp_df.columns = emp_df.columns.str.strip()
+                
+                # Find the employee ID column with flexible matching
+                emp_id_col = None
+                for col in emp_df.columns:
+                    col_lower = col.lower().strip()
+                    if 'employee id' in col_lower or 'emp id' in col_lower or 'emp_id' in col_lower:
+                        emp_id_col = col
+                        break
+                
+                if emp_id_col is None:
+                    st.error(f"❌ Could not find Employee ID column in CSV. Available columns: {list(emp_df.columns)}")
+                    raise KeyError("Employee ID column not found")
+                
+                # Find other required columns
+                name_col = None
+                for col in emp_df.columns:
+                    if col.lower().strip() == 'name':
+                        name_col = col
+                        break
+                
+                desig_col = None
+                for col in emp_df.columns:
+                    if 'designation' in col.lower().strip():
+                        desig_col = col
+                        break
+                
+                dept_col = None
+                for col in emp_df.columns:
+                    if 'department' in col.lower().strip():
+                        dept_col = col
+                        break
+                
+                # Select and rename columns
+                required_cols = {}
+                if emp_id_col:
+                    required_cols['Emp Id'] = emp_id_col
+                if name_col:
+                    required_cols['Name'] = name_col
+                if desig_col:
+                    required_cols['Designation'] = desig_col
+                if dept_col:
+                    required_cols['Department'] = dept_col
+                
+                # Check if we have at least Emp Id and Name
+                if 'Emp Id' not in required_cols or 'Name' not in required_cols:
+                    missing = [k for k in ['Emp Id', 'Name'] if k not in required_cols]
+                    st.error(f"❌ Missing required columns: {missing}. Available columns: {list(emp_df.columns)}")
+                    raise KeyError(f"Missing required columns: {missing}")
+                
+                # Select and rename
+                emp_df = emp_df[[required_cols[k] for k in required_cols.keys()]].copy()
+                emp_df.rename(columns={v: k for k, v in required_cols.items()}, inplace=True)
                 emp_df.reset_index(drop=True, inplace=True)
                 
                 # extract employee names
@@ -188,6 +255,17 @@ def app():
                 df_exempted.rename(columns={'late_count':'exempt_late','half_day_count':'exempt_HD','full_day_count':'exempt_FD'}, inplace=True)
                 if 'Name' in df_exempted.columns:
                     df_exempted.drop('Name',axis=1,inplace=True)
+                
+                # Verify 'Emp Id' exists in dataframes before merging
+                if 'Emp Id' not in df_fac_conso.columns:
+                    st.error(f"❌ 'Emp Id' column not found in faculty consolidated dataframe. Available columns: {list(df_fac_conso.columns)[:10]}")
+                    raise KeyError("'Emp Id' column not found in faculty consolidated dataframe")
+                if 'Emp Id' not in df_admin_conso.columns:
+                    st.error(f"❌ 'Emp Id' column not found in admin consolidated dataframe. Available columns: {list(df_admin_conso.columns)[:10]}")
+                    raise KeyError("'Emp Id' column not found in admin consolidated dataframe")
+                if 'Emp Id' not in df_exempted.columns:
+                    st.error(f"❌ 'Emp Id' column not found in exempted dataframe. Available columns: {list(df_exempted.columns)[:10]}")
+                    raise KeyError("'Emp Id' column not found in exempted dataframe")
 
                 df_fac_actual_exempted = pd.merge(df_fac_conso, df_exempted, how='left', on=['Emp Id'])
                 df_admin_actual_exempted = pd.merge(df_admin_conso, df_exempted, how='left', on=['Emp Id'])

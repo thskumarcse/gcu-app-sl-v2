@@ -9,6 +9,7 @@ import io
 from datetime import datetime
 import warnings
 import re
+from functools import partial
 from xml.sax.saxutils import escape
 from utility import clean_course_name
 
@@ -177,11 +178,15 @@ def process_marks_long_format(df, df_courses=None):
     def extract_course_code(row):
         prog = str(row.get('Program Name', '')).strip()
         assess = str(row['Assessment'])
-        if prog == 'B.Pharm (Practice)':
-            match = re.search(r'(\d+\.\d+)', assess)
-        else:
-            match = re.search(r'(ER\d{2}-\d{2}[A-Z]?)', assess)
-        return match.group(1) if match else None
+        # Try to match numeric course codes first (e.g., "1.4", "1.41", "2.1")
+        match = re.search(r'(\d+\.\d+)', assess)
+        if match:
+            return match.group(1)
+        # Try ER format (e.g., "ER12-34A")
+        match = re.search(r'(ER\d{2}-\d{2}[A-Z]?)', assess)
+        if match:
+            return match.group(1)
+        return None
 
     df_long['Course Code'] = df_long.apply(extract_course_code, axis=1)
 
@@ -220,6 +225,14 @@ def process_marks_long_format(df, df_courses=None):
 
 def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
     """Draw header with logo and student photo."""
+    # Validate inputs
+    if student_data is None or len(student_data) == 0:
+        raise ValueError("student_data is empty or None")
+    if canvas is None:
+        raise ValueError("canvas is None")
+    if doc is None:
+        raise ValueError("doc is None")
+    
     width, height = A4
     usable_width = width - doc.leftMargin - doc.rightMargin
     
@@ -234,9 +247,9 @@ def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
         if logo_path and os.path.exists(logo_path):
             canvas.drawImage(logo_path, 50, height - 140, width=80, height=80, mask='auto')
         else:
-            print(f"⚠️ Logo not found at {logo_path}")
+            print(f"Warning: Logo not found at {logo_path}")
     except Exception as e:
-        print(f"❌ Error drawing logo: {e}")
+        print(f"Error drawing logo: {e}")
         pass
 
     # Photo
@@ -245,9 +258,9 @@ def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
         if photo_file:
             canvas.drawImage(photo_file, 450, height - 140, width=70, height=80, mask='auto')
         else:
-            print(f"⚠️ No photo found for {student_name} ({enrollment_no}) in {photo_dir}")
+            print(f"Warning: No photo found for {student_name} ({enrollment_no}) in {photo_dir}")
     except Exception as e:
-        print(f"❌ Error drawing photo for {enrollment_no}: {e}")
+        print(f"Error drawing photo for {enrollment_no}: {e}")
         pass
 
     # Titles
@@ -330,10 +343,32 @@ def format_subject_name(text, max_len=45):
         subject_style.fontSize = 8  # Reduced from 9
     return Paragraph(str(text), subject_style)
 
+def sanitize_filename(name):
+    """Remove or replace characters that can't be used in filenames."""
+    if name is None:
+        return "Unknown"
+    # Replace problematic characters with underscores
+    import re
+    # Remove or replace characters that are problematic for Windows filenames
+    name = str(name)
+    # Replace Unicode characters that can't be encoded with 'charmap' with ASCII equivalents
+    name = name.encode('ascii', 'ignore').decode('ascii')
+    # Remove or replace invalid filename characters
+    invalid_chars = r'[<>:"/\\|?*]'
+    name = re.sub(invalid_chars, '_', name)
+    # Remove leading/trailing spaces and dots (Windows doesn't allow these)
+    name = name.strip(' .')
+    # Limit length to avoid path length issues
+    if len(name) > 100:
+        name = name[:100]
+    return name if name else "Unknown"
+
 def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir, suffix=""):
     """Generate single-page PDF transcript with marks (ABC format)."""
     width, height = A4
-    filename = os.path.join(output_dir, f"Transcript_Marks_{student_data.iloc[0]['Student Name']}_onepage{suffix}.pdf")
+    # Sanitize student name for filename
+    student_name = sanitize_filename(student_data.iloc[0].get('Student Name', 'Unknown'))
+    filename = os.path.join(output_dir, f"Transcript_Marks_{student_name}_onepage{suffix}.pdf")
     doc = BaseDocTemplate(filename, pagesize=A4)
 
     # Styles - reduced for single page
@@ -383,7 +418,7 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
         id="normal_frame"
     )
 
-    # Page template - use exact same pattern as working notebook
+    # Page template - use lambdas exactly like exam_transcript.py which works
     single_page_template = PageTemplate(
         id="OnePage",
         frames=[frame_main],
@@ -602,8 +637,31 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
     try:
         doc.build(elements)
         return filename
+    except TypeError as e:
+        # More detailed error for TypeError (argument mismatch)
+        import traceback
+        error_details = f"PDF build failed (TypeError): {e}\n"
+        error_details += f"Error type: {type(e)}\n"
+        error_details += f"Number of elements: {len(elements)}\n"
+        error_details += f"Element types: {[type(elem).__name__ for elem in elements[:5]]}\n"
+        error_details += f"\nFull traceback:\n{traceback.format_exc()}"
+        st.error(f"❌ {error_details}")
+        # Print without emojis to avoid encoding issues
+        try:
+            print(error_details)
+        except UnicodeEncodeError:
+            print(error_details.encode('ascii', 'ignore').decode('ascii'))
+        return None
     except Exception as e:
-        st.error(f"❌ PDF build failed: {e}")
+        import traceback
+        error_details = f"PDF build failed: {e}\n"
+        error_details += f"\nFull traceback:\n{traceback.format_exc()}"
+        st.error(f"❌ {error_details}")
+        # Print without emojis to avoid encoding issues
+        try:
+            print(error_details)
+        except UnicodeEncodeError:
+            print(error_details.encode('ascii', 'ignore').decode('ascii'))
         return None
 
 def app():
@@ -739,43 +797,52 @@ def app():
                         total_students = len(df_long.groupby("Student Code"))
                         
                         for i, (student_id, student_data) in enumerate(df_long.groupby("Student Code")):
-     
+                            # Validate student_data before processing
+                            if student_data is None or len(student_data) == 0:
+                                st.warning(f"⚠️ No data found for student {student_id}, skipping...")
+                                continue
+                            
                             student_data_year1 = student_data[student_data['year']==1]
-                            try:
-                                filename = generate_pdf_onepage(
-                                    student_id, 
-                                    student_data_year1, 
-                                    report_date.strftime("%d-%m-%Y"), 
-                                    output_dir, 
-                                    logo_path,
-                                    images_dir,
-                                    suffix="_1"
-                                )
-                                if filename:
-                                    generated_files.append(filename)
-                            except Exception as e:
-                                st.warning(f"Failed to generate transcript for student {student_id}: {str(e)}")
-                                import traceback
-                                st.write(traceback.format_exc())
+                            if len(student_data_year1) > 0:
+                                try:
+                                    filename = generate_pdf_onepage(
+                                        student_id, 
+                                        student_data_year1, 
+                                        report_date.strftime("%d-%m-%Y"), 
+                                        output_dir, 
+                                        logo_path,
+                                        images_dir,
+                                        suffix="_1"
+                                    )
+                                    if filename:
+                                        generated_files.append(filename)
+                                except Exception as e:
+                                    st.warning(f"Failed to generate transcript for student {student_id} (Year 1): {str(e)}")
+                                    import traceback
+                                    st.write(traceback.format_exc())
+                            else:
+                                st.info(f"ℹ️ No Year 1 data for student {student_id}")
                             
                             student_data_year2 = student_data[student_data['year']==2]
-                            
-                            try:
-                                filename = generate_pdf_onepage(
-                                    student_id, 
-                                    student_data_year2, 
-                                    report_date.strftime("%d-%m-%Y"), 
-                                    output_dir, 
-                                    logo_path,
-                                    images_dir,
-                                    suffix="_2"
-                                )
-                                if filename:
-                                    generated_files.append(filename)
-                            except Exception as e:
-                                st.warning(f"Failed to generate transcript for student {student_id}: {str(e)}")
-                                import traceback
-                                st.write(traceback.format_exc())
+                            if len(student_data_year2) > 0:
+                                try:
+                                    filename = generate_pdf_onepage(
+                                        student_id, 
+                                        student_data_year2, 
+                                        report_date.strftime("%d-%m-%Y"), 
+                                        output_dir, 
+                                        logo_path,
+                                        images_dir,
+                                        suffix="_2"
+                                    )
+                                    if filename:
+                                        generated_files.append(filename)
+                                except Exception as e:
+                                    st.warning(f"Failed to generate transcript for student {student_id} (Year 2): {str(e)}")
+                                    import traceback
+                                    st.write(traceback.format_exc())
+                            else:
+                                st.info(f"ℹ️ No Year 2 data for student {student_id}")
                             
                             progress_bar.progress((i + 1) / total_students)
                         

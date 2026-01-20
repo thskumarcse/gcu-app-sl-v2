@@ -702,48 +702,19 @@ def weighted_sum_and_replace_columns(df, cols, new_col, weights):
 def calculate_date_month(df, date_row_idx=6):
     """
     Extract full date labels (e.g., '3_01', '3_02', ..., '4_01') from a biometric DataFrame.
-    Now handles cross-year date ranges (e.g., 'December-25-2025 To January-24-2026').
 
     Assumes:
     - Date range string is in the first cell of the first row: 'March-01-2024 To April-01-2024'
-      or 'December-25-2025 To January-24-2026'
     - Raw day numbers are in `date_row_idx` (default 6).
-    
-    Returns:
-    - List of date strings in 'MM_DD' format (year information is preserved in the date range)
     """
 
     # --- Step 1: Extract and parse date range ---
     date_range = str(df.iloc[0, 0])
     try:
-        start_date_str, end_date_str = date_range.split(" To ")
-        
-        # Parse start date - try multiple formats
-        start_parts = start_date_str.strip().split("-")
-        start_month_name = start_parts[0].strip()
-        start_month = datetime.strptime(start_month_name, "%B").month
-        start_year = int(start_parts[-1].strip()) if len(start_parts) > 1 else None
-        
-        # Parse end date - try multiple formats
-        end_parts = end_date_str.strip().split("-")
-        end_month_name = end_parts[0].strip()
-        end_month = datetime.strptime(end_month_name, "%B").month
-        end_year = int(end_parts[-1].strip()) if len(end_parts) > 1 else None
-        
-        # If years are not extracted, use current year as fallback
-        if start_year is None:
-            start_year = datetime.now().year
-        if end_year is None:
-            end_year = datetime.now().year
-        
-        # Handle cross-year ranges: if end month < start month, end year should be start_year + 1
-        # But if years are explicitly provided, use them
-        if end_month < start_month and start_year == end_year:
-            # Implicit cross-year: e.g., Dec 2025 to Jan (should be Jan 2026)
-            end_year = start_year + 1
-        
+        start_date, end_date = date_range.split(" To ")
+        start_month = datetime.strptime(start_date.split("-")[0].strip(), "%B").month
+        end_month = datetime.strptime(end_date.split("-")[0].strip(), "%B").month
         month_numbers = [start_month, end_month]
-        year_numbers = [start_year, end_year]
     except Exception as e:
         raise ValueError(f"Invalid date range format in first cell: {date_range}") from e
 
@@ -766,10 +737,7 @@ def calculate_date_month(df, date_row_idx=6):
             month_index += 1
 
         prev_day = day
-        # Use the year corresponding to the current month_index
-        current_year = year_numbers[month_index]
-        current_month = month_numbers[month_index]
-        full_date = f"{current_month:02d}_{day:02d}"
+        full_date = f"{month_numbers[month_index]}_{day:02d}"
         dates_full.append(full_date)
 
     return dates_full
@@ -1256,36 +1224,9 @@ def process_exempted_leaves(file) : #, working_days):
 
     for sheet in sheet_names:
         df = pd.read_excel(file, sheet_name=sheet)
-        # Normalize column names
-        df.columns = df.columns.str.strip()
-        
-        # Handle both 'Emp Id' and 'Emp ID' column names with flexible matching
-        emp_id_col = None
-        for col in df.columns:
-            col_lower = col.lower().strip()
-            if 'emp id' in col_lower or 'emp_id' in col_lower or 'employee id' in col_lower:
-                emp_id_col = col
-                break
-        
-        if emp_id_col is None:
-            raise KeyError(f"'Emp Id' column not found in '{sheet}' sheet. Available columns: {list(df.columns)}")
-        
-        if emp_id_col != 'Emp Id':
-            df.rename(columns={emp_id_col: 'Emp Id'}, inplace=True)
-        
-        # Find Name column
-        name_col = None
-        for col in df.columns:
-            if col.lower().strip() == 'name':
-                name_col = col
-                break
-        
-        if name_col is None:
-            raise KeyError(f"'Name' column not found in '{sheet}' sheet. Available columns: {list(df.columns)}")
-        
-        if name_col != 'Name':
-            df.rename(columns={name_col: 'Name'}, inplace=True)
-        
+        # Handle both 'Emp Id' and 'Emp ID' column names
+        if 'Emp ID' in df.columns:
+            df.rename(columns={'Emp ID': 'Emp Id'}, inplace=True)
         df = df.dropna(subset=['Emp Id'])  # skip empty rows
         
         leave_pairs = df.columns[2:]
@@ -1506,71 +1447,19 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
         return matched
 
     # ---------- Determine attendance date range ----------
-    # First, extract all month-day pairs and sort them to detect cross-year ranges
-    month_day_pairs = []
-    for col in sorted(clock_in_cols):  # Sort to maintain chronological order
+    date_objs = []
+    for col in clock_in_cols:
         try:
             parts = col.split("_")
             m, d = int(parts[-2]), int(parts[-1])
-            month_day_pairs.append((m, d, col))
+            date_objs.append(datetime(current_year, m, d))
         except Exception:
             continue
 
-    if not month_day_pairs:
+    if not date_objs:
         if verbose:
             print("⚠️ No valid clock-in date columns found.")
         return []
-
-    # Detect if this is a cross-year range (e.g., Dec -> Jan)
-    # Check if we have months that wrap around (e.g., 12 followed by 1)
-    months = [m for m, d, col in month_day_pairs]
-    is_cross_year = False
-    base_year = current_year
-    
-    if len(months) > 1:
-        # Check if we have a month that's significantly higher than the next one
-        # (e.g., 12 -> 1, or 11 -> 1, etc.)
-        for i in range(len(months) - 1):
-            if months[i] > months[i + 1] + 1:  # e.g., 12 > 1+1 = 2
-                is_cross_year = True
-                first_month = months[0]
-                last_month = months[-1]
-                current_month = datetime.now().month
-                
-                # Special handling for Dec->Jan transitions
-                if first_month == 12 and last_month == 1:
-                    # Dec->Jan: Dec is from the year before Jan
-                    # If we're processing in Jan/Feb/Mar, Dec is from previous year
-                    # Otherwise, assume Dec is from current_year and Jan is next year
-                    if current_month <= 3:  # Jan, Feb, or Mar
-                        base_year = current_year - 1  # Dec is from previous year
-                    else:
-                        base_year = current_year  # Dec is from current year
-                elif first_month >= 11:  # Nov (11) or Dec (12) wrapping to earlier month
-                    # These months are at the end of the year
-                    base_year = current_year
-                elif first_month == 1:  # Jan wrapping to later month (unusual but possible)
-                    base_year = current_year
-                else:
-                    # Earlier months (Feb-Oct) wrapping to next year
-                    base_year = current_year - 1
-                break
-
-    # Create date objects with correct years
-    date_objs = []
-    col_to_date = {}
-    year_shift = 0
-    prev_month = None
-    
-    for m, d, col in month_day_pairs:
-        # If we detect a month wrap-around, increment year
-        if prev_month is not None and m < prev_month:
-            year_shift += 1
-        prev_month = m
-        
-        date_obj = datetime(base_year + year_shift, m, d)
-        date_objs.append(date_obj)
-        col_to_date[col] = date_obj
 
     start_date, end_date = min(date_objs), max(date_objs)
 
@@ -1592,15 +1481,9 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
     calendar_based = set()
     for col in clock_in_cols:
         try:
-            # Use the correctly dated object we created earlier
-            if col in col_to_date:
-                date_obj = col_to_date[col]
-            else:
-                # Fallback: parse from column name
-                parts = col.split("_")
-                month, day = int(parts[-2]), int(parts[-1])
-                date_obj = datetime(current_year, month, day)
-            
+            parts = col.split("_")
+            month, day = int(parts[-2]), int(parts[-1])
+            date_obj = datetime(current_year, month, day)
             weekday = date_obj.weekday()  # Mon=0 ... Sun=6
             week_num = (date_obj.day - 1) // 7 + 1
             if weekday == 6 or (weekday == 5 and week_num in [1, 3]):
@@ -1672,38 +1555,16 @@ def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
     if not clock_in_cols or not clock_out_cols:
         raise ValueError("No clock_in_ or clock_out_ columns found in input dataframes.")
 
-    # --- Step 3: Infer year automatically, handling cross-year ranges ---
-    # Extract all months to detect cross-year ranges
-    months = []
-    for col in sorted(clock_in_cols):
-        try:
-            parts = col.split("_")
-            month = int(parts[-2])
-            months.append(month)
-        except Exception:
-            continue
-    
+    # --- Step 3: Infer year automatically ---
+    # Pick the middle date column, e.g. 'clock_in_9_17'
+    sample_col = clock_in_cols[len(clock_in_cols)//2]
+    parts = sample_col.split("_")
+    month, day = int(parts[-2]), int(parts[-1])
     today = datetime.now()
     inferred_year = today.year
-    
-    # Detect cross-year range (e.g., Dec -> Jan)
-    is_cross_year = False
-    if len(months) > 1:
-        for i in range(len(months) - 1):
-            if months[i] > months[i + 1] + 1:  # e.g., 12 > 1+1 = 2
-                is_cross_year = True
-                # Base year is determined by the first month
-                if months[0] >= 11:  # Nov or Dec
-                    inferred_year = today.year
-                else:
-                    inferred_year = today.year - 1
-                break
-    
-    # If not cross-year, use heuristic for single-year ranges
-    if not is_cross_year and months:
-        sample_month = months[len(months)//2]
-        if sample_month > today.month + 1:
-            inferred_year -= 1
+    # optional heuristic: if month ahead of current month (e.g., data for past year)
+    if month > today.month + 1:
+        inferred_year -= 1
 
     # --- Step 4: Merge IN/OUT data ---
     df_admin_in.rename(columns={'Names': 'Name'}, inplace=True)
