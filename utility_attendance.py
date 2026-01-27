@@ -1142,7 +1142,23 @@ def calculate_leave_summary_with_wd_leaves_V2(df, working_days_list, debug_emp_i
 
     return final
 
-def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
+def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, attendance_start_date=None, attendance_end_date=None):
+    """
+    Calculate leave summary with working days, filtering leaves to only count those within attendance period.
+    
+    Parameters:
+    -----------
+    df_leave_erp : pd.DataFrame
+        Leave ERP data with columns like 'Emp Id', 'From Date', 'To Date', 'Leave Type', 'Status', 'Total Days'
+    working_days_list : list
+        List of working days from biometric data
+    attendance_start_date : datetime.date or pd.Timestamp, optional
+        Start date of attendance period (e.g., 26-Dec-2025). If None, uses min date from working_days_list
+    attendance_end_date : datetime.date or pd.Timestamp, optional
+        End date of attendance period (e.g., 25-Jan-2026). If None, uses max date from working_days_list
+    """
+    import streamlit as st
+    
     df = df_leave_erp.copy()
 
     # -------------------------------------------------
@@ -1150,6 +1166,48 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
     # -------------------------------------------------
     if 'Status' in df.columns:
         df = df[df['Status'].str.strip().str.lower() == 'approved'].copy()
+    
+    # -------------------------------------------------
+    # 1.5. Filter leaves to only those within attendance period
+    # -------------------------------------------------
+    if attendance_start_date is not None and attendance_end_date is not None:
+        # Normalize dates to date objects
+        if isinstance(attendance_start_date, pd.Timestamp):
+            attendance_start_date = attendance_start_date.date()
+        elif hasattr(attendance_start_date, 'date'):
+            attendance_start_date = attendance_start_date.date()
+            
+        if isinstance(attendance_end_date, pd.Timestamp):
+            attendance_end_date = attendance_end_date.date()
+        elif hasattr(attendance_end_date, 'date'):
+            attendance_end_date = attendance_end_date.date()
+        
+        # Convert leave dates to date objects for comparison
+        df['From Date'] = pd.to_datetime(df['From Date'], errors='coerce')
+        df['To Date'] = pd.to_datetime(df['To Date'], errors='coerce')
+        
+        # Filter: only include leaves that overlap with attendance period
+        # A leave overlaps if: leave_end >= attendance_start AND leave_start <= attendance_end
+        df = df[
+            (df['To Date'].notna()) & 
+            (df['From Date'].notna()) &
+            (df['To Date'].dt.date >= attendance_start_date) &
+            (df['From Date'].dt.date <= attendance_end_date)
+        ].copy()
+        
+        # For leaves that partially overlap, clip the dates to attendance period
+        # This ensures we only count working days within the attendance period
+        df['From Date Clipped'] = df['From Date'].apply(
+            lambda x: max(x.date(), attendance_start_date) if pd.notna(x) else None
+        )
+        df['To Date Clipped'] = df['To Date'].apply(
+            lambda x: min(x.date(), attendance_end_date) if pd.notna(x) else None
+        )
+        
+        # Convert clipped dates back to datetime for processing
+        df['From Date'] = pd.to_datetime(df['From Date Clipped'])
+        df['To Date'] = pd.to_datetime(df['To Date Clipped'])
+        df = df.drop(columns=['From Date Clipped', 'To Date Clipped'], errors='ignore')
     
     if df.empty:
         # Return empty dataframe with required columns
@@ -1175,15 +1233,167 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
     df = df[df['From Date'].notna() & df['To Date'].notna()].copy()
 
     # -------------------------------------------------
-    # 4. Working day lookup
+    # 4. Working day lookup - normalize working_days_list to MM_DD format
     # -------------------------------------------------
-    working_days_set = set(working_days_list)
+    # working_days_list may contain dates in DD_MM_YYYY, DD_MM, MM_DD_YYYY, or MM_DD format
+    # We need to normalize them all to MM_DD format for comparison
+    normalized_working_days_set = set()
+    
+    # Infer year from attendance period (if provided) or leave data (not current year!)
+    # Prefer attendance period dates if available
+    if attendance_start_date is not None:
+        # Extract year from attendance_start_date
+        if isinstance(attendance_start_date, pd.Timestamp):
+            inferred_year = attendance_start_date.year
+        elif isinstance(attendance_start_date, datetime):
+            inferred_year = attendance_start_date.year
+        elif hasattr(attendance_start_date, 'year'):
+            inferred_year = attendance_start_date.year
+        else:
+            # It's already a date object - try to get year attribute
+            try:
+                inferred_year = attendance_start_date.year
+            except:
+                inferred_year = datetime.now().year
+    else:
+        # Fallback: infer from leave data
+        min_date_for_year = df['From Date'].min()
+        inferred_year = datetime.now().year
+        if pd.notna(min_date_for_year):
+            if isinstance(min_date_for_year, pd.Timestamp):
+                inferred_year = min_date_for_year.year
+            elif hasattr(min_date_for_year, 'year'):
+                inferred_year = min_date_for_year.year
+    
+    current_year = inferred_year  # Use inferred year for parsing
+    
+    # Also generate calendar-based working days from attendance period (if provided)
+    # This ensures we include working days that might have been filtered out by biometric data
+    # Use attendance period if provided, otherwise use leave data date range
+    if attendance_start_date is not None and attendance_end_date is not None:
+        # Use attendance period dates
+        min_date = attendance_start_date
+        max_date = attendance_end_date
+        # Convert to date objects if needed
+        if isinstance(min_date, pd.Timestamp):
+            min_date = min_date.date()
+        elif hasattr(min_date, 'date') and not isinstance(min_date, type(datetime.now().date())):
+            min_date = min_date.date()
+        if isinstance(max_date, pd.Timestamp):
+            max_date = max_date.date()
+        elif hasattr(max_date, 'date') and not isinstance(max_date, type(datetime.now().date())):
+            max_date = max_date.date()
+    else:
+        # Fallback: Extract date range from leave data
+        min_date = df['From Date'].min()
+        max_date = df['To Date'].max()
+    
+    if pd.notna(min_date) and pd.notna(max_date):
+        # Convert to date objects
+        if isinstance(min_date, pd.Timestamp):
+            min_date = min_date.date()
+        elif hasattr(min_date, 'date'):
+            min_date = min_date.date()
+        if isinstance(max_date, pd.Timestamp):
+            max_date = max_date.date()
+        elif hasattr(max_date, 'date'):
+            max_date = max_date.date()
+        
+        debug_info.append(f"   Generating calendar working days from {min_date} to {max_date}")
+        
+        # Generate all dates in range and check if they're working days (not Sunday, not 1st/3rd Saturday)
+        from calendar import weekday
+        calendar_working_days = set()
+        current_cal_date = min_date
+        while current_cal_date <= max_date:
+            # Check if it's a Sunday (weekday() returns 6 for Sunday)
+            if current_cal_date.weekday() == 6:  # Sunday
+                current_cal_date += timedelta(days=1)
+                continue
+            
+            # Check if it's a Saturday
+            if current_cal_date.weekday() == 5:  # Saturday
+                # Check if it's 1st or 3rd Saturday of the month
+                day_of_month = current_cal_date.day
+                # 1st Saturday: day 1-7
+                # 3rd Saturday: day 15-21
+                if 1 <= day_of_month <= 7 or 15 <= day_of_month <= 21:
+                    current_cal_date += timedelta(days=1)
+                    continue
+            
+            # It's a working day - add to set
+            calendar_working_days.add(current_cal_date.strftime('%m_%d'))
+            current_cal_date += timedelta(days=1)
+        
+        # Merge calendar working days with biometric working days
+        normalized_working_days_set.update(calendar_working_days)
+    
+    for wd_str in working_days_list:
+        wd_str = str(wd_str).strip()
+        if not wd_str:
+            continue
+        
+        # Try to parse the date string in various formats
+        parsed_date = None
+        
+        # Try MM_DD_YYYY format FIRST (e.g., '12_27_2025') since working_days_list comes from clock_in columns
+        # which use MM_DD format (month_day)
+        try:
+            parsed_date = datetime.strptime(wd_str, '%m_%d_%Y')
+        except ValueError:
+            # Try DD_MM_YYYY format (e.g., '27_12_2025')
+            try:
+                parsed_date = datetime.strptime(wd_str, '%d_%m_%Y')
+            except ValueError:
+                # For ambiguous formats (DD_MM vs MM_DD), prefer MM_DD since working_days_list
+                # comes from clock_in column names which use MM_DD format (month_day)
+                # Try MM_DD format FIRST (e.g., '12_27' = Dec 27th) - use inferred year
+                try:
+                    parsed_date = datetime.strptime(f"{wd_str}_{inferred_year}", '%m_%d_%Y')
+                except ValueError:
+                    # Try DD_MM format as fallback (e.g., '27_12' = Dec 27th) - use inferred year
+                    try:
+                        parsed_date = datetime.strptime(f"{wd_str}_{inferred_year}", '%d_%m_%Y')
+                    except ValueError:
+                        # If all parsing fails, skip this entry
+                        continue
+        
+        if parsed_date:
+            # Normalize to MM_DD format
+            mm_dd_format = parsed_date.strftime('%m_%d')
+            normalized_working_days_set.add(mm_dd_format)
+            # Check specifically for 27-Dec-2025
+            if parsed_date.month == 12 and parsed_date.day == 27:
+                debug_info.append(f"   🎯 Found 27-Dec-2025! Added '{mm_dd_format}' to normalized set")
+    
+    debug_info.append(f"   Normalized working days set size: {len(normalized_working_days_set)}")
+    debug_info.append(f"   Sample normalized working days: {sorted(list(normalized_working_days_set))[:20]}")
+    # Check if 12_27 (27-Dec) is in the set
+    if '12_27' in normalized_working_days_set:
+        debug_info.append(f"   ✅ 12_27 (27-Dec) IS in normalized_working_days_set")
+    else:
+        debug_info.append(f"   ❌ 12_27 (27-Dec) is NOT in normalized_working_days_set!")
+        debug_info.append(f"   Looking for dates around 27-Dec in working_days_list:")
+        for wd in working_days_list:
+            if '27' in str(wd) or '12' in str(wd):
+                debug_info.append(f"      Found: '{wd}'")
 
-    def is_working_day(date):
+    def is_working_day(date_obj):
         """Check if a date is a working day based on MM_DD format"""
-        if pd.isna(date):
+        if pd.isna(date_obj):
             return False
-        return date.strftime('%m_%d') in working_days_set
+        # Normalize to date object if it's a datetime
+        if isinstance(date_obj, pd.Timestamp):
+            date_obj = date_obj.date()
+        elif hasattr(date_obj, 'date'):
+            date_obj = date_obj.date()
+        # Format as MM_DD for comparison
+        mm_dd = date_obj.strftime('%m_%d')
+        is_wd = mm_dd in normalized_working_days_set
+        # Debug for 27-Dec specifically
+        if date_obj.month == 12 and date_obj.day == 27:
+            debug_info.append(f"   🔍 is_working_day check for 27-Dec-{date_obj.year}: mm_dd='{mm_dd}', in set={mm_dd in normalized_working_days_set}, result={is_wd}")
+        return is_wd
 
     # -------------------------------------------------
     # 5. Adjust leave days based on working calendar
@@ -1203,9 +1413,24 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
             adjusted_days.append(0.0)
             continue
 
+        # Normalize start and end to date objects for proper comparison
+        if isinstance(start, pd.Timestamp):
+            start_date = start.date()
+        elif hasattr(start, 'date'):
+            start_date = start.date()
+        else:
+            start_date = start
+            
+        if isinstance(end, pd.Timestamp):
+            end_date = end.date()
+        elif hasattr(end, 'date'):
+            end_date = end.date()
+        else:
+            end_date = end
+
         # Preserve half-day semantics
         if total_days == 0.5:
-            if is_working_day(start):
+            if is_working_day(start_date):
                 adjusted_days.append(0.5)
                 # Count for Total WD leaves if not Casual or Extraordinary
                 if leave_type.lower() not in ['casual leave', 'extraordinary leave']:
@@ -1216,13 +1441,35 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
 
         # Count working days in the date range
         count = 0.0
-        current = start
-        while current <= end:
+        current = start_date
+        working_days_found = []
+        # Iterate through each day in the range (inclusive)
+        while current <= end_date:
             if is_working_day(current):
                 count += 1.0
+                working_days_found.append(current.strftime('%d-%b-%Y'))
+            # Move to next day
             current += timedelta(days=1)
 
         adjusted_days.append(count)
+        
+        # Debug output for troubleshooting (can be removed later)
+        if emp_id == 'GCU020057' and 'vacation' in leave_type.lower():
+            debug_info.append(f"\n🔍 DEBUG GCU020057 Vacation Leave:")
+            debug_info.append(f"   Leave Type: {leave_type}")
+            debug_info.append(f"   From Date: {start_date.strftime('%d-%b-%Y')} ({start_date.strftime('%m_%d')})")
+            debug_info.append(f"   To Date: {end_date.strftime('%d-%b-%Y')} ({end_date.strftime('%m_%d')})")
+            debug_info.append(f"   Total Days (from ERP): {total_days}")
+            debug_info.append(f"   Working days found: {working_days_found}")
+            debug_info.append(f"   Count: {count}")
+            debug_info.append(f"   Checking each date in range:")
+            check_current = start_date
+            while check_current <= end_date:
+                date_str = check_current.strftime('%m_%d')
+                is_wd = is_working_day(check_current)
+                status = '✅ WORKING' if is_wd else '❌ NOT WORKING'
+                debug_info.append(f"      {check_current.strftime('%d-%b-%Y')} ({date_str}): {status} (in set: {date_str in normalized_working_days_set})")
+                check_current += timedelta(days=1)
         
         # Accumulate Total WD leaves (excluding Casual Leave and Extraordinary Leave)
         if leave_type.lower() not in ['casual leave', 'extraordinary leave']:
@@ -1271,6 +1518,27 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
         leave_summary['Total WD leaves'] = leave_summary['Emp Id'].map(lambda x: total_wd_leaves_map.get(x, 0.0))
     
     leave_summary['Total WD leaves'] = leave_summary['Total WD leaves'].fillna(0.0)
+    
+    # Print all debug info
+    for msg in debug_info:
+        print(msg)
+        try:
+            import streamlit as st
+            st.write(msg)
+        except:
+            pass  # If not in Streamlit context, just print
+    
+    # Debug: Show final result for GCU020057
+    if 'GCU020057' in leave_summary.get('Emp Id', pd.Series()).values:
+        gc_final = leave_summary[leave_summary['Emp Id'] == 'GCU020057']
+        print(f"\n🔍 DEBUG: Final result for GCU020057:")
+        print(gc_final.to_string())
+        try:
+            import streamlit as st
+            st.write(f"\n🔍 DEBUG: Final result for GCU020057:")
+            st.dataframe(gc_final)
+        except:
+            pass
 
     return leave_summary
 
@@ -1727,6 +1995,116 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
 
     return all_holidays
 
+def extract_attendance_period_dates(df_clock_in, year=None):
+    """
+    Extract attendance period start and end dates from clock_in columns.
+    Handles cross-year ranges (e.g., Dec 2025 to Jan 2026) correctly.
+    
+    Parameters
+    ----------
+    df_clock_in : pd.DataFrame
+        Clock-in dataframe with columns like 'clock_in_09_10', 'clock_in_09_11', etc.
+    year : int, optional
+        Base year for date inference (default = current year).
+        If None, auto-detects based on cross-year logic.
+    
+    Returns
+    -------
+    tuple (start_date, end_date)
+        Start and end dates as datetime.date objects, or (None, None) if extraction fails.
+    """
+    clock_in_cols = [c for c in df_clock_in.columns if c.startswith("clock_in_")]
+    if not clock_in_cols:
+        return None, None
+    
+    current_year = year or datetime.now().year
+    current_month = datetime.now().month
+    
+    # Extract all month-day pairs
+    # Column format is clock_in_MM_DD (e.g., clock_in_12_26 = Dec 26, clock_in_01_01 = Jan 1)
+    month_day_pairs = []
+    for col in clock_in_cols:
+        try:
+            parts = col.split("_")
+            if len(parts) >= 4:
+                # Format: clock_in_MM_DD or clock_in_MM_DD_YYYY
+                m, d = int(parts[-2]), int(parts[-1])
+                month_day_pairs.append((m, d, col))
+            elif len(parts) == 3:
+                # Handle format like 'clock_in_9_18' (no year, unpadded)
+                try:
+                    m, d = int(parts[-2]), int(parts[-1])
+                    month_day_pairs.append((m, d, col))
+                except ValueError:
+                    continue
+        except Exception:
+            continue
+    
+    if not month_day_pairs:
+        return None, None
+    
+    # Detect if this is a cross-year range BEFORE sorting
+    # Check if we have both low months (1-3) and high months (11-12)
+    months = [m for m, d, col in month_day_pairs]
+    unique_months = sorted(set(months))
+    has_low_months = any(m <= 3 for m in unique_months)
+    has_high_months = any(m >= 11 for m in unique_months)
+    is_cross_year = has_low_months and has_high_months
+    
+    # Determine base_year based on cross-year logic
+    base_year = current_year
+    if is_cross_year:
+        # If we have both low and high months, it's likely a Dec->Jan transition
+        # For Dec 2025 -> Jan 2026: base_year should be 2025
+        if current_month <= 3:  # Jan, Feb, or Mar
+            base_year = current_year - 1  # Dec is from previous year
+        else:
+            base_year = current_year  # Dec is from current year
+    
+    # Now sort by (month, day) to get chronological order
+    # For cross-year ranges, we'll handle year assignment in the loop below
+    month_day_pairs.sort(key=lambda x: (x[0], x[1]))
+    
+    # Get first and last months for additional logic
+    first_month = months[0] if months else None
+    last_month = months[-1] if months else None
+    
+    # Create date objects with correct years
+    date_objs = []
+    
+    if is_cross_year:
+        # For cross-year ranges, we need to handle the wrap-around correctly
+        # Dates with months >= 11 are likely from the base_year
+        # Dates with months <= 3 are likely from base_year + 1
+        for m, d, col in month_day_pairs:
+            if m >= 11:  # Nov, Dec - use base_year
+                date_obj = datetime(base_year, m, d)
+            else:  # Jan, Feb, Mar - use base_year + 1
+                date_obj = datetime(base_year + 1, m, d)
+            date_objs.append(date_obj.date())
+    else:
+        # For same-year ranges, use simple year assignment
+        year_shift = 0
+        prev_month = None
+        for m, d, col in month_day_pairs:
+            # If we detect a month wrap-around (e.g., 12 -> 1), increment year
+            if prev_month is not None and m < prev_month:
+                year_shift += 1
+            prev_month = m
+            
+            date_obj = datetime(base_year + year_shift, m, d)
+            date_objs.append(date_obj.date())
+    
+    if not date_objs:
+        return None, None
+    
+    # Get actual min and max dates (not just from sorted month_day_pairs)
+    # This ensures we get the correct start and end dates even with cross-year ranges
+    start_date = min(date_objs)
+    end_date = max(date_objs)
+    
+    return start_date, end_date
+
 # this is final
 def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
                        misc_holidays="", misc_working_days=""):
@@ -1893,10 +2271,11 @@ def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
                     full_abs_dates.append(dd_mm)
 
         # --- Step 9: Calculate totals ---
-        # Separate full-day absences from half-day absences
-        # Count unique half-days by combining am_abs and pm_abs into a set
-        half_day_set = set(am_abs) | set(pm_abs)
-        total_abs_days = len(full_abs_dates) + 0.5 * len(half_day_set)
+        # Calculate Absent using weighted sum: AM_abs * 0.5 + PM_abs * 0.5 + Full_days * 1.0
+        # This matches the calculation in other merge functions
+        # Note: am_abs and pm_abs are mutually exclusive (a day can't be in both)
+        # If someone is absent both AM and PM, they're in full_abs_dates, not am_abs or pm_abs
+        total_abs_days = len(full_abs_dates) * 1.0 + len(am_abs) * 0.5 + len(pm_abs) * 0.5
 
         results.append({
             'Emp Id': emp_id,

@@ -17,7 +17,8 @@ from datetime import datetime
 from utility_attendance import (
     stepwise_file_upload, read_session_bytes_with_retry, process_exempted_leaves,_is_rerun_exc,
     split_file, pad_month_in_columns, detect_holidays_staffs, calculate_working_days,
-    merge_files_staffs, calculate_leave_summary_with_wd_leaves, weighted_sum_and_replace_columns
+    merge_files_staffs, calculate_leave_summary_with_wd_leaves, weighted_sum_and_replace_columns,
+    extract_attendance_period_dates
 )
 from utility import preprocess_date
 
@@ -151,6 +152,12 @@ def app():
                 if misc_holidays_list:
                     all_holidays.extend(misc_holidays_list)
 
+                # Extract attendance period date range BEFORE removing holidays
+                # This ensures we get the full date range including December dates
+                # Use a copy of df_gimt_in before holiday removal
+                df_gimt_in_before_holidays = df_gimt_in.copy()
+                attendance_start_date, attendance_end_date = extract_attendance_period_dates(df_gimt_in_before_holidays, year=None)
+
                 # Let detect_holidays_staffs automatically infer year(s) from date columns
                 # This handles cross-year ranges like Dec 2025 to Jan 2026 correctly
                 holidays = detect_holidays_staffs(df_gimt_in, year=None, misc_holidays=all_holidays, misc_working_days=misc_working_days, verbose=False)
@@ -168,6 +175,11 @@ def app():
                 final_working_days = df_gimt_in.columns
                 working_days_list = calculate_working_days(df_gimt_in)
                 no_working_days = len(df_gimt_in.columns) - 3 if len(df_gimt_in.columns) > 3 else len(df_gimt_in.columns)
+                
+                if attendance_start_date and attendance_end_date:
+                    st.info(f"📅 Attendance period: {attendance_start_date.strftime('%d-%b-%Y')} to {attendance_end_date.strftime('%d-%b-%Y')}")
+                else:
+                    st.warning("⚠️ Could not extract attendance period dates from clock_in columns")
 
                 # Merge with ERP employee master
                 emp_df = pd.read_csv('./data/2015_10_27_employee_list.csv', skiprows=6, encoding='windows-1252')
@@ -247,9 +259,32 @@ def app():
                     df_leave_erp['To Date'] = df_leave_erp['To Date'].apply(preprocess_date)
                     df_leave_erp['To Date'] = pd.to_datetime(df_leave_erp['To Date'], errors='coerce')
 
-                df_leave_erp_summary = calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list)
+                df_leave_erp_summary = calculate_leave_summary_with_wd_leaves(
+                    df_leave_erp, 
+                    working_days_list,
+                    attendance_start_date=attendance_start_date,
+                    attendance_end_date=attendance_end_date
+                )
                 df_leave_erp_summary.fillna(0, inplace=True)
-                df_leave_erp_summary['Approved leaves (ERP)'] = df_leave_erp_summary.get('Total WD leaves', 0) + df_leave_erp_summary.get('Casual Leave', 0)
+                
+                # Calculate Approved leaves (ERP) = Sum of ALL approved leave types
+                # Leave types: Casual Leave, Duty Leave, Earned Leave, Maternity Leave, Sick Leave, Vacation Leave
+                # Exclude non-leave columns: 'Emp Id', 'Name', 'Total WD leaves'
+                non_leave_cols = ['Emp Id', 'Name', 'Total WD leaves']
+                # Get all columns that are not in the exclusion list (these are all leave type columns)
+                leave_type_cols = [col for col in df_leave_erp_summary.columns if col not in non_leave_cols]
+                
+                # Sum all leave types
+                if leave_type_cols:
+                    df_leave_erp_summary['Approved leaves (ERP)'] = (
+                        df_leave_erp_summary[leave_type_cols]
+                        .apply(pd.to_numeric, errors='coerce')
+                        .fillna(0.0)
+                        .sum(axis=1)
+                    )
+                else:
+                    # Fallback: if no leave type columns found, set to 0
+                    df_leave_erp_summary['Approved leaves (ERP)'] = 0.0
 
                 # Merge EXEMPTED and calculate adjusted values
                 df_exempted.rename(columns={'late_count':'exempt_late','half_day_count':'exempt_HD','full_day_count':'exempt_FD'}, inplace=True)
@@ -302,21 +337,21 @@ def app():
                 df_fac_report = weighted_sum_and_replace_columns(df_fac_report, ['Half Days','Full Days'], 'Observed Leaves', [0.5,1.0])
                 df_admin_report = weighted_sum_and_replace_columns(df_admin_report, ['Half Days','Full Days'], 'Observed Leaves', [0.5,1.0])
 
-                # Calculate Unauthorized leaves = Absent - Total WD leaves
-                # Note: Only subtract Total WD leaves (working day leaves), not Casual Leave
-                # Casual Leave is not counted against working days for unauthorized leave calculation
+                # Calculate Unauthorized leaves = Absent - Approved leaves (ERP)
+                # Approved leaves (ERP) includes ALL approved leave types:
+                # Casual Leave, Duty Leave, Earned Leave, Maternity Leave, Sick Leave, Vacation Leave
                 for df_report in [df_fac_report, df_admin_report]:
-                    if 'Absent' in df_report.columns and 'Total WD leaves' in df_report.columns:
+                    if 'Absent' in df_report.columns and 'Approved leaves (ERP)' in df_report.columns:
                         # Ensure numeric types
                         absent = pd.to_numeric(df_report['Absent'], errors='coerce').fillna(0.0)
-                        total_wd = pd.to_numeric(df_report['Total WD leaves'], errors='coerce').fillna(0.0)
-                        df_report["Unauthorized leaves"] = (absent - total_wd).clip(lower=0.0)
+                        approved_leaves = pd.to_numeric(df_report['Approved leaves (ERP)'], errors='coerce').fillna(0.0)
+                        df_report["Unauthorized leaves"] = (absent - approved_leaves).clip(lower=0.0)
                     else:
                         df_report["Unauthorized leaves"] = 0.0
                         if 'Absent' not in df_report.columns:
                             st.warning(f"⚠️ 'Absent' column not found. Available columns: {list(df_report.columns)[:10]}")
-                        if 'Total WD leaves' not in df_report.columns:
-                            st.warning(f"⚠️ 'Total WD leaves' column not found. Available columns: {list(df_report.columns)[:10]}")
+                        if 'Approved leaves (ERP)' not in df_report.columns:
+                            st.warning(f"⚠️ 'Approved leaves (ERP)' column not found. Available columns: {list(df_report.columns)[:10]}")
                 
                         
                 
