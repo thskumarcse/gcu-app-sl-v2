@@ -294,6 +294,8 @@ def app():
                 
                 df_fac_report = pd.merge(df_fac_actual_exempted, df_leave_erp_summary, how='left', on='Emp Id', suffixes=('','_leave'))
                 df_admin_report = pd.merge(df_admin_actual_exempted, df_leave_erp_summary, how='left', on='Emp Id', suffixes=('','_leave'))
+                
+                # Fill NaN values but ensure numeric columns are properly typed
                 df_fac_report.fillna(0, inplace=True)
                 df_admin_report.fillna(0, inplace=True)
 
@@ -303,15 +305,18 @@ def app():
                 # Calculate Unauthorized leaves = Absent - Total WD leaves
                 # Note: Only subtract Total WD leaves (working day leaves), not Casual Leave
                 # Casual Leave is not counted against working days for unauthorized leave calculation
-                if 'Absent' in df_fac_report.columns and 'Total WD leaves' in df_fac_report.columns:
-                    df_fac_report["Unauthorized leaves"] = (df_fac_report["Absent"] - df_fac_report["Total WD leaves"]).clip(lower=0)
-                else:
-                    df_fac_report["Unauthorized leaves"] = 0
-                    
-                if 'Absent' in df_admin_report.columns and 'Total WD leaves' in df_admin_report.columns:
-                    df_admin_report["Unauthorized leaves"] = (df_admin_report["Absent"] - df_admin_report["Total WD leaves"]).clip(lower=0)
-                else:
-                    df_admin_report["Unauthorized leaves"] = 0
+                for df_report in [df_fac_report, df_admin_report]:
+                    if 'Absent' in df_report.columns and 'Total WD leaves' in df_report.columns:
+                        # Ensure numeric types
+                        absent = pd.to_numeric(df_report['Absent'], errors='coerce').fillna(0.0)
+                        total_wd = pd.to_numeric(df_report['Total WD leaves'], errors='coerce').fillna(0.0)
+                        df_report["Unauthorized leaves"] = (absent - total_wd).clip(lower=0.0)
+                    else:
+                        df_report["Unauthorized leaves"] = 0.0
+                        if 'Absent' not in df_report.columns:
+                            st.warning(f"⚠️ 'Absent' column not found. Available columns: {list(df_report.columns)[:10]}")
+                        if 'Total WD leaves' not in df_report.columns:
+                            st.warning(f"⚠️ 'Total WD leaves' column not found. Available columns: {list(df_report.columns)[:10]}")
                 
                         
                 

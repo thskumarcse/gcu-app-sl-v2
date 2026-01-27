@@ -1146,7 +1146,17 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
     df = df_leave_erp.copy()
 
     # -------------------------------------------------
-    # 1. Clean and convert Total Days to float
+    # 1. Filter only Approved leaves
+    # -------------------------------------------------
+    if 'Status' in df.columns:
+        df = df[df['Status'].str.strip().str.lower() == 'approved'].copy()
+    
+    if df.empty:
+        # Return empty dataframe with required columns
+        return pd.DataFrame(columns=['Emp Id', 'Name', 'Total WD leaves'])
+
+    # -------------------------------------------------
+    # 2. Clean and convert Total Days to float
     # -------------------------------------------------
     df['Total Days'] = (
         pd.to_numeric(
@@ -1156,53 +1166,89 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
     )
 
     # -------------------------------------------------
-    # 2. Convert dates
+    # 3. Convert dates
     # -------------------------------------------------
-    df['From Date'] = pd.to_datetime(df['From Date'])
-    df['To Date'] = pd.to_datetime(df['To Date'])
+    df['From Date'] = pd.to_datetime(df['From Date'], errors='coerce')
+    df['To Date'] = pd.to_datetime(df['To Date'], errors='coerce')
+    
+    # Remove rows with invalid dates
+    df = df[df['From Date'].notna() & df['To Date'].notna()].copy()
 
     # -------------------------------------------------
-    # 3. Working day lookup
+    # 4. Working day lookup
     # -------------------------------------------------
     working_days_set = set(working_days_list)
 
     def is_working_day(date):
+        """Check if a date is a working day based on MM_DD format"""
+        if pd.isna(date):
+            return False
         return date.strftime('%m_%d') in working_days_set
 
     # -------------------------------------------------
-    # 4. Adjust leave days based on working calendar
+    # 5. Adjust leave days based on working calendar
     # -------------------------------------------------
     adjusted_days = []
+    total_wd_leaves_map = {}  # Track Total WD leaves per employee (excluding Casual and Extraordinary)
 
     for _, row in df.iterrows():
         start = row['From Date']
         end = row['To Date']
         total_days = row['Total Days']
+        leave_type = str(row.get('Leave Type', '')).strip()
+        emp_id = row.get('Emp Id') or row.get('Employee ID', '')
+        
+        # Skip if missing required fields
+        if pd.isna(start) or pd.isna(end) or not emp_id:
+            adjusted_days.append(0.0)
+            continue
 
         # Preserve half-day semantics
         if total_days == 0.5:
-            adjusted_days.append(0.5)
+            if is_working_day(start):
+                adjusted_days.append(0.5)
+                # Count for Total WD leaves if not Casual or Extraordinary
+                if leave_type.lower() not in ['casual leave', 'extraordinary leave']:
+                    total_wd_leaves_map[emp_id] = total_wd_leaves_map.get(emp_id, 0.0) + 0.5
+            else:
+                adjusted_days.append(0.0)
             continue
 
+        # Count working days in the date range
         count = 0.0
         current = start
-
         while current <= end:
             if is_working_day(current):
-                count += 1
+                count += 1.0
             current += timedelta(days=1)
 
         adjusted_days.append(count)
+        
+        # Accumulate Total WD leaves (excluding Casual Leave and Extraordinary Leave)
+        if leave_type.lower() not in ['casual leave', 'extraordinary leave']:
+            total_wd_leaves_map[emp_id] = total_wd_leaves_map.get(emp_id, 0.0) + count
 
     df['Adjusted Days'] = adjusted_days
 
     # -------------------------------------------------
-    # 5. Pivot: Leave Types as Columns (Employee-wise)
+    # 6. Pivot: Leave Types as Columns (Employee-wise)
     # -------------------------------------------------
-    df.rename(columns={'Employee ID':'Emp Id'}, inplace=True)
+    if 'Employee ID' in df.columns and 'Emp Id' not in df.columns:
+        df.rename(columns={'Employee ID':'Emp Id'}, inplace=True)
+    
+    if 'Emp Id' not in df.columns:
+        # Try to find employee ID column
+        for col in df.columns:
+            if 'emp' in col.lower() and 'id' in col.lower():
+                df.rename(columns={col: 'Emp Id'}, inplace=True)
+                break
+    
+    if 'Emp Id' not in df.columns:
+        raise ValueError("Could not find Employee ID column in leave data")
+    
     leave_summary = (
         df.pivot_table(
-            index=['Emp Id', 'Name'],
+            index=['Emp Id', 'Name'] if 'Name' in df.columns else ['Emp Id'],
             columns='Leave Type',
             values='Adjusted Days',
             aggfunc='sum',
@@ -1213,6 +1259,18 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list):
 
     # Optional: flatten column index
     leave_summary.columns.name = None
+    
+    # Add 'Total WD leaves' column (excluding Casual Leave and Extraordinary Leave)
+    if 'Name' in leave_summary.columns:
+        total_wd_df = pd.DataFrame([
+            {'Emp Id': emp_id, 'Total WD leaves': total_wd_leaves_map.get(emp_id, 0.0)}
+            for emp_id in leave_summary['Emp Id'].unique()
+        ])
+        leave_summary = pd.merge(leave_summary, total_wd_df, on='Emp Id', how='left')
+    else:
+        leave_summary['Total WD leaves'] = leave_summary['Emp Id'].map(lambda x: total_wd_leaves_map.get(x, 0.0))
+    
+    leave_summary['Total WD leaves'] = leave_summary['Total WD leaves'].fillna(0.0)
 
     return leave_summary
 
