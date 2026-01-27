@@ -300,13 +300,18 @@ def app():
                 df_fac_report = weighted_sum_and_replace_columns(df_fac_report, ['Half Days','Full Days'], 'Observed Leaves', [0.5,1.0])
                 df_admin_report = weighted_sum_and_replace_columns(df_admin_report, ['Half Days','Full Days'], 'Observed Leaves', [0.5,1.0])
 
-                # NEED to bring names from erp and merge properly
                 # Calculate Unauthorized leaves = Absent - Total WD leaves
-                #df_fac_report["Unauthorized leaves"] = (df_fac_report["Absent"] - df_fac_report["Approved leaves (ERP)"]).clip(lower=0) 
-                #df_admin_report["Unauthorized leaves"] = (df_admin_report["Absent"] - df_admin_report["Approved leaves (ERP)"]).clip(lower=0)
-                
-                df_fac_report["Unauthorized leaves"] = (df_fac_report["Absent"] - df_fac_report["Approved leaves (ERP)"]).clip(lower=0)
-                df_admin_report["Unauthorized leaves"] = (df_admin_report["Absent"] - df_admin_report["Approved leaves (ERP)"]).clip(lower=0)
+                # Note: Only subtract Total WD leaves (working day leaves), not Casual Leave
+                # Casual Leave is not counted against working days for unauthorized leave calculation
+                if 'Absent' in df_fac_report.columns and 'Total WD leaves' in df_fac_report.columns:
+                    df_fac_report["Unauthorized leaves"] = (df_fac_report["Absent"] - df_fac_report["Total WD leaves"]).clip(lower=0)
+                else:
+                    df_fac_report["Unauthorized leaves"] = 0
+                    
+                if 'Absent' in df_admin_report.columns and 'Total WD leaves' in df_admin_report.columns:
+                    df_admin_report["Unauthorized leaves"] = (df_admin_report["Absent"] - df_admin_report["Total WD leaves"]).clip(lower=0)
+                else:
+                    df_admin_report["Unauthorized leaves"] = 0
                 
                         
                 
