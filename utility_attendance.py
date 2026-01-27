@@ -1299,8 +1299,6 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
         elif hasattr(max_date, 'date'):
             max_date = max_date.date()
         
-        debug_info.append(f"   Generating calendar working days from {min_date} to {max_date}")
-        
         # Generate all dates in range and check if they're working days (not Sunday, not 1st/3rd Saturday)
         from calendar import weekday
         calendar_working_days = set()
@@ -1362,21 +1360,6 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
             # Normalize to MM_DD format
             mm_dd_format = parsed_date.strftime('%m_%d')
             normalized_working_days_set.add(mm_dd_format)
-            # Check specifically for 27-Dec-2025
-            if parsed_date.month == 12 and parsed_date.day == 27:
-                debug_info.append(f"   🎯 Found 27-Dec-2025! Added '{mm_dd_format}' to normalized set")
-    
-    debug_info.append(f"   Normalized working days set size: {len(normalized_working_days_set)}")
-    debug_info.append(f"   Sample normalized working days: {sorted(list(normalized_working_days_set))[:20]}")
-    # Check if 12_27 (27-Dec) is in the set
-    if '12_27' in normalized_working_days_set:
-        debug_info.append(f"   ✅ 12_27 (27-Dec) IS in normalized_working_days_set")
-    else:
-        debug_info.append(f"   ❌ 12_27 (27-Dec) is NOT in normalized_working_days_set!")
-        debug_info.append(f"   Looking for dates around 27-Dec in working_days_list:")
-        for wd in working_days_list:
-            if '27' in str(wd) or '12' in str(wd):
-                debug_info.append(f"      Found: '{wd}'")
 
     def is_working_day(date_obj):
         """Check if a date is a working day based on MM_DD format"""
@@ -1431,7 +1414,7 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
         # Preserve half-day semantics
         if total_days == 0.5:
             if is_working_day(start_date):
-                adjusted_days.append(0.5)
+            adjusted_days.append(0.5)
                 # Count for Total WD leaves if not Casual or Extraordinary
                 if leave_type.lower() not in ['casual leave', 'extraordinary leave']:
                     total_wd_leaves_map[emp_id] = total_wd_leaves_map.get(emp_id, 0.0) + 0.5
@@ -1453,24 +1436,6 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
 
         adjusted_days.append(count)
         
-        # Debug output for troubleshooting (can be removed later)
-        if emp_id == 'GCU020057' and 'vacation' in leave_type.lower():
-            debug_info.append(f"\n🔍 DEBUG GCU020057 Vacation Leave:")
-            debug_info.append(f"   Leave Type: {leave_type}")
-            debug_info.append(f"   From Date: {start_date.strftime('%d-%b-%Y')} ({start_date.strftime('%m_%d')})")
-            debug_info.append(f"   To Date: {end_date.strftime('%d-%b-%Y')} ({end_date.strftime('%m_%d')})")
-            debug_info.append(f"   Total Days (from ERP): {total_days}")
-            debug_info.append(f"   Working days found: {working_days_found}")
-            debug_info.append(f"   Count: {count}")
-            debug_info.append(f"   Checking each date in range:")
-            check_current = start_date
-            while check_current <= end_date:
-                date_str = check_current.strftime('%m_%d')
-                is_wd = is_working_day(check_current)
-                status = '✅ WORKING' if is_wd else '❌ NOT WORKING'
-                debug_info.append(f"      {check_current.strftime('%d-%b-%Y')} ({date_str}): {status} (in set: {date_str in normalized_working_days_set})")
-                check_current += timedelta(days=1)
-        
         # Accumulate Total WD leaves (excluding Casual Leave and Extraordinary Leave)
         if leave_type.lower() not in ['casual leave', 'extraordinary leave']:
             total_wd_leaves_map[emp_id] = total_wd_leaves_map.get(emp_id, 0.0) + count
@@ -1481,7 +1446,7 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
     # 6. Pivot: Leave Types as Columns (Employee-wise)
     # -------------------------------------------------
     if 'Employee ID' in df.columns and 'Emp Id' not in df.columns:
-        df.rename(columns={'Employee ID':'Emp Id'}, inplace=True)
+    df.rename(columns={'Employee ID':'Emp Id'}, inplace=True)
     
     if 'Emp Id' not in df.columns:
         # Try to find employee ID column
@@ -1518,27 +1483,6 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
         leave_summary['Total WD leaves'] = leave_summary['Emp Id'].map(lambda x: total_wd_leaves_map.get(x, 0.0))
     
     leave_summary['Total WD leaves'] = leave_summary['Total WD leaves'].fillna(0.0)
-    
-    # Print all debug info
-    for msg in debug_info:
-        print(msg)
-        try:
-            import streamlit as st
-            st.write(msg)
-        except:
-            pass  # If not in Streamlit context, just print
-    
-    # Debug: Show final result for GCU020057
-    if 'GCU020057' in leave_summary.get('Emp Id', pd.Series()).values:
-        gc_final = leave_summary[leave_summary['Emp Id'] == 'GCU020057']
-        print(f"\n🔍 DEBUG: Final result for GCU020057:")
-        print(gc_final.to_string())
-        try:
-            import streamlit as st
-            st.write(f"\n🔍 DEBUG: Final result for GCU020057:")
-            st.dataframe(gc_final)
-        except:
-            pass
 
     return leave_summary
 
@@ -1932,7 +1876,7 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
             # Normalize column name to ensure matching
             parts = col.split("_")
             if len(parts) >= 4:
-                month, day = int(parts[-2]), int(parts[-1])
+            month, day = int(parts[-2]), int(parts[-1])
                 normalized_col = f"clock_in_{month:02d}_{day:02d}"
             else:
                 normalized_col = col
@@ -2171,7 +2115,7 @@ def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
     if not is_cross_year and months:
         sample_month = months[len(months)//2]
         if sample_month > today.month + 1:
-            inferred_year -= 1
+        inferred_year -= 1
 
     # --- Step 4: Merge IN/OUT data ---
     df_admin_in.rename(columns={'Names': 'Name'}, inplace=True)
