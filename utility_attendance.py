@@ -1526,6 +1526,8 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
     months = [m for m, d, col in month_day_pairs]
     is_cross_year = False
     base_year = current_year
+    first_month = months[0] if months else None
+    last_month = months[-1] if months else None
     
     if len(months) > 1:
         # Check if we have a month that's significantly higher than the next one
@@ -1533,22 +1535,28 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
         for i in range(len(months) - 1):
             if months[i] > months[i + 1] + 1:  # e.g., 12 > 1+1 = 2
                 is_cross_year = True
-                first_month = months[0]
-                last_month = months[-1]
                 current_month = datetime.now().month
                 
                 # Special handling for Dec->Jan transitions
                 if first_month == 12 and last_month == 1:
                     # Dec->Jan: Dec is from the year before Jan
-                    # If we're processing in Jan/Feb/Mar, Dec is from previous year
-                    # Otherwise, assume Dec is from current_year and Jan is next year
+                    # For Dec 2025 -> Jan 2026: base_year should be 2025
+                    # December dates get base_year (2025), January dates get base_year + 1 (2026)
+                    # If we're processing in Jan/Feb/Mar 2026, the data is likely Dec 2025 -> Jan 2026
+                    # So base_year should be current_year - 1 (2025)
                     if current_month <= 3:  # Jan, Feb, or Mar
-                        base_year = current_year - 1  # Dec is from previous year
+                        base_year = current_year - 1  # Dec is from previous year (2025)
                     else:
+                        # If processing later in the year, assume Dec is from current year
+                        # and Jan is from next year (future data)
                         base_year = current_year  # Dec is from current year
                 elif first_month >= 11:  # Nov (11) or Dec (12) wrapping to earlier month
                     # These months are at the end of the year
-                    base_year = current_year
+                    # If wrapping to Jan, it's likely next year
+                    if last_month == 1:
+                        base_year = current_year - 1  # Previous year for Nov/Dec
+                    else:
+                        base_year = current_year
                 elif first_month == 1:  # Jan wrapping to later month (unusual but possible)
                     base_year = current_year
                 else:
@@ -1570,7 +1578,10 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
         
         date_obj = datetime(base_year + year_shift, m, d)
         date_objs.append(date_obj)
+        # Store with normalized column name (ensure padding matches)
+        normalized_col = f"clock_in_{m:02d}_{d:02d}"
         col_to_date[col] = date_obj
+        col_to_date[normalized_col] = date_obj  # Also store normalized version
 
     start_date, end_date = min(date_objs), max(date_objs)
 
@@ -1592,20 +1603,41 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
     calendar_based = set()
     for col in clock_in_cols:
         try:
+            # Normalize column name to ensure matching
+            parts = col.split("_")
+            if len(parts) >= 4:
+                month, day = int(parts[-2]), int(parts[-1])
+                normalized_col = f"clock_in_{month:02d}_{day:02d}"
+            else:
+                normalized_col = col
+            
             # Use the correctly dated object we created earlier
             if col in col_to_date:
                 date_obj = col_to_date[col]
+            elif normalized_col in col_to_date:
+                date_obj = col_to_date[normalized_col]
             else:
-                # Fallback: parse from column name
-                parts = col.split("_")
-                month, day = int(parts[-2]), int(parts[-1])
-                date_obj = datetime(current_year, month, day)
+                # Fallback: parse from column name and infer correct year
+                # Determine correct year for this date based on cross-year logic
+                fallback_year = base_year
+                if is_cross_year:
+                    # If this is a January date and we're in a cross-year range starting with Dec,
+                    # it should be base_year + 1
+                    if month == 1 and first_month == 12:
+                        fallback_year = base_year + 1
+                    # If this is a December date in a cross-year range, it's base_year
+                    elif month == 12:
+                        fallback_year = base_year
+                
+                date_obj = datetime(fallback_year, month, day)
             
             weekday = date_obj.weekday()  # Mon=0 ... Sun=6
             week_num = (date_obj.day - 1) // 7 + 1
             if weekday == 6 or (weekday == 5 and week_num in [1, 3]):
                 calendar_based.add(col)
-        except Exception:
+        except Exception as e:
+            if verbose:
+                print(f"⚠️ Error processing column '{col}' for holiday detection: {e}")
             continue
 
     # ---------- Combine all ----------
