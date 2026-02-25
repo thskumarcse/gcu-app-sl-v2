@@ -1361,6 +1361,8 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
             mm_dd_format = parsed_date.strftime('%m_%d')
             normalized_working_days_set.add(mm_dd_format)
 
+    debug_info = []
+
     def is_working_day(date_obj):
         """Check if a date is a working day based on MM_DD format"""
         if pd.isna(date_obj):
@@ -1414,7 +1416,7 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
         # Preserve half-day semantics
         if total_days == 0.5:
             if is_working_day(start_date):
-            adjusted_days.append(0.5)
+                adjusted_days.append(0.5)
                 # Count for Total WD leaves if not Casual or Extraordinary
                 if leave_type.lower() not in ['casual leave', 'extraordinary leave']:
                     total_wd_leaves_map[emp_id] = total_wd_leaves_map.get(emp_id, 0.0) + 0.5
@@ -1446,7 +1448,7 @@ def calculate_leave_summary_with_wd_leaves(df_leave_erp, working_days_list, atte
     # 6. Pivot: Leave Types as Columns (Employee-wise)
     # -------------------------------------------------
     if 'Employee ID' in df.columns and 'Emp Id' not in df.columns:
-    df.rename(columns={'Employee ID':'Emp Id'}, inplace=True)
+        df.rename(columns={'Employee ID':'Emp Id'}, inplace=True)
     
     if 'Emp Id' not in df.columns:
         # Try to find employee ID column
@@ -1778,7 +1780,8 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
     # ---------- Determine attendance date range ----------
     # First, extract all month-day pairs and sort them to detect cross-year ranges
     month_day_pairs = []
-    for col in sorted(clock_in_cols):  # Sort to maintain chronological order
+    # Preserve the original column order from the input file to detect cross-year ranges.
+    for col in clock_in_cols:
         try:
             parts = col.split("_")
             m, d = int(parts[-2]), int(parts[-1])
@@ -1792,47 +1795,44 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
         return []
 
     # Detect if this is a cross-year range (e.g., Dec -> Jan)
-    # Check if we have months that wrap around (e.g., 12 followed by 1)
     months = [m for m, d, col in month_day_pairs]
+    months_set = set(months)
     is_cross_year = False
     base_year = current_year
-    first_month = months[0] if months else None
-    last_month = months[-1] if months else None
-    
-    if len(months) > 1:
-        # Check if we have a month that's significantly higher than the next one
-        # (e.g., 12 -> 1, or 11 -> 1, etc.)
-        for i in range(len(months) - 1):
-            if months[i] > months[i + 1] + 1:  # e.g., 12 > 1+1 = 2
-                is_cross_year = True
-                current_month = datetime.now().month
-                
-                # Special handling for Dec->Jan transitions
-                if first_month == 12 and last_month == 1:
-                    # Dec->Jan: Dec is from the year before Jan
-                    # For Dec 2025 -> Jan 2026: base_year should be 2025
-                    # December dates get base_year (2025), January dates get base_year + 1 (2026)
-                    # If we're processing in Jan/Feb/Mar 2026, the data is likely Dec 2025 -> Jan 2026
-                    # So base_year should be current_year - 1 (2025)
-                    if current_month <= 3:  # Jan, Feb, or Mar
-                        base_year = current_year - 1  # Dec is from previous year (2025)
-                    else:
-                        # If processing later in the year, assume Dec is from current year
-                        # and Jan is from next year (future data)
-                        base_year = current_year  # Dec is from current year
-                elif first_month >= 11:  # Nov (11) or Dec (12) wrapping to earlier month
-                    # These months are at the end of the year
-                    # If wrapping to Jan, it's likely next year
-                    if last_month == 1:
-                        base_year = current_year - 1  # Previous year for Nov/Dec
-                    else:
-                        base_year = current_year
-                elif first_month == 1:  # Jan wrapping to later month (unusual but possible)
-                    base_year = current_year
-                else:
-                    # Earlier months (Feb-Oct) wrapping to next year
-                    base_year = current_year - 1
-                break
+    first_month = min(months) if months else None
+    last_month = max(months) if months else None
+
+    # If we see both Dec and Jan within a typical monthly report length, treat as cross-year
+    if 12 in months_set and 1 in months_set:
+        is_cross_year = True
+    else:
+        # Fallback: order-based wrap detection if columns are already in chronological order
+        if len(months) > 1:
+            for i in range(len(months) - 1):
+                if months[i] > months[i + 1] + 1:
+                    is_cross_year = True
+                    break
+
+    if is_cross_year:
+        current_month = datetime.now().month
+        # When running in Jan–Mar, Dec data is typically from the previous year
+        if current_month <= 3:
+            base_year = current_year - 1
+        else:
+            base_year = current_year
+
+    # Order the month/day pairs for date construction
+    if is_cross_year and any(m >= 11 for m in months_set) and 1 in months_set:
+        def _cross_year_key(m, d):
+            # Place Nov/Dec before Jan/Feb for cross-year ranges
+            return (0 if m >= 11 else 1, m, d)
+
+        ordered_pairs = sorted(month_day_pairs, key=lambda t: _cross_year_key(t[0], t[1]))
+    else:
+        ordered_pairs = month_day_pairs
+
+    first_month = ordered_pairs[0][0] if ordered_pairs else first_month
+    last_month = ordered_pairs[-1][0] if ordered_pairs else last_month
 
     # Create date objects with correct years
     date_objs = []
@@ -1840,7 +1840,7 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
     year_shift = 0
     prev_month = None
     
-    for m, d, col in month_day_pairs:
+    for m, d, col in ordered_pairs:
         # If we detect a month wrap-around, increment year
         if prev_month is not None and m < prev_month:
             year_shift += 1
@@ -1876,7 +1876,7 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
             # Normalize column name to ensure matching
             parts = col.split("_")
             if len(parts) >= 4:
-            month, day = int(parts[-2]), int(parts[-1])
+                month, day = int(parts[-2]), int(parts[-1])
                 normalized_col = f"clock_in_{month:02d}_{day:02d}"
             else:
                 normalized_col = col
@@ -2115,7 +2115,7 @@ def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
     if not is_cross_year and months:
         sample_month = months[len(months)//2]
         if sample_month > today.month + 1:
-        inferred_year -= 1
+            inferred_year -= 1
 
     # --- Step 4: Merge IN/OUT data ---
     df_admin_in.rename(columns={'Names': 'Name'}, inplace=True)
@@ -2144,6 +2144,30 @@ def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
     late_flags_df = calculate_late(df, clock_in_cols)
     early_flags_df = calculate_early(df, clock_out_cols)
 
+    def _parse_date_key(date_key, default_year):
+        for fmt in ('%d_%m_%Y', '%m_%d_%Y', '%d_%m', '%m_%d'):
+            try:
+                if fmt in ('%d_%m', '%m_%d'):
+                    return datetime.strptime(f"{date_key}_{default_year}", f"{fmt}_%Y").date()
+                return datetime.strptime(date_key, fmt).date()
+            except ValueError:
+                continue
+        return None
+
+    def _sort_key(date_key):
+        parsed = _parse_date_key(date_key, inferred_year)
+        return parsed or datetime(1900, 1, 1).date()
+
+    def _is_absent_value(val):
+        if pd.isna(val):
+            return True
+        s = str(val).strip()
+        return s in ("", "0", "0.0", "00:00:00", "0:00:00", "nan", "NaN")
+
+    in_key_map = {c.replace('clock_in_', ''): c for c in clock_in_cols}
+    out_key_map = {c.replace('clock_out_', ''): c for c in clock_out_cols}
+    all_date_keys = sorted(set(in_key_map) | set(out_key_map), key=_sort_key)
+
     results = []
 
     # --- Step 8: Process each employee ---
@@ -2156,30 +2180,35 @@ def merge_files_staffs(df_admin_in, df_admin_out, emp_df, no_working_days,
         am_abs, pm_abs = [], []
         full_abs_dates, half_day_dates = [], []
 
-        for col_in, col_out in zip(clock_in_cols, clock_out_cols):
-            dd_mm = col_in.replace('clock_in_', '')
+        for dd_mm in all_date_keys:
+            col_in = in_key_map.get(dd_mm)
+            col_out = out_key_map.get(dd_mm)
             #if col_in in holiday_cols:
             #    continue  # skip processing for holidays
 
-            val_in = str(row[col_in])
-            val_out = str(row[col_out])
+            raw_in = row[col_in] if col_in in row else 0
+            raw_out = row[col_out] if col_out in row else 0
+            in_absent = _is_absent_value(raw_in)
+            out_absent = _is_absent_value(raw_out)
+            val_in = str(raw_in).strip() if not in_absent else '0'
+            val_out = str(raw_out).strip() if not out_absent else '0'
 
             # Full day absent
-            if val_in == '0' and val_out == '0':
+            if in_absent and out_absent:
                 full_abs_dates.append(dd_mm)
                 continue
 
             # Half-day absent
             # Check if one is '0' (absent) and the other has a time value (present)
-            if val_in == '0' and val_out != '0':
+            if in_absent and not out_absent:
                 # Present in PM only (clock_out has value)
                 half_day_dates.append(dd_mm)
                 am_abs.append(dd_mm)
-            elif val_in != '0' and val_out == '0':
+            elif not in_absent and out_absent:
                 # Present in AM only (clock_in has value)
                 half_day_dates.append(dd_mm)
                 pm_abs.append(dd_mm)
-            elif val_in != '0' and val_out != '0':
+            elif not in_absent and not out_absent:
                 # Both have values - check for late arrival or early departure
                 # Check if clock_in is after 10:30 AM (late arrival = AM absence)
                 try:

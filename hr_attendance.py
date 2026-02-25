@@ -1,463 +1,353 @@
-"""HR Attendance app (restored pipeline, guarded against reruns)
-
-This module restores the HR attendance processing pipeline but only
-executes the heavy processing when all required uploads are present and
-when session-state bytes are stable. It uses `read_session_bytes_with_retry`
-to avoid transient Streamlit rerun-control errors and marks processing
-as done in `st.session_state['hr_processed']` to avoid duplicate runs.
-"""
-
 import streamlit as st
 import pandas as pd
 import numpy as np
-import io
 from datetime import datetime
-
-# Import helpers from utility modules
+import io
+import os
 from utility_attendance import (
-    stepwise_file_upload, read_session_bytes_with_retry, process_exempted_leaves,_is_rerun_exc,
-    split_file, pad_month_in_columns, detect_holidays_staffs, calculate_working_days,
-    merge_files_staffs, calculate_leave_summary_with_wd_leaves, weighted_sum_and_replace_columns,
-    extract_attendance_period_dates
+    stepwise_file_upload, split_file, merge_files, move_columns,
+    weighted_sum_and_replace_columns, calculate_leave_summary_with_wd_leaves,
+    calculate_working_days, process_exempted_leaves
 )
-from utility import preprocess_date
+from utility import connect_gsheet, get_dataframe, preprocess_date
 
-# Default holiday list (can be extended via UI)
-HOLIDAY_LIST = ['29-sep-2025','30-sep-2025','01-oct-2025','02-oct-2025','03-oct-2025',
-                '06-oct-2025','18-oct-2025','20-oct-2025','21-oct-2025','23-sep-2025',
-                '05-nov-2025','25-dec-2025','13-jan-2026','14-jan-2026','15-jan-2026',
-                '16-jan-2026','26-jan-2026','03-mar-2026','21-mar-2026','03-apr-2026',
-                '13-apr-2026','14-apr-2026', '15-apr-2026','16-apr-2026','17-apr-2026',
-                '01-may-2026','27-may-2026','15-aug-2026','04-sep-2026','12-sep-2026',
-                '17-sep-2026','02-oct-2026','19-oct-2026','20-oct-2026','21-oct-2026',
-                '22-oct-2026','23-oct-2026','24-oct-2026','25-oct-2026','08-nov-2026',
-                '24-nov-2026','25-dec-2026']
+def fix_streamlit_layout():
+    """Fix Streamlit layout issues"""
+    # Page config is handled by main.py
+    pass
 
+def set_compact_theme():
+    """Set compact theme for better UI"""
+    st.markdown("""
+    <style>
+    .main > div {
+        padding-top: 2rem;
+    }
+    .stSelectbox > div > div {
+        background-color: #f0f2f6;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+def _apply_present_bio(df_merged, df_in):
+    if 'Present' not in df_in.columns:
+        return df_merged
+
+    present_bio = df_in[['Emp Id', 'Present']].copy()
+    present_bio.rename(columns={'Present': 'present_bio'}, inplace=True)
+    df_merged = pd.merge(df_merged, present_bio, how='left', on='Emp Id')
+
+    present = pd.to_numeric(df_merged.get('Present', 0), errors='coerce').fillna(0.0)
+    present_bio_vals = pd.to_numeric(df_merged.get('present_bio', 0), errors='coerce').fillna(0.0)
+    working_days = pd.to_numeric(df_merged.get('Working Days', 0), errors='coerce').fillna(0.0)
+
+    updated_present = present.where(present_bio_vals <= present, present_bio_vals)
+    updated_present = updated_present.where(updated_present <= working_days, working_days)
+    df_merged['Present'] = updated_present
+    df_merged['Absent'] = (working_days - updated_present).clip(lower=0.0)
+
+    return df_merged
+
+def _build_clock_sheet(df_in, df_out, report_df):
+    base = report_df[['Emp Id', 'Name', 'Present', 'Absent']].copy()
+    clock_in_cols = [c for c in df_in.columns if c.startswith('clock_in_')]
+    clock_out_cols = [c for c in df_out.columns if c.startswith('clock_out_')]
+    clock_df = df_in[['Emp Id'] + clock_in_cols].merge(
+        df_out[['Emp Id'] + clock_out_cols],
+        on='Emp Id',
+        how='left'
+    )
+    return base.merge(clock_df, on='Emp Id', how='left')
+
+def _has_streamlit_secrets():
+    secrets_paths = [
+        os.path.join(os.path.expanduser("~"), ".streamlit", "secrets.toml"),
+        os.path.join(os.getcwd(), ".streamlit", "secrets.toml"),
+    ]
+    return any(os.path.exists(p) for p in secrets_paths)
 
 def app():
-    st.title("HR Attendance")
+    fix_streamlit_layout()
+    set_compact_theme()
+    
+    st.header("HR Attendance")
+    
+    # File upload section
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.info("📁 Upload your attendance files step by step")
+        
+        # Working days input
+        no_working_days = st.number_input(
+            "Number of Working Days",
+            min_value=1,
+            max_value=31,
+            value=20,
+            help="Enter the number of working days for this month"
+        )
+        
+        # Stepwise file upload
+        labels = ["GIMT", "GIPS", "ADMIN", "LEAVE"]
+        dfs = stepwise_file_upload(labels, key_prefix="attendance")
+        
+        # Exempted file upload
+        st.markdown("---")
+        exempted_file = st.file_uploader(
+            "📋 Upload Exempted Leaves File",
+            type=['xlsx', 'xls'],
+            help="Exempted leaves data (required)",
+            label_visibility="collapsed"
+        )
+        st.caption("💡 Upload exempted file is required")
 
-    # Stepwise upload for main attendance files
-    labels = ["GIMT", "GIPS", "ADMIN", "LEAVE"]
-    dfs = stepwise_file_upload(labels, key_prefix="attendance")
+    if len(dfs) == len(labels) and exempted_file is not None:
+        st.success("✅ All files uploaded successfully!")
+        st.success("🚀 Attendance processing pipeline ready.")
 
-    st.markdown("---")
-    st.write("Upload the Exempted Leaves file below (xlsx/xls).")
-
-    exempted_file = st.file_uploader(
-        "Exempted Leaves (xlsx/xls)",
-        type=["xlsx", "xls"],
-        key="exempted_uploader",
-        label_visibility="visible"
-    )
-
-    # Persist uploaded bytes
-    if exempted_file is not None:
+        # Process files
         try:
-            name_key = "exempted_bytes_name"
-            bytes_key = "exempted_bytes"
-            if st.session_state.get(name_key) != exempted_file.name:
-                st.session_state[bytes_key] = exempted_file.read()
-                st.session_state[name_key] = exempted_file.name
-                #st.success(f"Stored {exempted_file.name} in session state")
-        except Exception as e:
-            if _is_rerun_exc(e):
-                raise
-            st.error(f"Failed to read uploaded file: {e}")
-
-    # If processing already completed, show download buttons and a clear control
-    if st.session_state.get("hr_processed"):
-        st.success("Processing already completed for this session. Clear session to re-run.")
-        # Show persisted downloads if available
-        fac_bytes = st.session_state.get('hr_faculty_xlsx')
-        adm_bytes = st.session_state.get('hr_admin_xlsx')
-        if fac_bytes or adm_bytes:
-            col1, col2 = st.columns(2)
-            with col1:
-                if fac_bytes:
-                    st.download_button(
-                        label="📥 Download Faculty Report",
-                        data=fac_bytes,
-                        file_name=f"faculty_attendance_report_{datetime.now().strftime('%Y%m%d')}.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        key="hr_faculty_download_stored",
-                    )
-            with col2:
-                if adm_bytes:
-                    st.download_button(
-                        label="📥 Download Admin Report",
-                        data=adm_bytes,
-                        file_name=f"admin_attendance_report_{datetime.now().strftime('%Y%m%d')}.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        key="hr_admin_download_stored",
-                    )
-        """
-        if st.button("Clear HR session data"):
-            for k in [
-                'hr_processed', 'hr_faculty_xlsx', 'hr_admin_xlsx',
-                'exempted_bytes', 'exempted_bytes_name'
-            ]:
-                if k in st.session_state:
-                    del st.session_state[k]
-            st.experimental_rerun()
-        return
-        """
-    # Trigger automatic processing when we have all files and the exempted bytes
-    if len(dfs) == len(labels) and "exempted_bytes" in st.session_state:
-        #st.info("All files uploaded — starting processing...")
-        try:
-            # Read exempted bytes robustly
-            bio_bytes = read_session_bytes_with_retry("exempted_bytes", attempts=5, delay=0.12)
-            bio = io.BytesIO(bio_bytes)
-            df_exempted = process_exempted_leaves(bio)
-
-            # BEGIN: core processing (adapted from original pipeline)
+            # Step 1: Read files and merge (from notebook)
             df_gimt = dfs.get("GIMT")
             df_admin = dfs.get("ADMIN")
             df_gips = dfs.get("GIPS")
             df_leave_erp = dfs.get("LEAVE")
-
-            # Split and pad columns
-            df_gimt_all, df_gimt_in, df_gimt_out = split_file(df_gimt)
-            df_gips_all, df_gips_in, df_gips_out = split_file(df_gips)
-            df_admin_all, df_admin_in, df_admin_out = split_file(df_admin)
             
-            # Verify that 'Emp Id' column exists in split dataframes
-            for name, df_in, df_out in [('GIMT', df_gimt_in, df_gimt_out), 
-                                        ('GIPS', df_gips_in, df_gips_out), 
-                                        ('ADMIN', df_admin_in, df_admin_out)]:
-                if 'Emp Id' not in df_in.columns:
-                    available_cols = list(df_in.columns)[:10]  # Show first 10 columns
-                    st.error(f"❌ 'Emp Id' column not found in {name} IN dataframe. Available columns: {available_cols}")
-                    raise KeyError(f"'Emp Id' column not found in {name} IN dataframe")
-                if 'Emp Id' not in df_out.columns:
-                    st.error(f"❌ 'Emp Id' column not found in {name} OUT dataframe.")
-                    raise KeyError(f"'Emp Id' column not found in {name} OUT dataframe")
+            # Split and merge files
+            df_gimt_all, df_gimt_in, df_gimt_out = split_file(df_gimt)
+            df_gimt_merged = merge_files(df_gimt_in, df_gimt_out, no_working_days)
+            df_gimt_merged = _apply_present_bio(df_gimt_merged, df_gimt_in)
 
-            df_gimt_in = pad_month_in_columns(df_gimt_in, 'clock_in')
-            df_gips_in = pad_month_in_columns(df_gips_in, 'clock_in')
-            df_admin_in = pad_month_in_columns(df_admin_in, 'clock_in')
-            df_gimt_out = pad_month_in_columns(df_gimt_out, 'clock_out')
-            df_gips_out = pad_month_in_columns(df_gips_out, 'clock_out')
-            df_admin_out = pad_month_in_columns(df_admin_out, 'clock_out')
+            df_gips_all, df_gips_in, df_gips_out = split_file(df_gips)
+            df_gips_merged = merge_files(df_gips_in, df_gips_out, no_working_days)
+            df_gips_merged = _apply_present_bio(df_gips_merged, df_gips_in)
 
-            # Holidays detection & removal
-            misc_holidays = st.text_input("Enter list of Misc. holidays : dd-mm-yyyy, comma-separated", value="")
-            misc_working_days = st.text_input("Enter list of Misc. Working days : dd-mm-yyyy, comma-separated", value="")
+            df_admin_all, df_admin_in, df_admin_out = split_file(df_admin)
+            df_admin_merged = merge_files(df_admin_in, df_admin_out, no_working_days)
+            df_admin_merged = _apply_present_bio(df_admin_merged, df_admin_in)
+            
+            # Step 1.1: Faculty Detailed view (GIMT + GIPS only)
+            df_fac_detail = pd.concat([df_gimt_all, df_gips_all], ignore_index=True)
+            df_fac_conso = pd.concat([df_gimt_merged, df_gips_merged], ignore_index=True)
+            df_fac_detail.fillna(0, inplace=True)
+            df_fac_conso.fillna(0, inplace=True)
+            
+            df_admin_detail = df_admin_all.copy()
+            df_admin_detail.fillna(0, inplace=True)  
 
-            # Button placed right after the text input
-            if st.button("Proceed"):
-                misc_holidays_list = [h.strip() for h in misc_holidays.split(',') if h.strip()] if misc_holidays else []
-                all_holidays = HOLIDAY_LIST.copy()
-                if misc_holidays_list:
-                    all_holidays.extend(misc_holidays_list)
-
-                # Extract attendance period date range BEFORE removing holidays
-                # This ensures we get the full date range including December dates
-                # Use a copy of df_gimt_in before holiday removal
-                df_gimt_in_before_holidays = df_gimt_in.copy()
-                attendance_start_date, attendance_end_date = extract_attendance_period_dates(df_gimt_in_before_holidays, year=None)
-
-                # Let detect_holidays_staffs automatically infer year(s) from date columns
-                # This handles cross-year ranges like Dec 2025 to Jan 2026 correctly
-                holidays = detect_holidays_staffs(df_gimt_in, year=None, misc_holidays=all_holidays, misc_working_days=misc_working_days, verbose=False)
-
-                cols_to_delete_in = holidays
-                cols_to_delete_out = [c.replace('clock_in', 'clock_out') for c in holidays]
-
-                df_gimt_in = df_gimt_in.drop(columns=cols_to_delete_in, axis=1, errors='ignore')
-                df_gimt_out = df_gimt_out.drop(columns=cols_to_delete_out, axis=1, errors='ignore')
-                df_gips_in = df_gips_in.drop(columns=cols_to_delete_in, axis=1, errors='ignore')
-                df_gips_out = df_gips_out.drop(columns=cols_to_delete_out, axis=1, errors='ignore')
-                df_admin_in = df_admin_in.drop(columns=cols_to_delete_in, axis=1, errors='ignore')
-                df_admin_out = df_admin_out.drop(columns=cols_to_delete_out, axis=1, errors='ignore')
-
-                final_working_days = df_gimt_in.columns
-                working_days_list = calculate_working_days(df_gimt_in)
-                no_working_days = len(df_gimt_in.columns) - 3 if len(df_gimt_in.columns) > 3 else len(df_gimt_in.columns)
-                
-                if attendance_start_date and attendance_end_date:
-                    st.info(f"📅 Attendance period: {attendance_start_date.strftime('%d-%b-%Y')} to {attendance_end_date.strftime('%d-%b-%Y')}")
+            df_admin_conso = df_admin_merged.copy()
+            df_admin_conso.fillna(0, inplace=True)
+            
+            # Rename columns
+            col_to_rename = {'AM_abs':'actual_AM_abs','PM_abs':'actual_PM_abs','days_abs':'actual_days_abs','No_of_late':'actual_No_of_late'}
+            df_fac_conso.rename(columns=col_to_rename, inplace=True)
+            df_admin_conso.rename(columns=col_to_rename, inplace=True)
+            
+            # Reorder columns
+            desired_order = [
+                'Emp Id', 'Names',
+                'Working Days', 'Present', 'Absent',
+                'actual_AM_abs', 'actual_PM_abs', 'actual_days_abs',
+                'half_day_flags', 'late_flags', 'early_flags',
+                'actual_No_of_late'
+            ]
+            desired_order = [col for col in desired_order if col in df_fac_conso.columns]
+            df_fac_conso = df_fac_conso[desired_order]
+            df_admin_conso = df_admin_conso[desired_order]
+            
+            # Step 2: Merge with ERP employee data (secrets) or fallback to uploaded master file
+            emp_df = None
+            try:
+                if _has_streamlit_secrets():
+                    client = connect_gsheet()
+                    df_emp = get_dataframe(client, st.secrets["my_secrets"]["sheet_id"], "users")
+                    emp_df = df_emp[['Emp Id','Name','Designation','Department']]
                 else:
-                    st.warning("⚠️ Could not extract attendance period dates from clock_in columns")
-
-                # Merge with ERP employee master
-                emp_df = pd.read_csv('./data/2015_10_27_employee_list.csv', skiprows=6, encoding='windows-1252')
-                
-                # Normalize column names (strip whitespace, handle variations)
-                emp_df.columns = emp_df.columns.str.strip()
-                
-                # Find the employee ID column with flexible matching
-                emp_id_col = None
-                for col in emp_df.columns:
-                    col_lower = col.lower().strip()
-                    if 'employee id' in col_lower or 'emp id' in col_lower or 'emp_id' in col_lower:
-                        emp_id_col = col
-                        break
-                
-                if emp_id_col is None:
-                    st.error(f"❌ Could not find Employee ID column in CSV. Available columns: {list(emp_df.columns)}")
-                    raise KeyError("Employee ID column not found")
-                
-                # Find other required columns
-                name_col = None
-                for col in emp_df.columns:
-                    if col.lower().strip() == 'name':
-                        name_col = col
-                        break
-                
-                desig_col = None
-                for col in emp_df.columns:
-                    if 'designation' in col.lower().strip():
-                        desig_col = col
-                        break
-                
-                dept_col = None
-                for col in emp_df.columns:
-                    if 'department' in col.lower().strip():
-                        dept_col = col
-                        break
-                
-                # Select and rename columns
-                required_cols = {}
-                if emp_id_col:
-                    required_cols['Emp Id'] = emp_id_col
-                if name_col:
-                    required_cols['Name'] = name_col
-                if desig_col:
-                    required_cols['Designation'] = desig_col
-                if dept_col:
-                    required_cols['Department'] = dept_col
-                
-                # Check if we have at least Emp Id and Name
-                if 'Emp Id' not in required_cols or 'Name' not in required_cols:
-                    missing = [k for k in ['Emp Id', 'Name'] if k not in required_cols]
-                    st.error(f"❌ Missing required columns: {missing}. Available columns: {list(emp_df.columns)}")
-                    raise KeyError(f"Missing required columns: {missing}")
-                
-                # Select and rename
-                emp_df = emp_df[[required_cols[k] for k in required_cols.keys()]].copy()
-                emp_df.rename(columns={v: k for k, v in required_cols.items()}, inplace=True)
-                emp_df.reset_index(drop=True, inplace=True)
-                
-                # extract employee names
-                emp_names_df = emp_df[['Emp Id', 'Name']].copy()
-
-                # Merge files for staffs - SAVE 1
-                df_gimt_merged = merge_files_staffs(df_gimt_in, df_gimt_out, emp_df.copy(), no_working_days, all_holidays, misc_working_days)
-                df_gips_merged = merge_files_staffs(df_gips_in, df_gips_out, emp_df.copy(), no_working_days, all_holidays, misc_working_days)
-                df_admin_merged = merge_files_staffs(df_admin_in, df_admin_out, emp_df.copy(), no_working_days, all_holidays, misc_working_days)
-
-                df_fac_conso = pd.concat([df_gimt_merged, df_gips_merged], ignore_index=True)
-                df_admin_conso = df_admin_merged.copy()
-
-                # Process LEAVE ERP data
-                if 'From Date' in df_leave_erp.columns:
-                    df_leave_erp['From Date'] = df_leave_erp['From Date'].apply(preprocess_date)
-                    df_leave_erp['From Date'] = pd.to_datetime(df_leave_erp['From Date'], errors='coerce')
-                if 'To Date' in df_leave_erp.columns:
-                    df_leave_erp['To Date'] = df_leave_erp['To Date'].apply(preprocess_date)
-                    df_leave_erp['To Date'] = pd.to_datetime(df_leave_erp['To Date'], errors='coerce')
-
-                df_leave_erp_summary = calculate_leave_summary_with_wd_leaves(
-                    df_leave_erp, 
-                    working_days_list,
-                    attendance_start_date=attendance_start_date,
-                    attendance_end_date=attendance_end_date
+                    raise RuntimeError("secrets_missing")
+            except Exception:
+                # Fallback: continue without ERP names/roles
+                combined = pd.concat([df_gimt_in, df_gips_in, df_admin_in], ignore_index=True)
+                emp_df = combined[['Emp Id', 'Names']].drop_duplicates().rename(
+                    columns={'Names': 'Name'}
                 )
-                df_leave_erp_summary.fillna(0, inplace=True)
+                emp_df['Designation'] = ''
+                emp_df['Department'] = ''
+            
+            # Merge with employee data
+            df_fac_detail_ID = pd.merge(df_fac_detail, emp_df, how='left', on='Emp Id')
+            df_fac_detail_ID = move_columns(df_fac_detail_ID, {'Name':1,'Designation':2,'Department':3})
+            df_fac_detail_ID = df_fac_detail_ID.drop('Names', axis=1)
+
+            df_admin_detail_ID = pd.merge(df_admin_detail, emp_df, how='left', on='Emp Id')
+            df_admin_detail_ID = move_columns(df_admin_detail_ID, {'Name':1,'Designation':2,'Department':3})
+            df_admin_detail_ID = df_admin_detail_ID.drop('Names', axis=1)
+            
+            df_fac_conso_ID = pd.merge(df_fac_conso, emp_df, how='left', on='Emp Id')
+            df_fac_conso_ID = move_columns(df_fac_conso_ID, {'Name':1,'Designation':2,'Department':3})
+            df_fac_conso_ID = df_fac_conso_ID.drop('Names', axis=1)
+
+            df_admin_conso_ID = pd.merge(df_admin_conso, emp_df, how='left', on='Emp Id')
+            df_admin_conso_ID = move_columns(df_admin_conso_ID, {'Name':1,'Designation':2,'Department':3})
+            df_admin_conso_ID = df_admin_conso_ID.drop('Names', axis=1)
+            
+            # Step 2.1: Handling half days
+            df_fac_actual = df_fac_conso_ID.copy()
+            df_admin_actual = df_admin_conso_ID.copy()
+
+            # handling half days
+            df_fac_actual['actual_half_day'] = df_fac_actual.apply(lambda x: len(x['actual_AM_abs'])+len(x['actual_PM_abs']),axis=1)
+            df_admin_actual['actual_half_day'] = df_admin_actual.apply(lambda x: len(x['actual_AM_abs'])+len(x['actual_PM_abs']),axis=1)
+
+            # handling full days
+            df_fac_actual['actual_full_day'] = df_fac_actual.apply(lambda x: len(x['actual_days_abs']),axis=1)
+            df_admin_actual['actual_full_day'] = df_admin_actual.apply(lambda x: len(x['actual_days_abs']),axis=1)
+            
+            col_to_select = ['Emp Id', 'Name', 'Designation', 'Department', 'Working Days', 'Present', 'Absent',
+                           'actual_half_day', 'actual_full_day', 'actual_No_of_late']
+            df_fac_actual = df_fac_actual[col_to_select]
+            df_admin_actual = df_admin_actual[col_to_select]
+            
+            # Step 3: Exempted leave adjustments
+            df_exempted = process_exempted_leaves(exempted_file)
+            df_exempted.rename(columns={'late_count':'exempt_late','half_day_count':'exempt_HD','full_day_count':'exempt_FD'}, inplace=True)
+            df_exempted.drop('Name',axis=1,inplace=True)
+            
+            # Merging Actual and Exempted Leaves
+            df_fac_actual_exempted = pd.merge(df_fac_actual,df_exempted , how='left', on=['Emp Id'])
+            df_fac_actual_exempted.fillna(0, inplace=True)
+
+            df_admin_actual_exempted = pd.merge(df_admin_actual,df_exempted , how='left', on=['Emp Id'])
+            df_admin_actual_exempted.fillna(0, inplace=True)
+            
+            # Calculating the balance Actual and Exempted Leaves
+            df_fac_actual_exempted['Half Days'] = np.maximum(df_fac_actual_exempted['actual_half_day'] - df_fac_actual_exempted['exempt_HD'],0)
+            df_fac_actual_exempted['Full Days'] = np.maximum(df_fac_actual_exempted['actual_full_day'] - df_fac_actual_exempted['exempt_FD'],0)
+            df_fac_actual_exempted['Late'] = np.maximum(df_fac_actual_exempted['actual_No_of_late'] - df_fac_actual_exempted['exempt_late'],0)
+
+            df_admin_actual_exempted['Half Days'] = np.maximum(df_admin_actual_exempted['actual_half_day'] - df_admin_actual_exempted['exempt_HD'],0)
+            df_admin_actual_exempted['Full Days'] = np.maximum(df_admin_actual_exempted['actual_full_day'] - df_admin_actual_exempted['exempt_FD'],0)
+            df_admin_actual_exempted['Late'] = np.maximum(df_admin_actual_exempted['actual_No_of_late'] - df_admin_actual_exempted['exempt_late'],0)
+            
+            col_to_select = ['Emp Id', 'Name', 'Designation', 'Department', 'Working Days', 'Present', 'Absent','Half Days','Full Days','Late']
+            df_fac_attend_adjusted = df_fac_actual_exempted[col_to_select]
+            df_admin_attend_adjusted = df_admin_actual_exempted[col_to_select]
+            
+            # Step 4: ERP Leave integration
+            df_leave_erp["From Date"] = df_leave_erp["From Date"].apply(preprocess_date)
+            df_leave_erp["To Date"] = df_leave_erp["To Date"].apply(preprocess_date)
+            df_leave_erp["From Date"] = pd.to_datetime(df_leave_erp["From Date"], errors='coerce')
+            df_leave_erp["To Date"] = pd.to_datetime(df_leave_erp["To Date"], errors='coerce')
+            
+            # corrected leaves
+            df_leave_erp_summary = calculate_leave_summary_with_wd_leaves(df_leave_erp, calculate_working_days(df_gimt_in)) 
+            df_leave_erp_summary.fillna(0, inplace=True)
+            
+            df_leave_erp_summary['Approved leaves (ERP)'] = df_leave_erp_summary['Total WD leaves'] + df_leave_erp_summary['Casual Leave']
+            cols_to_drop = [
+                "Casual Leave", "Sick Leave", "Duty Leave", "Vacation Leave",
+                "Maternity Leave", "Earned Leave", "Paternity Leave",'Total WD leaves'
+            ]
+            df_leave_compact = df_leave_erp_summary.drop(columns=[c for c in cols_to_drop if c in df_leave_erp_summary.columns], errors="ignore")
+            df_leave_compact = df_leave_compact[['Emp Id','Name','Approved leaves (ERP)']]
+            df_leave_compact.drop(columns='Name', axis=1,inplace=True)
+
+            df_fac_report = pd.merge(df_fac_actual_exempted, df_leave_compact , how='left', on=['Emp Id'])
+            df_fac_report.fillna(0, inplace=True)
+
+            df_admin_report = pd.merge(df_admin_actual_exempted, df_leave_compact , how='left', on=['Emp Id'])
+            df_admin_report.fillna(0, inplace=True)
+            
+            col_to_sum = ['Half Days','Full Days']
+            df_fac_report = weighted_sum_and_replace_columns(df_fac_report, col_to_sum, 'Observed Leaves', [0.5,1.0])
+            df_admin_report = weighted_sum_and_replace_columns(df_admin_report, col_to_sum, 'Observed Leaves', [0.5,1.0])
+
+            cols_to_delete = ['actual_half_day','actual_full_day','actual_No_of_late','exempt_late','exempt_HD', 'exempt_FD']
+            df_fac_report = df_fac_report.drop(columns=[c for c in cols_to_delete if c in df_fac_report.columns], errors="ignore")
+            df_admin_report = df_admin_report.drop(columns=[c for c in cols_to_delete if c in df_admin_report.columns], errors="ignore")
+            
+            df_fac_report["Unauthorised leaves"] = (df_fac_report["Absent"] - df_fac_report["Approved leaves (ERP)"]).clip(lower=0)
+            df_admin_report["Unauthorised leaves"] = (df_admin_report["Absent"] - df_admin_report["Approved leaves (ERP)"]).clip(lower=0)
+            
+            # Step 5: Final Report
+            df_fac_report_print = df_fac_report.copy()
+            df_admin_report_print = df_admin_report.copy()
+
+            df_fac_report_print = df_fac_report_print.drop(columns='Observed Leaves')
+            df_admin_report_print = df_admin_report_print.drop(columns='Observed Leaves')
+
+            df_fac_report_print = df_fac_report_print.rename(columns={'Approved leaves (ERP)': 'Approved leaves'})
+            df_admin_report_print = df_admin_report_print.rename(columns={'Approved leaves (ERP)': 'Approved leaves'})
+
+            # Build clock-in/out sheets
+            df_fac_clock_sheet = _build_clock_sheet(
+                pd.concat([df_gimt_in, df_gips_in], ignore_index=True),
+                pd.concat([df_gimt_out, df_gips_out], ignore_index=True),
+                df_fac_report_print
+            )
+            df_admin_clock_sheet = _build_clock_sheet(
+                df_admin_in,
+                df_admin_out,
+                df_admin_report_print
+            )
+            
+            # Show reports
+            st.success("📊 Reports generated successfully!")
+            
+            # Faculty Report
+            st.subheader("👨‍🏫 Faculty Report")
+            st.dataframe(df_fac_report_print)
+            
+            # Admin Report
+            st.subheader("👨‍💼 Admin Report")
+            st.dataframe(df_admin_report_print)
+            
+            # Download buttons
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Faculty Excel
+                faculty_buffer = io.BytesIO()
+                with pd.ExcelWriter(faculty_buffer, engine='openpyxl') as writer:
+                    df_fac_detail_ID.to_excel(writer, sheet_name='Bio details', index=False)
+                    df_fac_conso_ID.to_excel(writer, sheet_name='Bio Consolidated', index=False)
+                    df_fac_actual_exempted.to_excel(writer, sheet_name='Exempted', index=False)
+                    df_leave_erp_summary.to_excel(writer, sheet_name='ERP Leave', index=False)
+                    df_fac_clock_sheet.to_excel(writer, sheet_name='Clock In Out', index=False)
+                    df_fac_report_print.to_excel(writer, sheet_name='Report', index=False)
+                faculty_buffer.seek(0)
                 
-                # Calculate Approved leaves (ERP) = Sum of ALL approved leave types
-                # Leave types: Casual Leave, Duty Leave, Earned Leave, Maternity Leave, Sick Leave, Vacation Leave
-                # Exclude non-leave columns: 'Emp Id', 'Name', 'Total WD leaves'
-                non_leave_cols = ['Emp Id', 'Name', 'Total WD leaves']
-                # Get all columns that are not in the exclusion list (these are all leave type columns)
-                leave_type_cols = [col for col in df_leave_erp_summary.columns if col not in non_leave_cols]
+                st.download_button(
+                    label="📥 Download Faculty Report",
+                    data=faculty_buffer.getvalue(),
+                    file_name=f"faculty_attendance_report_{datetime.now().strftime('%Y%m%d')}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            
+            with col2:
+                # Admin Excel
+                admin_buffer = io.BytesIO()
+                with pd.ExcelWriter(admin_buffer, engine='openpyxl') as writer:
+                    df_admin_detail_ID.to_excel(writer, sheet_name='Bio details', index=False)
+                    df_admin_conso_ID.to_excel(writer, sheet_name='Bio Consolidated', index=False)
+                    df_admin_actual_exempted.to_excel(writer, sheet_name='Exempted', index=False)
+                    df_leave_erp_summary.to_excel(writer, sheet_name='ERP Leave', index=False)
+                    df_admin_clock_sheet.to_excel(writer, sheet_name='Clock In Out', index=False)
+                    df_admin_report_print.to_excel(writer, sheet_name='Report', index=False)
+                admin_buffer.seek(0)
                 
-                # Sum all leave types
-                if leave_type_cols:
-                    df_leave_erp_summary['Approved leaves (ERP)'] = (
-                        df_leave_erp_summary[leave_type_cols]
-                        .apply(pd.to_numeric, errors='coerce')
-                        .fillna(0.0)
-                        .sum(axis=1)
-                    )
-                else:
-                    # Fallback: if no leave type columns found, set to 0
-                    df_leave_erp_summary['Approved leaves (ERP)'] = 0.0
-
-                # Merge EXEMPTED and calculate adjusted values
-                df_exempted.rename(columns={'late_count':'exempt_late','half_day_count':'exempt_HD','full_day_count':'exempt_FD'}, inplace=True)
-                if 'Name' in df_exempted.columns:
-                    df_exempted.drop('Name',axis=1,inplace=True)
-                
-                # Verify 'Emp Id' exists in dataframes before merging
-                if 'Emp Id' not in df_fac_conso.columns:
-                    st.error(f"❌ 'Emp Id' column not found in faculty consolidated dataframe. Available columns: {list(df_fac_conso.columns)[:10]}")
-                    raise KeyError("'Emp Id' column not found in faculty consolidated dataframe")
-                if 'Emp Id' not in df_admin_conso.columns:
-                    st.error(f"❌ 'Emp Id' column not found in admin consolidated dataframe. Available columns: {list(df_admin_conso.columns)[:10]}")
-                    raise KeyError("'Emp Id' column not found in admin consolidated dataframe")
-                if 'Emp Id' not in df_exempted.columns:
-                    st.error(f"❌ 'Emp Id' column not found in exempted dataframe. Available columns: {list(df_exempted.columns)[:10]}")
-                    raise KeyError("'Emp Id' column not found in exempted dataframe")
-
-                df_fac_actual_exempted = pd.merge(df_fac_conso, df_exempted, how='left', on=['Emp Id'])
-                df_admin_actual_exempted = pd.merge(df_admin_conso, df_exempted, how='left', on=['Emp Id'])
-                df_fac_actual_exempted.fillna(0, inplace=True)
-                df_admin_actual_exempted.fillna(0, inplace=True)
-
-                for df in [df_fac_actual_exempted, df_admin_actual_exempted]:
-                    if not df.empty:
-                        actual_am = pd.to_numeric(df.get('actual_AM_abs', 0), errors='coerce').fillna(0) if 'actual_AM_abs' in df.columns else 0
-                        actual_pm = pd.to_numeric(df.get('actual_PM_abs', 0), errors='coerce').fillna(0) if 'actual_PM_abs' in df.columns else 0
-                        actual_days_abs = pd.to_numeric(df.get('actual_days_abs', 0), errors='coerce').fillna(0) if 'actual_days_abs' in df.columns else 0
-                        actual_late = pd.to_numeric(df.get('actual_No_of_late', 0), errors='coerce').fillna(0) if 'actual_No_of_late' in df.columns else 0
-
-                        exempt_hd = pd.to_numeric(df.get('exempt_HD', 0), errors='coerce').fillna(0) if 'exempt_HD' in df.columns else 0
-                        exempt_fd = pd.to_numeric(df.get('exempt_FD', 0), errors='coerce').fillna(0) if 'exempt_FD' in df.columns else 0
-                        exempt_late = pd.to_numeric(df.get('exempt_late', 0), errors='coerce').fillna(0) if 'exempt_late' in df.columns else 0
-
-                        df['Half Days'] = (actual_am + actual_pm - exempt_hd).clip(lower=0)
-                        df['Full Days'] = (actual_days_abs - exempt_fd).clip(lower=0)
-                        df['Late'] = (actual_late - exempt_late).clip(lower=0)
-
-                if 'Name' in df_fac_actual_exempted.columns:
-                    df_fac_actual_exempted.drop('Name',axis=1,inplace=True)
-                if 'Name' in df_admin_actual_exempted.columns:
-                    df_admin_actual_exempted.drop('Name',axis=1,inplace=True)
-                
-                df_fac_report = pd.merge(df_fac_actual_exempted, df_leave_erp_summary, how='left', on='Emp Id', suffixes=('','_leave'))
-                df_admin_report = pd.merge(df_admin_actual_exempted, df_leave_erp_summary, how='left', on='Emp Id', suffixes=('','_leave'))
-                
-                # Fill NaN values but ensure numeric columns are properly typed
-                df_fac_report.fillna(0, inplace=True)
-                df_admin_report.fillna(0, inplace=True)
-
-                df_fac_report = weighted_sum_and_replace_columns(df_fac_report, ['Half Days','Full Days'], 'Observed Leaves', [0.5,1.0])
-                df_admin_report = weighted_sum_and_replace_columns(df_admin_report, ['Half Days','Full Days'], 'Observed Leaves', [0.5,1.0])
-
-                # Calculate Unauthorized leaves = Absent - Approved leaves (ERP)
-                # Approved leaves (ERP) includes ALL approved leave types:
-                # Casual Leave, Duty Leave, Earned Leave, Maternity Leave, Sick Leave, Vacation Leave
-                for df_report in [df_fac_report, df_admin_report]:
-                    if 'Absent' in df_report.columns and 'Approved leaves (ERP)' in df_report.columns:
-                        # Ensure numeric types
-                        absent = pd.to_numeric(df_report['Absent'], errors='coerce').fillna(0.0)
-                        approved_leaves = pd.to_numeric(df_report['Approved leaves (ERP)'], errors='coerce').fillna(0.0)
-                        df_report["Unauthorized leaves"] = (absent - approved_leaves).clip(lower=0.0)
-                    else:
-                        df_report["Unauthorized leaves"] = 0.0
-                        if 'Absent' not in df_report.columns:
-                            st.warning(f"⚠️ 'Absent' column not found. Available columns: {list(df_report.columns)[:10]}")
-                        if 'Approved leaves (ERP)' not in df_report.columns:
-                            st.warning(f"⚠️ 'Approved leaves (ERP)' column not found. Available columns: {list(df_report.columns)[:10]}")
-                
-                        
-                
-                # - merge names from ERP
-                if 'Name' in df_fac_report.columns:
-                    df_fac_report.drop('Name', axis=1, inplace=True)
-                if 'Name' in df_admin_report.columns:
-                    df_admin_report.drop('Name', axis=1, inplace=True)
-                df_fac_report = pd.merge(df_fac_report, emp_names_df, how='left', on='Emp Id', suffixes=('','_erp'))
-                df_admin_report = pd.merge(df_admin_report, emp_names_df, how='left', on='Emp Id', suffixes=('','_erp'))
-                df_fac_report.fillna(0, inplace=True)
-                df_admin_report.fillna(0, inplace=True)
-                
-                cols_selected = ['Emp Id', 'Name', 'Designation', 'Department', 'Working Days', 'Present','Absent', 'Late',
-                                'Approved leaves (ERP)', 'Unauthorized leaves']
-                df_fac_report = df_fac_report[[col for col in cols_selected if col in df_fac_report.columns]]
-                df_admin_report = df_admin_report[[col for col in cols_selected if col in df_admin_report.columns]]
-                
-                # Final formatting and display
-                for _df in (df_fac_report, df_admin_report):
-                    for _col in ['Emp Id', 'Name', 'Designation', 'Department']:
-                        if _col in _df.columns:
-                            _df[_col] = _df[_col].astype(str).fillna('')
-
-                st.subheader("👨‍🏫 Faculty Report")
-                st.dataframe(df_fac_report)
-                st.subheader("👨‍💼 Admin Report")
-                st.dataframe(df_admin_report)
-
-                # Prepare downloadable Excel reports (Faculty and Admin)
-                try:
-                    # Build buffers and persist them in session_state so downloads
-                    # survive Streamlit reruns triggered by clicks on download buttons.
-                    faculty_buffer = io.BytesIO()
-                    with pd.ExcelWriter(faculty_buffer, engine='openpyxl') as writer:
-                        try:
-                            df_fac_conso.to_excel(writer, sheet_name='Bio Consolidated', index=False)
-                        except Exception:
-                            pass
-                        try:
-                            df_exempted.to_excel(writer, sheet_name='Exempted', index=False)
-                        except Exception:
-                            pass
-                        try:
-                            df_leave_erp_summary.to_excel(writer, sheet_name='ERP Leave', index=False)
-                        except Exception:
-                            pass
-                        try:
-                            df_fac_report.to_excel(writer, sheet_name='Report', index=False)
-                        except Exception:
-                            pass
-                    faculty_buffer.seek(0)
-                    st.session_state['hr_faculty_xlsx'] = faculty_buffer.getvalue()
-
-                    admin_buffer = io.BytesIO()
-                    with pd.ExcelWriter(admin_buffer, engine='openpyxl') as writer:
-                        try:
-                            df_admin_conso.to_excel(writer, sheet_name='Bio Consolidated', index=False)
-                        except Exception:
-                            pass
-                        try:
-                            df_exempted.to_excel(writer, sheet_name='Exempted', index=False)
-                        except Exception:
-                            pass
-                        try:
-                            df_leave_erp_summary.to_excel(writer, sheet_name='ERP Leave', index=False)
-                        except Exception:
-                            pass
-                        try:
-                            df_admin_report.to_excel(writer, sheet_name='Report', index=False)
-                        except Exception:
-                            pass
-                    admin_buffer.seek(0)
-                    st.session_state['hr_admin_xlsx'] = admin_buffer.getvalue()
-
-                    # Show download buttons reading from session_state so they remain
-                    # available across reruns.
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.download_button(
-                            label="📥 Download Faculty Report",
-                            data=st.session_state.get('hr_faculty_xlsx'),
-                            file_name=f"faculty_attendance_report_{datetime.now().strftime('%Y%m%d')}.xlsx",
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                            key="hr_faculty_download_generated",
-                        )
-                    with col2:
-                        st.download_button(
-                            label="📥 Download Admin Report",
-                            data=st.session_state.get('hr_admin_xlsx'),
-                            file_name=f"admin_attendance_report_{datetime.now().strftime('%Y%m%d')}.xlsx",
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                            key="hr_admin_download_generated",
-                        )
-                except Exception as e:
-                    st.warning(f"Could not create download files: {e}")
-
-                # END core processing
-                st.session_state['hr_processed'] = True
-                st.success("HR Attendance processing completed.")
-
+                st.download_button(
+                    label="📥 Download Admin Report",
+                    data=admin_buffer.getvalue(),
+                    file_name=f"admin_attendance_report_{datetime.now().strftime('%Y%m%d')}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            
         except Exception as e:
-            if _is_rerun_exc(e):
-                raise
-            st.error(f"❌ Error in HR processing: {e}")
-
+            st.error(f"❌ Error in processing: {str(e)}")
+            import traceback
+            st.write(traceback.format_exc())
+    
+    else:
+        st.info("📋 Please upload all required files to proceed")
 
 if __name__ == "__main__":
     app()
