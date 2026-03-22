@@ -124,6 +124,32 @@ def _employee_master_from_leave_export(df_leave):
     return sub[["Emp Id", "Name", "Designation", "Department"]]
 
 
+def _emp_master_csv_paths():
+    """Prefer CSV next to this module (works when cwd differs on cloud deploy)."""
+    _root = os.path.dirname(os.path.abspath(__file__))
+    return [
+        os.path.join(_root, "data", "emp_master_data.csv"),
+        os.path.join(os.getcwd(), "data", "emp_master_data.csv"),
+    ]
+
+
+def _try_load_employee_master_from_csv():
+    for path in _emp_master_csv_paths():
+        if not os.path.isfile(path):
+            continue
+        try:
+            raw = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
+            raw = raw.dropna(how="all")
+            if raw.empty:
+                continue
+            emp = _standardize_master_df(raw)
+            if not emp.empty:
+                return emp, path
+        except Exception:
+            continue
+    return None, None
+
+
 def _identity_master_from_detail(detail_id_df):
     """
     Name, Designation, Department from `df_fac_detail_ID` / `df_admin_detail_ID`
@@ -252,13 +278,6 @@ def _build_clock_sheet(df_in, df_out, report_df):
         how='left'
     )
     return base.merge(clock_df, on='Emp Id', how='left')
-
-def _has_streamlit_secrets():
-    secrets_paths = [
-        os.path.join(os.path.expanduser("~"), ".streamlit", "secrets.toml"),
-        os.path.join(os.getcwd(), ".streamlit", "secrets.toml"),
-    ]
-    return any(os.path.exists(p) for p in secrets_paths)
 
 def app():
     fix_streamlit_layout()
@@ -424,21 +443,39 @@ def app():
             df_fac_conso = df_fac_conso[desired_order]
             df_admin_conso = df_admin_conso[desired_order]
             
-            # Step 2: Merge with ERP employee data (from data/emp_master_data.csv)
-            _emp_csv_path = os.path.join("data", "emp_master_data.csv")
-            try:
-                raw_emp = pd.read_csv(_emp_csv_path, dtype=str)
-                emp_df = _standardize_master_df(raw_emp)
-                if emp_df.empty:
-                    raise RuntimeError("empty_emp_master_csv")
-            except Exception as _e:
-                st.warning(
-                    f"⚠️ Could not load employee master from '{_emp_csv_path}' ({_e}). "
-                    "Name, Designation and Department will be blank for unmatched employees."
+            # Step 2: Employee master — `data/emp_master_data.csv` only (not Google Sheet), then
+            # biometric Names; enrich from LEAVE export for extra IDs / missing fields.
+            emp_df, _csv_used = _try_load_employee_master_from_csv()
+            emp_source = "csv" if emp_df is not None and not emp_df.empty else None
+
+            if emp_df is None or emp_df.empty:
+                combined = pd.concat(
+                    [df_gimt_in, df_gips_in, df_admin_in], ignore_index=True
                 )
-                emp_df = pd.DataFrame(columns=["Emp Id", "Name", "Designation", "Department"])
+                emp_df = (
+                    combined[["Emp Id", "Names"]]
+                    .drop_duplicates()
+                    .rename(columns={"Names": "Name"})
+                )
+                emp_df["Designation"] = ""
+                emp_df["Department"] = ""
+                emp_source = "biometric"
 
             emp_df["Emp Id"] = _normalize_emp_id_series(emp_df["Emp Id"])
+
+            leave_enrich = _employee_master_from_leave_export(df_leave_erp)
+            if not leave_enrich.empty:
+                leave_enrich["Emp Id"] = _normalize_emp_id_series(leave_enrich["Emp Id"])
+                emp_df = pd.concat([emp_df, leave_enrich], ignore_index=True)
+                emp_df = emp_df.drop_duplicates(subset=["Emp Id"], keep="first")
+
+            if emp_source == "biometric":
+                st.info(
+                    "Employee master: **Names** come from uploaded attendance files; "
+                    "**Designation** / **Department** use the LEAVE upload when present. "
+                    "For full HR fields, add a populated **`data/emp_master_data.csv`** next to the app "
+                    "(see deploy-safe paths under `hr_attendance._emp_master_csv_paths`)."
+                )
 
             for _bio in (df_fac_detail, df_admin_detail, df_fac_conso, df_admin_conso):
                 _bio["Emp Id"] = _normalize_emp_id_series(_bio["Emp Id"])
