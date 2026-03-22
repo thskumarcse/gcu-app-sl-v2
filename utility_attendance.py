@@ -10,6 +10,43 @@ import time
 # Set of special employee IDs allowed till 9:25
 LATE_ALLOWED_IDS = {'GCU010013', 'GCU010017', 'GCU010025', 'GCU030010', 'GCU010005', 'GCU020004'}
 
+# Declared institutional holidays (dd-mmm-yyyy). Keep in sync with 2025_final_attendance_solver.ipynb HOLIDAY_LIST.
+HOLIDAY_LIST = [
+    '29-sep-2025', '30-sep-2025', '01-oct-2025', '02-oct-2025', '03-oct-2025',
+    '06-oct-2025', '18-oct-2025', '20-oct-2025', '21-oct-2025', '23-sep-2025',
+    '05-nov-2025', '25-dec-2025', '13-jan-2026', '14-jan-2026', '15-jan-2026',
+    '16-jan-2026', '26-jan-2026', '03-mar-2026', '21-mar-2026', '03-apr-2026',
+    '13-apr-2026', '14-apr-2026', '15-apr-2026', '16-apr-2026', '17-apr-2026',
+    '01-may-2026', '27-may-2026', '15-aug-2026', '04-sep-2026', '12-sep-2026',
+    '17-sep-2026', '02-oct-2026', '19-oct-2026', '20-oct-2026', '21-oct-2026',
+    '22-oct-2026', '23-oct-2026', '24-oct-2026', '25-oct-2026', '08-nov-2026',
+    '24-nov-2026', '25-dec-2026',
+]
+
+
+def normalize_clock_in_column_name(col: str) -> str:
+    """Normalize clock_in column names (e.g. clock_in_9_5 -> clock_in_09_05)."""
+    if not isinstance(col, str) or not col.startswith('clock_in_'):
+        return col
+    parts = col.split('_')
+    if len(parts) < 4:
+        return col
+    try:
+        m, d = int(parts[-2]), int(parts[-1])
+        return f'clock_in_{m:02d}_{d:02d}'
+    except ValueError:
+        return col
+
+
+def _clock_col_for_holiday_match(col: str) -> str:
+    """Map clock_in_* or clock_out_* to normalized clock_in_MM_DD for holiday set lookup."""
+    if not isinstance(col, str):
+        return col
+    if col.startswith('clock_out_'):
+        suf = col.replace('clock_out_', '', 1)
+        return normalize_clock_in_column_name(f'clock_in_{suf}')
+    return normalize_clock_in_column_name(col)
+
 
 def stepwise_file_upload(
     upload_labels, 
@@ -147,14 +184,16 @@ def read_session_bytes_with_retry(bytes_key: str, attempts: int = 3, delay: floa
             raise last_exc
 
 
-def merge_files(df_in, df_out, no_working_days):
+def merge_files(df_in, df_out, no_working_days, holiday_cols=None):
     total_days = len(calculate_working_days(df_in))
     cols_in = [col for col in df_in.columns if col.startswith('clock_in_') and 'nan' not in col]
     cols_out = [col for col in df_out.columns if col.startswith('clock_out_') and 'nan' not in col]
 
     late_df = calculate_late(df_in, cols_in)
     early_df = calculate_early(df_out, cols_out)
-    holiday_cols = detect_holidays(df_in)  # detects holidays from clock-in data
+    if holiday_cols is None:
+        holiday_cols = detect_holidays(df_in)
+    holiday_norm = {normalize_clock_in_column_name(h) for h in holiday_cols}
 
     merged_data = []
 
@@ -166,7 +205,8 @@ def merge_files(df_in, df_out, no_working_days):
         late_flags = [
             col.replace('clock_in_', '')
             for col in cols_in
-            if late_df.loc[i, col] == 'Late' and col not in holiday_cols
+            if late_df.loc[i, col] == 'Late'
+            and _clock_col_for_holiday_match(col) not in holiday_norm
         ]
 
         in_date_keys = [col.replace('clock_in_', '') for col in cols_in]
@@ -183,7 +223,10 @@ def merge_files(df_in, df_out, no_working_days):
             col_in = f'clock_in_{date}'
             col_out = f'clock_out_{date}'
 
-            if col_in in holiday_cols or col_out in holiday_cols:
+            if (
+                _clock_col_for_holiday_match(col_in) in holiday_norm
+                or _clock_col_for_holiday_match(col_out) in holiday_norm
+            ):
                 continue  # Skip holidays
 
             in_val = str(df_in.loc[i, col_in]) if col_in in df_in.columns else '0'
@@ -1938,6 +1981,51 @@ def detect_holidays_staffs(df_clock_in, year=None, misc_holidays=None, misc_work
         print(f"🎯 Final holidays: {all_holidays}")
 
     return all_holidays
+
+
+def faculty_calendar_working_context(
+    df_clock_in,
+    declared_holidays=None,
+    extra_holidays_csv: str = '',
+    extra_working_csv: str = '',
+    year=None,
+):
+    """
+    Working-day calendar for faculty biometric files: Sundays, 1st & 3rd Saturdays off,
+    plus declared holidays (HOLIDAY_LIST + optional comma-separated extras), with optional
+    forced working-day overrides.
+
+    Returns
+    -------
+    holiday_cols : list[str]
+        clock_in_* column names treated as holidays for this file.
+    working_mm_dd : list[str]
+        Date suffixes (e.g. '12_26') for columns that count as working days.
+    n_working : int
+        len(working_mm_dd)
+    """
+    declared_holidays = list(declared_holidays or [])
+    misc = declared_holidays[:]
+    if extra_holidays_csv and str(extra_holidays_csv).strip():
+        misc.extend(
+            x.strip() for x in str(extra_holidays_csv).split(',') if x.strip()
+        )
+    holiday_cols = detect_holidays_staffs(
+        df_clock_in,
+        year=year,
+        misc_holidays=misc,
+        misc_working_days=str(extra_working_csv or '').strip(),
+        verbose=False,
+    )
+    hol_norm = {normalize_clock_in_column_name(h) for h in holiday_cols}
+    cols_in = [
+        c for c in df_clock_in.columns
+        if c.startswith('clock_in_') and 'nan' not in str(c).lower()
+    ]
+    working_cols = [c for c in cols_in if normalize_clock_in_column_name(c) not in hol_norm]
+    working_mm_dd = [c.replace('clock_in_', '', 1) for c in working_cols]
+    return holiday_cols, working_mm_dd, len(working_mm_dd)
+
 
 def extract_attendance_period_dates(df_clock_in, year=None):
     """
