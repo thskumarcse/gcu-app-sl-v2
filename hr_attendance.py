@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import io
+import json
 import os
 from utility_attendance import (
     stepwise_file_upload, split_file, merge_files, move_columns,
@@ -15,10 +16,12 @@ from utility import preprocess_date
 
 
 def _normalize_emp_id_series(s):
-    """Align biometric / sheet / leave Emp Id values for merges (Excel often yields '123.0')."""
+    """Align biometric / CSV / leave Emp Id values for merges (Excel often yields '123.0')."""
     out = s.astype(str).str.strip()
     out = out.replace({"nan": "", "None": "", "<NA>": ""}, regex=False)
     out = out.str.replace(r"\.0$", "", regex=True)
+    # Case-insensitive join (e.g. gcu010042 vs GCU010042)
+    out = out.str.upper()
     return out
 
 
@@ -79,6 +82,13 @@ def _standardize_master_df(raw_df):
     out["Name"] = raw_df[name_c] if name_c else ""
     out["Designation"] = raw_df[des_c] if des_c else ""
     out["Department"] = raw_df[dep_c] if dep_c else ""
+    for c in ("Name", "Designation", "Department"):
+        out[c] = (
+            out[c]
+            .astype(str)
+            .str.strip()
+            .replace({"-": "", "nan": "", "None": ""}, regex=False)
+        )
     return out
 
 
@@ -124,21 +134,138 @@ def _employee_master_from_leave_export(df_leave):
     return sub[["Emp Id", "Name", "Designation", "Department"]]
 
 
-def _emp_master_csv_paths():
-    """Prefer CSV next to this module (works when cwd differs on cloud deploy)."""
-    _root = os.path.dirname(os.path.abspath(__file__))
+def _emp_app_root():
+    """Directory containing `hr_attendance.py` (repo / app root in most deploys)."""
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+def _emp_package_data_dir():
+    """Legacy `data/` next to the app (some hosts omit this folder from the image)."""
+    return os.path.join(_emp_app_root(), "data")
+
+
+def _emp_master_json_paths():
+    """
+    Prefer root-level files (cwd and app dir) — many deployments expose cwd/repo root
+    but not `data/`. Order: cwd root, app root, then data/ fallbacks.
+    """
+    cwd = os.getcwd()
+    app = _emp_app_root()
     return [
-        os.path.join(_root, "data", "emp_master_data.csv"),
-        os.path.join(os.getcwd(), "data", "emp_master_data.csv"),
+        os.path.join(cwd, "emp_master_data.json"),
+        os.path.join(app, "emp_master_data.json"),
+        os.path.join(_emp_package_data_dir(), "emp_master_data.json"),
+        os.path.join(cwd, "data", "emp_master_data.json"),
     ]
 
 
-def _try_load_employee_master_from_csv():
+def _emp_master_csv_paths():
+    cwd = os.getcwd()
+    app = _emp_app_root()
+    return [
+        os.path.join(cwd, "emp_master_data.csv"),
+        os.path.join(app, "emp_master_data.csv"),
+        os.path.join(_emp_package_data_dir(), "emp_master_data.csv"),
+        os.path.join(cwd, "data", "emp_master_data.csv"),
+    ]
+
+
+def _emp_master_dataframe_from_json(data):
+    """
+    Build master DataFrame from JSON: list of records, or {"employees": [...]} / {"records": [...]}.
+    Accepts keys Emp Id / emp_id / employeeId, etc.
+    """
+    empty = pd.DataFrame(columns=["Emp Id", "Name", "Designation", "Department"])
+    if data is None:
+        return empty
+    if isinstance(data, dict):
+        data = data.get("employees") or data.get("records") or data.get("data")
+    if not isinstance(data, list) or len(data) == 0:
+        return empty
+    df = pd.DataFrame(data)
+    if df.empty:
+        return empty
+
+    rename = {}
+    for c in df.columns:
+        ck = str(c).strip().lower().replace(" ", "").replace("_", "")
+        if ck in ("empid", "employeeid"):
+            rename[c] = "Emp Id"
+        elif ck == "name":
+            rename[c] = "Name"
+        elif ck == "designation":
+            rename[c] = "Designation"
+        elif ck in ("department", "dept"):
+            rename[c] = "Department"
+    if rename:
+        df = df.rename(columns=rename)
+
+    for need in ("Emp Id", "Name", "Designation", "Department"):
+        if need not in df.columns:
+            df[need] = ""
+
+    df = df.dropna(subset=["Emp Id"], how="all")
+    df = df[df["Emp Id"].astype(str).str.strip() != ""]
+    if df.empty:
+        return empty
+
+    for c in ("Name", "Designation", "Department"):
+        df[c] = (
+            df[c]
+            .astype(str)
+            .str.strip()
+            .replace({"-": "", "nan": "", "None": ""}, regex=False)
+        )
+    return df[["Emp Id", "Name", "Designation", "Department"]]
+
+
+def _try_load_employee_master(uploaded_file=None):
+    """
+    Employee master load order (after upload):
+    1) Uploaded .json / .csv
+    2) emp_master_data.json in cwd, then next to hr_attendance.py, then data/ fallbacks
+    3) emp_master_data.csv (same locations)
+    """
+    # --- Upload ---
+    if uploaded_file is not None:
+        try:
+            name = (getattr(uploaded_file, "name", "") or "").lower()
+            raw_bytes = uploaded_file.read()
+            if name.endswith(".json"):
+                text = raw_bytes.decode("utf-8-sig")
+                emp = _emp_master_dataframe_from_json(json.loads(text))
+                if not emp.empty:
+                    return emp, getattr(uploaded_file, "name", None) or "uploaded JSON"
+            else:
+                raw = pd.read_csv(io.BytesIO(raw_bytes), dtype=str, encoding="utf-8-sig")
+                raw.columns = [str(c).strip() for c in raw.columns]
+                raw = raw.dropna(how="all")
+                if not raw.empty:
+                    emp = _standardize_master_df(raw)
+                    if not emp.empty:
+                        return emp, getattr(uploaded_file, "name", None) or "uploaded CSV"
+        except Exception:
+            pass
+
+    # --- Bundled JSON (UTF-8, no pandas CSV edge cases) ---
+    for path in _emp_master_json_paths():
+        if not os.path.isfile(path):
+            continue
+        try:
+            with open(path, encoding="utf-8") as f:
+                emp = _emp_master_dataframe_from_json(json.load(f))
+            if not emp.empty:
+                return emp, path
+        except Exception:
+            continue
+
+    # --- CSV fallback ---
     for path in _emp_master_csv_paths():
         if not os.path.isfile(path):
             continue
         try:
             raw = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
+            raw.columns = [str(c).strip() for c in raw.columns]
             raw = raw.dropna(how="all")
             if raw.empty:
                 continue
@@ -147,6 +274,7 @@ def _try_load_employee_master_from_csv():
                 return emp, path
         except Exception:
             continue
+
     return None, None
 
 
@@ -315,6 +443,20 @@ def app():
             key="hr_wd_override",
         )
 
+        st.markdown(
+            "**Employee master** — optional; place **`emp_master_data.json`** in the app root (cwd) or next to `hr_attendance.py`, "
+            "or use `data/` / upload."
+        )
+        emp_master_upload = st.file_uploader(
+            "Upload employee master (.json or .csv)",
+            type=["json", "csv"],
+            key="hr_emp_master_file",
+            help=(
+                "JSON: list of objects with Emp Id, Name, Designation, Department (or employeeId / emp_id aliases). "
+                "Overrides on-disk files when set."
+            ),
+        )
+
         # Stepwise file upload
         labels = ["GIMT", "GIPS", "ADMIN", "LEAVE"]
         dfs = stepwise_file_upload(labels, key_prefix="attendance")
@@ -443,10 +585,10 @@ def app():
             df_fac_conso = df_fac_conso[desired_order]
             df_admin_conso = df_admin_conso[desired_order]
             
-            # Step 2: Employee master — `data/emp_master_data.csv` only (not Google Sheet), then
-            # biometric Names; enrich from LEAVE export for extra IDs / missing fields.
-            emp_df, _csv_used = _try_load_employee_master_from_csv()
-            emp_source = "csv" if emp_df is not None and not emp_df.empty else None
+            # Step 2: Employee master — upload, then cwd/app-root JSON/CSV, then data/, then biometric;
+            # merge LEAVE export (prefer richer row when master file was not used).
+            emp_df, _master_label = _try_load_employee_master(uploaded_file=emp_master_upload)
+            emp_source = "master" if emp_df is not None and not emp_df.empty else None
 
             if emp_df is None or emp_df.empty:
                 combined = pd.concat(
@@ -466,15 +608,27 @@ def app():
             leave_enrich = _employee_master_from_leave_export(df_leave_erp)
             if not leave_enrich.empty:
                 leave_enrich["Emp Id"] = _normalize_emp_id_series(leave_enrich["Emp Id"])
-                emp_df = pd.concat([emp_df, leave_enrich], ignore_index=True)
+                if emp_source == "master":
+                    # Keep master file rows first; LEAVE only adds extra Emp Ids
+                    emp_df = pd.concat([emp_df, leave_enrich], ignore_index=True)
+                else:
+                    # Prefer LEAVE designation/dept over bare biometric for the same Emp Id
+                    emp_df = pd.concat([leave_enrich, emp_df], ignore_index=True)
                 emp_df = emp_df.drop_duplicates(subset=["Emp Id"], keep="first")
 
-            if emp_source == "biometric":
-                st.info(
-                    "Employee master: **Names** come from uploaded attendance files; "
-                    "**Designation** / **Department** use the LEAVE upload when present. "
-                    "For full HR fields, add a populated **`data/emp_master_data.csv`** next to the app "
-                    "(see deploy-safe paths under `hr_attendance._emp_master_csv_paths`)."
+            if emp_source == "master":
+                st.success(
+                    f"Employee master loaded (**{len(emp_df)}** rows) from `{_master_label}`."
+                )
+            else:
+                _json_p = "\n".join(f"- `{p}`" for p in _emp_master_json_paths())
+                _csv_p = "\n".join(f"- `{p}`" for p in _emp_master_csv_paths())
+                st.warning(
+                    "No employee master file was loaded. Checked **JSON**:\n"
+                    f"{_json_p}\n\n**CSV**:\n"
+                    f"{_csv_p}\n\n"
+                    "Commit **`emp_master_data.json`** at the **repository root** (run `python scripts/build_emp_master_json.py`) "
+                    "or upload a **.json / .csv** above. Without it, **Name** comes from attendance files."
                 )
 
             for _bio in (df_fac_detail, df_admin_detail, df_fac_conso, df_admin_conso):

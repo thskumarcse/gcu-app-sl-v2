@@ -1,0 +1,2816 @@
+[
+  {
+    "Emp Id": "SYSADMIN",
+    "Name": "System  Administrator",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "APPLICANT_PORTAL_USER",
+    "Name": "APP_FIRST_NAME APP_MIDDLE_NAME APP_LAST_NAME",
+    "Designation": "",
+    "Department": ""
+  },
+  {
+    "Emp Id": "mis",
+    "Name": "MIS  Admin",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "EMP4",
+    "Name": "Lokesh  Yadav",
+    "Designation": "",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "EMP5",
+    "Name": "Birshu  Sarma",
+    "Designation": "",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020041",
+    "Name": "Bhabajit  Baruah",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020132",
+    "Name": "Ian Stewart Suchiang",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020043",
+    "Name": "Abhinandan  Kalita",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020115",
+    "Name": "Sunayan  Bardoloi",
+    "Designation": "Sr. Professor & HoD",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU010042",
+    "Name": "ANJAN  DEKA",
+    "Designation": "Administration",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030144",
+    "Name": "Kalyan Changmai",
+    "Designation": "Multitasking Executive",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030117",
+    "Name": "MOHD AZIZUDDIN AHMED",
+    "Designation": "Lab Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020035",
+    "Name": "JEETUMONI  BARMAN",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020111",
+    "Name": "Rachel  Kabi",
+    "Designation": "Assistant Professor & HoD",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020048",
+    "Name": "Bipul Kumar Talukdar",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020100",
+    "Name": "Nur Ahammed Khan",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU010039",
+    "Name": "Babita  Baishya",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU010041",
+    "Name": "NITUL  SARMA",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020134",
+    "Name": "PRAYASH  BORAH",
+    "Designation": "Assistant Professor",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU020069",
+    "Name": "Mala  Ahmed",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020019",
+    "Name": "MUKTA RANJAN SINGHA",
+    "Designation": "Associate Professor & HOD",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030009",
+    "Name": "Rupa Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020117",
+    "Name": "Hari Prasad Goenka",
+    "Designation": "Sr. Professor & HoD",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU020057",
+    "Name": "Thokchom Shanta Kumar",
+    "Designation": "Associate Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020061",
+    "Name": "Snehal  Kaushik",
+    "Designation": "Associate Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU010043",
+    "Name": "Papari  Das",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020030",
+    "Name": "Ritushree  Dutta",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU010017",
+    "Name": "Ananya  Borah",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU010044",
+    "Name": "Angkesh Sarma Bordoloi",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020045",
+    "Name": "NAMRATA  KATAKI",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020077",
+    "Name": "Anupam  Sarma",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU010013",
+    "Name": "Raisa  Choudhury",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU010024",
+    "Name": "Mridul  Das",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030054",
+    "Name": "KABINDRA MEDHI",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030108",
+    "Name": "Dipankar Baruah",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010033",
+    "Name": "Parash Kumar Das",
+    "Designation": "Lab assistant",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU010040",
+    "Name": "Banajit  Nath",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020086",
+    "Name": "Arzoo  Newar",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020011",
+    "Name": "MADHUMITA  MAHANTA",
+    "Designation": "Associate Professor & HoD (I/c)",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020082",
+    "Name": "Damanbhalang  Rynjah",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020099",
+    "Name": "Robert  Ravi",
+    "Designation": "Professor & HOD",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020085",
+    "Name": "Farak Ali",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020084",
+    "Name": "Shahnaz Alom",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020059",
+    "Name": "Jun Moni Kalita",
+    "Designation": "Associate Professor & HOD",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020054",
+    "Name": "Damiki  Laloo",
+    "Designation": "Professor & HOD",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020130",
+    "Name": "Ankur Jyoti Kashyap",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020039",
+    "Name": "Moytri Sarmah",
+    "Designation": "Associate Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020047",
+    "Name": "Himangshu Sekhar Brahma",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020126",
+    "Name": "Punamjyoti Das",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030052",
+    "Name": "Indreswar Baishya",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020068",
+    "Name": "SHATABDI GHOSE",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020121",
+    "Name": "Devilata  Pegu",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020014",
+    "Name": "Debarshi  Mallick",
+    "Designation": "Associate Professor & HOD",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030118",
+    "Name": "NAYANA  DAS",
+    "Designation": "Lab Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020013",
+    "Name": "Ajanta  Deka",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020133",
+    "Name": "Dharitri  Sarkar",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020089",
+    "Name": "Binita  Devi",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020026",
+    "Name": "Sangeeta  Das",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030006",
+    "Name": "Bhaskar  Chakravarty",
+    "Designation": "Lab Instructor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020102",
+    "Name": "Nilakshi  Goswami",
+    "Designation": "Assistant Professor & HoD (I/c)",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020109",
+    "Name": "Kriti  Phukan",
+    "Designation": "Assistant Professor",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU030113",
+    "Name": "Simanta Thakuria",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020074",
+    "Name": "Bhrigu Kumar Das",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030061",
+    "Name": "RUPAM  SARMAH",
+    "Designation": "Lab Instructor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020002",
+    "Name": "Swarnali  Pathak",
+    "Designation": "Assistant Professor & HoD (I/c)",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020137",
+    "Name": "Kamal  Das",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020135",
+    "Name": "JYOTI PRASAD DEKA",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020058",
+    "Name": "Dheeman  Bhuyan",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020104",
+    "Name": "SUPRIYA SAHU",
+    "Designation": "Associate Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030033",
+    "Name": "Deepa Das Talukdar",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020021",
+    "Name": "SAMPURNA  BHUYAN",
+    "Designation": "Associate Professor & HoD (I/c)",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020096",
+    "Name": "Pallab Jyoti Das",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020034",
+    "Name": "Rajib  Bhowmik",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020028",
+    "Name": "Sandip  Bordoloi",
+    "Designation": "Associate Professor & HOD",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020088",
+    "Name": "Anwesha  Gayan",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030099",
+    "Name": "Girija Nath",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020097",
+    "Name": "Bhaskar Jyoti Medhi",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020049",
+    "Name": "Pallavi  Roy",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020120",
+    "Name": "NITISHA  Mazumdar",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030129",
+    "Name": "SAFIZUL  ISLAM",
+    "Designation": "Lab Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020010",
+    "Name": "Adarsh  Pradhan",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030143",
+    "Name": "Dipankar  Rabha",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010012",
+    "Name": "Sourobh Mazinder Barua",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030050",
+    "Name": "Hari Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020023",
+    "Name": "ARNAB KUMAR DAS",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020009",
+    "Name": "Manjula  Kalita",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020093",
+    "Name": "Bhargab Deka",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020114",
+    "Name": "Nayana  Adhikari",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020070",
+    "Name": "Dhriti  Borah",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU030104",
+    "Name": "Amalesh Baruah",
+    "Designation": "System Administrator",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020129",
+    "Name": "Nirmala  Devi",
+    "Designation": "Associate Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020064",
+    "Name": "Zartaj Washmin Banu",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020067",
+    "Name": "Priyanka Choudhury",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030049",
+    "Name": "Ranjit  Sinha",
+    "Designation": "Lab Instructor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030085",
+    "Name": "Haren Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030093",
+    "Name": "Simanta Baishya",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020072",
+    "Name": "Mrinmoy Deka",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020063",
+    "Name": "Asha  Das",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020079",
+    "Name": "Rupa  Sengupta",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020075",
+    "Name": "TRIDEEP  SAIKIA",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030111",
+    "Name": "Ratan Baishya",
+    "Designation": "Lab assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020001",
+    "Name": "Lipi  Goswami",
+    "Designation": "Assistant Professor & HoD (I/c)",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020003",
+    "Name": "Kajal  Dutta",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020080",
+    "Name": "Alakesh  Bharali",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020107",
+    "Name": "Salema Khatun",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020038",
+    "Name": "Priti  Sarmah",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020110",
+    "Name": "SANSWRANG BASUMATARY",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020005",
+    "Name": "Abdul Baquee Ahmed",
+    "Designation": "Professor",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020037",
+    "Name": "Oveepsa  Chakraborty",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030010",
+    "Name": "Nabami Das Baruah",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010036",
+    "Name": "Pranjeet  Das",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020071",
+    "Name": "Shekhar Chandra Bora",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030114",
+    "Name": "Deepa  Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020060",
+    "Name": "Tapash  Chakraborty",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020056",
+    "Name": "ARINDOM  AIN",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030032",
+    "Name": "RUBI  KALITA",
+    "Designation": "Lab Instructor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020138",
+    "Name": "Salma  Mazid",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020004",
+    "Name": "Dipankar  Saha",
+    "Designation": "Professor & HOD",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020127",
+    "Name": "Rubina Chowdhury",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020083",
+    "Name": "Bedanta Bhattacharjee",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020094",
+    "Name": "Ashis Kumar Goswami",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020025",
+    "Name": "Alokojjwal  Das",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020062",
+    "Name": "Kankan Kishore Pathak",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030101",
+    "Name": "Bhogeswar  Saikia",
+    "Designation": "Workshop Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030014",
+    "Name": "Prabodh  Barman",
+    "Designation": "Workshop Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030041",
+    "Name": "Ramen  Talukdar",
+    "Designation": "Workshop Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020119",
+    "Name": "Bhaswati  Sarmah",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU030008",
+    "Name": "Santosh Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020052",
+    "Name": "Dhruva Jyoti Sharma",
+    "Designation": "Assistant Professor",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU020008",
+    "Name": "Nilanjana  Deb",
+    "Designation": "Associate Professor & HoD (I/c)",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU020123",
+    "Name": "MONISHA  DEVI",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030141",
+    "Name": "Bhabajyoti Baishya",
+    "Designation": "Multitasking Executive",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020051",
+    "Name": "Faruk  Ahmed",
+    "Designation": "Assistant Professor",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU030042",
+    "Name": "Monirupa  Misra",
+    "Designation": "Lab Instructor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030145",
+    "Name": "Binod  Das",
+    "Designation": "Lab Instructor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020027",
+    "Name": "Junumoni  Das",
+    "Designation": "Sr. Asst. Prof. & Head HR and Personnel Division",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU020131",
+    "Name": "Sujan  Sinha",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020029",
+    "Name": "SANJIB  HAZARIKA",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020044",
+    "Name": "Subhadra  Das",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020015",
+    "Name": "MANASHI  DEVI",
+    "Designation": "Assistant Professor & HoD (I/c)",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020016",
+    "Name": "Gargi Kar Purkayastha",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020050",
+    "Name": "BASAB  DAS",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020046",
+    "Name": "Swapnaneel  Sarma",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020078",
+    "Name": "Lima  Patowary",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030097",
+    "Name": "Hitesh  Barman",
+    "Designation": "Workshop Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010037",
+    "Name": "ANUJ  MEDHI",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030106",
+    "Name": "NILAM  BHARADWAJ",
+    "Designation": "Lab Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020090",
+    "Name": "Ravi Kumar Rajan",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020113",
+    "Name": "DAISY  BHATTACHARJEE",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020122",
+    "Name": "Monalisha  Gautom",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020108",
+    "Name": "Abhinav  Sarma",
+    "Designation": "Assistant Professor",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU020116",
+    "Name": "Jupitara  Boro",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020024",
+    "Name": "Trishna Das",
+    "Designation": "Associate Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020012",
+    "Name": "Minakshi  Gogoi",
+    "Designation": "Professor & HOD",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030018",
+    "Name": "Mahesh  Das",
+    "Designation": "Lab Instructor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020081",
+    "Name": "Hemanga  Hazarika",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020095",
+    "Name": "Padmanath Pegu",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020101",
+    "Name": "Namrata Koushik",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020125",
+    "Name": "Gitanjali  Devi",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020128",
+    "Name": "Anisha  Bordoloi",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU030069",
+    "Name": "Mridusmita  Baruah",
+    "Designation": "Lab Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020124",
+    "Name": "Dipjyoti  Deka",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020006",
+    "Name": "ANINDITA  BORA",
+    "Designation": "Associate Professor & HOD",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020103",
+    "Name": "Rajat Subhra Dutta",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020007",
+    "Name": "Smriti Rekha Chanda Das",
+    "Designation": "Associate Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU010005",
+    "Name": "Dwipen  Das",
+    "Designation": "Administration",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU010002",
+    "Name": "Kandarpa  Das",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "Admin",
+    "Name": "ERP  ADMIN",
+    "Designation": "",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020112",
+    "Name": "Palakshi  Sarmah",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU030012",
+    "Name": "Saraswati Das Patowary",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030164",
+    "Name": "Bhaskar Jyoti Bhuyan",
+    "Designation": "Administration",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "Management",
+    "Name": "Management  D",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "CAP123",
+    "Name": "demo  file",
+    "Designation": "",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030025",
+    "Name": "Latif Ali",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030044",
+    "Name": "Jyotish Deka",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020018",
+    "Name": "Bhanu P.  Sahu",
+    "Designation": "Professor & HOD",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020142",
+    "Name": "Vidhya  Srinivasan",
+    "Designation": "Professor",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU020136",
+    "Name": "Shantanu  Chakravarty",
+    "Designation": "Professor & HOD",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020118",
+    "Name": "Nozomi  Tokuma",
+    "Designation": "Assistant Professor (Foreign Languages)",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020040",
+    "Name": "Prithvi Narayan Sinha",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020139",
+    "Name": "Jyotima  Nath",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020092",
+    "Name": "Tutumoni Kalita",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020033",
+    "Name": "Kritanjali  Jaiswal",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020036",
+    "Name": "Rajarshi  Paul",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020091",
+    "Name": "Nikhil Biswas",
+    "Designation": "Associate Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020020",
+    "Name": "Shrabani  Medhi",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020022",
+    "Name": "PRANJAL DAS",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020105",
+    "Name": "Sharmila  Sharan",
+    "Designation": "Sr. Assistant Professor",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU020106",
+    "Name": "Asish  Bhaumik",
+    "Designation": "Associate Professor",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU040005",
+    "Name": "Ankita  Saikia",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040001",
+    "Name": "Suman  Kumar",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020175",
+    "Name": "Chinmoy  Bhuyan",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020140",
+    "Name": "Dhimanjit  Sarma",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU010025",
+    "Name": "Arup Kumar Das",
+    "Designation": "Administration",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030087",
+    "Name": "Diganta Kumar Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030063",
+    "Name": "Gokul Chandra Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030060",
+    "Name": "Sankar Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030165",
+    "Name": "Pranjit Sarma",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030122",
+    "Name": "Bandana Kalita",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010011",
+    "Name": "Nripen Chandra Barman",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030146",
+    "Name": "Kanshouwa Torung Maring",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010004",
+    "Name": "Kishore Kumar Choudhury",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020066",
+    "Name": "Uddipan  Das",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020141",
+    "Name": "Junmoni  Nath",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020087",
+    "Name": "Kasturi  Bhuyan",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020073",
+    "Name": "Ranadeep  Borgohain",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020076",
+    "Name": "Rajana James",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU000001",
+    "Name": "Bijoyananda  Chowdhury",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030011",
+    "Name": "Nitul Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030045",
+    "Name": "Naba Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030043",
+    "Name": "Mantu  Saikia",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020098",
+    "Name": "Sanghita  Das",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030057",
+    "Name": "Parag Moni Kalita",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030100",
+    "Name": "Sanjuma Begum",
+    "Designation": "Multitasking Assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030086",
+    "Name": "Minakshi Das",
+    "Designation": "Multitasking Assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030105",
+    "Name": "Pronita Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030103",
+    "Name": "Apurba Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030066",
+    "Name": "Mollika Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030053",
+    "Name": "Sikha Rani Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030112",
+    "Name": "Rumi Begum",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030055",
+    "Name": "Anu Das",
+    "Designation": "Multitasking Assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010032",
+    "Name": "Luit  Chowdhury",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU010035",
+    "Name": "Utpal  Sarmah",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030065",
+    "Name": "Jyoti Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030070",
+    "Name": "Jadu Nandan Pradhani",
+    "Designation": "System Administrator",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030073",
+    "Name": "Hiranya Saikia",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030079",
+    "Name": "Bhaskar Jyoti Kalita",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030092",
+    "Name": "Abhijit Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030125",
+    "Name": "Krishnanu Biswa Kashyap",
+    "Designation": "Lab Attendant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030134",
+    "Name": "Sanjib Sharma",
+    "Designation": "Lab Attendant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030135",
+    "Name": "Raktim Bhattacharya",
+    "Designation": "Lab Attendant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030152",
+    "Name": "Leena Lakra",
+    "Designation": "Non Teaching",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030154",
+    "Name": "Mondita Saikia",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030147",
+    "Name": "Jabir  Khan",
+    "Designation": "Lab Technician/Instructor",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030148",
+    "Name": "Bhaskar Jyoti Hazarika",
+    "Designation": "Lab Technician/Instructor",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "T01",
+    "Name": "Netra  Bordoloi",
+    "Designation": "Lab Attendant",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "T02",
+    "Name": "Nayan Moni Baruah",
+    "Designation": "Lab Attendant",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "T03",
+    "Name": "Pranjit Saikia",
+    "Designation": "Lab Attendant",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030072",
+    "Name": "PRAHLAD ROY",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030035",
+    "Name": "Ritu Raj Phukan",
+    "Designation": "Lab Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030037",
+    "Name": "Kandarpa  Bezbaruah",
+    "Designation": "Workshop Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030046",
+    "Name": "Mantu Kr Kalita",
+    "Designation": "Workshop Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030058",
+    "Name": "Tapan Kr Tamuli",
+    "Designation": "Workshop Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030015",
+    "Name": "Soneswar Kalita",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030027",
+    "Name": "Jibeswar Thakuria",
+    "Designation": "Lab assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030132",
+    "Name": "Ripunjoy  Boruah",
+    "Designation": "Lab assistant",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030161",
+    "Name": "Nausad  Ahmed",
+    "Designation": "Lab Technician/Instructor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030062",
+    "Name": "Joydeep  Gupta",
+    "Designation": "Lab Instructor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU030067",
+    "Name": "Eyajul Ali",
+    "Designation": "Lab assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030028",
+    "Name": "Isha Haque Ali",
+    "Designation": "Lab assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030051",
+    "Name": "Prakash Talukdar",
+    "Designation": "Lab assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030162",
+    "Name": "Nripen Das",
+    "Designation": "Multitasking Assistant",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030133",
+    "Name": "Ajit Ch. Phukan",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010001",
+    "Name": "Jayanta  Deka",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030034",
+    "Name": "Bipul  Sarma",
+    "Designation": "Lab Technician/Instructor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU010034",
+    "Name": "Manish  Das",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU010038",
+    "Name": "Nayanjyoti  Baruah",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030036",
+    "Name": "Amrit Talukdar",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030031",
+    "Name": "Tridib Roy",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030096",
+    "Name": "Kamal Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020143",
+    "Name": "Subarna Sankar Das",
+    "Designation": "Assistant Professor",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU020144",
+    "Name": "Rohan  Basu",
+    "Designation": "Associate Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU030166",
+    "Name": "Hiran  Devi",
+    "Designation": "Multitasking Executive",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030126",
+    "Name": "Rita Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030001",
+    "Name": "Sakina Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030002",
+    "Name": "Rehena Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030003",
+    "Name": "Iaja Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030016",
+    "Name": "Bijuli Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030019",
+    "Name": "Gitanjali Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030020",
+    "Name": "Julo Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030021",
+    "Name": "Rahijan Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030022",
+    "Name": "Runu Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030029",
+    "Name": "Gita Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030030",
+    "Name": "Noni Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030038",
+    "Name": "Sajida Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030039",
+    "Name": "Merina Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030040",
+    "Name": "Anima Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030047",
+    "Name": "Juna Begum",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030048",
+    "Name": "Sabitri Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030074",
+    "Name": "Purnima Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030075",
+    "Name": "Kamala Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030077",
+    "Name": "Sarada Das",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030078",
+    "Name": "Kalpana Roy",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030081",
+    "Name": "Indrabati Basfore",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030082",
+    "Name": "Basanti Basfore",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030088",
+    "Name": "Bina Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030089",
+    "Name": "Hanufa Bibi",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030090",
+    "Name": "Mina Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030094",
+    "Name": "Amit Basfore",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030095",
+    "Name": "Hemanti Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030109",
+    "Name": "Rina Deka",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030119",
+    "Name": "Karan  Basfor",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030120",
+    "Name": "Churiya Begum",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030123",
+    "Name": "Sumit Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030138",
+    "Name": "Anita Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030139",
+    "Name": "Kisan Basfor",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030149",
+    "Name": "Rina Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030163",
+    "Name": "Sagar Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030083",
+    "Name": "Sufia Khatun",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030004",
+    "Name": "Nur Islam Ali Islam Ali",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030005",
+    "Name": "Bhadreswar Das",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030007",
+    "Name": "Biren Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030013",
+    "Name": "Jiban Kalita",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030017",
+    "Name": "Hanif Ali",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030023",
+    "Name": "Tahik Ali",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030024",
+    "Name": "Kamrup Das",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030056",
+    "Name": "Lakhi Nath Barman",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030068",
+    "Name": "Anup Baruah",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030076",
+    "Name": "Utpal Das",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030080",
+    "Name": "Laba Ram Das",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030084",
+    "Name": "Thaneswar Kalita",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030091",
+    "Name": "Ashutosh Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030098",
+    "Name": "Bakul Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030102",
+    "Name": "Jit Keleng",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030107",
+    "Name": "Diganta  Deka",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030110",
+    "Name": "Paresh Das",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030115",
+    "Name": "Md Siddik Ali",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030116",
+    "Name": "Khalil Ali",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030121",
+    "Name": "Niranjan Chowary",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030124",
+    "Name": "Dimbeswar Borah",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030127",
+    "Name": "Safiqul Haque",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030128",
+    "Name": "Dilip Kumar Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030130",
+    "Name": "Md Jamser Ali",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030140",
+    "Name": "Madan Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030142",
+    "Name": "Bijoy Mandal",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030150",
+    "Name": "Hitesh Kalita",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030151",
+    "Name": "Raja Mohan",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030153",
+    "Name": "Pinku Mohan",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030155",
+    "Name": "Md Zakir Hussain",
+    "Designation": "Security (I/C)",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030156",
+    "Name": "Simanta Talukdar",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030157",
+    "Name": "Pabitra Das",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030158",
+    "Name": "Puja  Das",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030159",
+    "Name": "Sangita  Das",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030160",
+    "Name": "Krishana Sonar",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030026",
+    "Name": "Bikash Singh",
+    "Designation": "Driver",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030168",
+    "Name": "Sajahan Ali",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030169",
+    "Name": "Himangshu Patowary",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "T100",
+    "Name": "Test Account",
+    "Designation": "Administration",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU030064",
+    "Name": "Biman Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030071",
+    "Name": "Jogeswar Kurmi",
+    "Designation": "Lab Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030131",
+    "Name": "Rajib Baruah",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030167",
+    "Name": "Gourav  Phukan",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020065",
+    "Name": "Susankar Kushari",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030059",
+    "Name": "Hamid Ali",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030170",
+    "Name": "Imran  Ali",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020145",
+    "Name": "Niju Moni Das",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU030173",
+    "Name": "Hridai  Gautam",
+    "Designation": "Lab Technician/Instructor",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020146",
+    "Name": "Barsha  Chhetri",
+    "Designation": "Assistant Professor & HoD (I/c)",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020147",
+    "Name": "Puja  Sen",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "SeroCST",
+    "Name": "Santosh  Sahu",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU000002",
+    "Name": "Kunki  Chowdhury",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020148",
+    "Name": "Balin  Hazarika",
+    "Designation": "Professor",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU030175",
+    "Name": "Mrinmoy Gogoi",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030176",
+    "Name": "Anisha Akhter",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030174",
+    "Name": "Deepak  Basfor",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030177",
+    "Name": "Arijit Nath",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030171",
+    "Name": "Jiten Das",
+    "Designation": "Non Teaching",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020149",
+    "Name": "Bondita  Baruah",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020152",
+    "Name": "Tejoswita  Gogoi",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020150",
+    "Name": "Amar  Saikia",
+    "Designation": "Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020151",
+    "Name": "Nabajyoti Kalita",
+    "Designation": "Lecturer",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020153",
+    "Name": "Ummey Rummana Barlaskar",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020154",
+    "Name": "Chayanika  Das",
+    "Designation": "Assistant Professor",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU020031",
+    "Name": "Amarjyoti  Pathak",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020155",
+    "Name": "Pasang Drema Goiba",
+    "Designation": "Assistant Professor",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU020156",
+    "Name": "Monoj  Rajkhowa",
+    "Designation": "Assistant Professor",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU030178",
+    "Name": "Nisha Kalita",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030179",
+    "Name": "Akash Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030180",
+    "Name": "Geetanjali  Gogoi",
+    "Designation": "Lab Instructor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020157",
+    "Name": "Dhunusmita  Barman",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020158",
+    "Name": "Debika  Sarmah",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020159",
+    "Name": "Nasreen  Ahmed",
+    "Designation": "Assistant Professor",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020160",
+    "Name": "Ajaan Anubhav Borah",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020162",
+    "Name": "Rashidul  Alam",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020163",
+    "Name": "Subungshri  Basumatary",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020164",
+    "Name": "Gargee  Chakravarty",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU020165",
+    "Name": "Diganta Jyoti Sarma",
+    "Designation": "Assistant Professor",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020166",
+    "Name": "Manoj  Khaund",
+    "Designation": "Assistant Professor",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU030181",
+    "Name": "Minakshi  Patowari",
+    "Designation": "Security Guard",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020167",
+    "Name": "Nandita  Chitrakar",
+    "Designation": "Assistant Professor",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040003",
+    "Name": "Hirakjyoti Sarma",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040004",
+    "Name": "Samrat Dev Sarma",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040006",
+    "Name": "Girish Chandra Gogoi",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040007",
+    "Name": "Rituparna Choudhury",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040008",
+    "Name": "Jyoti Mishra",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040009",
+    "Name": "Mohd Shahil Alam Ahmed",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040010",
+    "Name": "Sanghamitra Saharia",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU040011",
+    "Name": "Dimpi Moni Kalita",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU040012",
+    "Name": "Birina Bhuyan",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020168",
+    "Name": "Abhishek Kakati",
+    "Designation": "Assistant Professor",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU010026",
+    "Name": "Biraj Kr. Borgohain",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020169",
+    "Name": "Madhusmita  Ronghangpi",
+    "Designation": "Assistant Professor",
+    "Department": "School of Law"
+  },
+  {
+    "Emp Id": "GCU030182",
+    "Name": "Siddharth Basfor",
+    "Designation": "Cleaner",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020170",
+    "Name": "Mona Alice Marbaniang",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020171",
+    "Name": "Rituparna  Choudhury",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020172",
+    "Name": "Neelutpal  Gogoi",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020173",
+    "Name": "Dipunja  Gohain",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU/SSA01",
+    "Name": "Arupananda Chowdhury",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "sambit.kundu",
+    "Name": "Serosoft Sambit Kundu",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU040013",
+    "Name": "Benjamin Bashyas Sarma",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "aman.sharma",
+    "Name": "Serosoft Aman Sharma",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU040014",
+    "Name": "Deepjyoti  Goswami",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU040015",
+    "Name": "Nikita  Gogoi",
+    "Designation": "",
+    "Department": "School Of Engineering and Technology"
+  },
+  {
+    "Emp Id": "GCU040016",
+    "Name": "Dipjyoti Sarma",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU040017",
+    "Name": "Sampreeti Das",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU030183",
+    "Name": "Rajesh  Barman",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030184",
+    "Name": "Dipu  Basfor",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030185",
+    "Name": "Bhrigu  Sarma",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU005",
+    "Name": "Prabhat Chandra Barman",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030186",
+    "Name": "Amlan Deep Deka",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020176",
+    "Name": "Ahana  Choudhury",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020177",
+    "Name": "Birina  Bhuyan",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020179",
+    "Name": "Shalini  Ojha",
+    "Designation": "",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU020180",
+    "Name": "Prakash  Khundrakpam",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020181",
+    "Name": "Kaustov Pronob Borthakur",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020182",
+    "Name": "Suranjana Patowary",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU030187",
+    "Name": "Sudarshana  Saikia",
+    "Designation": "",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU020174",
+    "Name": "Gour Gopal Banik",
+    "Designation": "",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU020178",
+    "Name": "Sasanka Bujar Baruah",
+    "Designation": "",
+    "Department": "School of Management and Commerce"
+  },
+  {
+    "Emp Id": "GCU030188",
+    "Name": "Najnin  Shikari",
+    "Designation": "",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU020183",
+    "Name": "Bhagyashree Mahanta",
+    "Designation": "",
+    "Department": "School of Natural Science"
+  },
+  {
+    "Emp Id": "GCU020184",
+    "Name": "James H. Zothantluanga",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020185",
+    "Name": "Poulami  Patra",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020186",
+    "Name": "Stabak  Das",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020187",
+    "Name": "Arpita  Paul",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030189",
+    "Name": "Punyam  Gurung",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030190",
+    "Name": "Rehanuddin  Ahmed",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030191",
+    "Name": "Ashikul  Hoque",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "serosunny",
+    "Name": "Sunny  Digwani",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "serorakesh",
+    "Name": "Rakesh  Bamnolkar",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "AI Admin",
+    "Name": "AI  Admin",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020189",
+    "Name": "Fariza Saidin",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040018",
+    "Name": "Anushka Sharma",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040019",
+    "Name": "Rini Gogoi",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU040020",
+    "Name": "Pooja  Kalita",
+    "Designation": "",
+    "Department": "School of Law"
+  },
+  {
+    "Emp Id": "GCU030198",
+    "Name": "Chiman  Deka",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU030195",
+    "Name": "Jakir  Hussain",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030196",
+    "Name": "Zubair  Khan",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030197",
+    "Name": "Jesmin  Begum",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020190",
+    "Name": "Elangbam Bidyarani",
+    "Designation": "",
+    "Department": "School of Agricultural Science"
+  },
+  {
+    "Emp Id": "GCU020191",
+    "Name": "Karobi  Handique",
+    "Designation": "",
+    "Department": "School of Agricultural Science"
+  },
+  {
+    "Emp Id": "GCU020192",
+    "Name": "Gauri Mohan",
+    "Designation": "",
+    "Department": "School of Agricultural Science"
+  },
+  {
+    "Emp Id": "GCU020193",
+    "Name": "Sanjana Bora",
+    "Designation": "",
+    "Department": "School of Agricultural Science"
+  },
+  {
+    "Emp Id": "GCU020194",
+    "Name": "Shilpi Gupta",
+    "Designation": "",
+    "Department": "School of Agricultural Science"
+  },
+  {
+    "Emp Id": "GCU020195",
+    "Name": "Liza Kalita",
+    "Designation": "",
+    "Department": "School of Agricultural Science"
+  },
+  {
+    "Emp Id": "GCU020196",
+    "Name": "Chumi Sarma",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020197",
+    "Name": "Priyanka Yadav",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020198",
+    "Name": "Sidhant Tamang",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020199",
+    "Name": "Ayush  Roy",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU030199",
+    "Name": "Bicky Basfore",
+    "Designation": "",
+    "Department": "Admin Non Teaching"
+  },
+  {
+    "Emp Id": "GCU020200",
+    "Name": "Sampreeti  Das",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020201",
+    "Name": "Rupam  Kalita",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020202",
+    "Name": "Plazapriya Rajbongshi",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020203",
+    "Name": "Prasanjit  Das",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020204",
+    "Name": "Chayanika Goswami",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020209",
+    "Name": "Zannatun Firdousi",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU020205",
+    "Name": "Sandipan Das",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020206",
+    "Name": "Rakibur Rahman",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020207",
+    "Name": "Mahbubur Rahman",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020208",
+    "Name": "Tanmay  Sarma",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU030200",
+    "Name": "Rani Pegu",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Tezpur"
+  },
+  {
+    "Emp Id": "GCU020210",
+    "Name": "Niloy Jyoti Saikia",
+    "Designation": "",
+    "Department": "School of Pharmaceutical Science - Guwahati"
+  },
+  {
+    "Emp Id": "GCU010018",
+    "Name": "Sidharth Shankar",
+    "Designation": "",
+    "Department": "Administration"
+  },
+  {
+    "Emp Id": "GCU020211",
+    "Name": "Jyoti  Mishra",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020212",
+    "Name": "Anuradha  Das",
+    "Designation": "",
+    "Department": "School of Allied Health Sciences"
+  },
+  {
+    "Emp Id": "GCU040024",
+    "Name": "Jinti Das",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020213",
+    "Name": "Tajbina  Yasin",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020214",
+    "Name": "Purnima  Saikia",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  },
+  {
+    "Emp Id": "GCU020215",
+    "Name": "Priti Rekha Das",
+    "Designation": "",
+    "Department": "School Of Humanities & Social Science"
+  }
+]
