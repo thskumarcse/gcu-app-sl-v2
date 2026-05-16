@@ -159,7 +159,7 @@ def expand_student_rows(df):
 
     return pd.DataFrame(all_rows)
 
-def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
+def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir, session):
     """Draw header with logo and student photo."""
     width, height = A4
     usable_width = width - doc.leftMargin - doc.rightMargin
@@ -200,7 +200,7 @@ def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
     canvas.drawCentredString(width / 2, height - 85, "TRANSCRIPT")
     canvas.setFont("Times-Roman", 12)
     canvas.drawCentredString(width / 2, height - 100, course_name)
-    canvas.drawCentredString(width / 2, height - 115, "2023-2025")
+    canvas.drawCentredString(width / 2, height - 115, session)
 
     # Student data table
     std_data = [
@@ -272,7 +272,7 @@ def format_subject_name(text, max_len=45):
         subject_style.fontSize = 9
     return Paragraph(str(text), subject_style)
 
-def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, photo_dir):
+def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, photo_dir, session):
     """Generate PDF transcript for a student."""
     width, height = A4
     filename = os.path.join(output_dir, f"Transcript_{student_data.iloc[0]['CNAME']}.pdf")
@@ -312,7 +312,7 @@ def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, p
     first_page_template = PageTemplate(
         id='FirstPage',
         frames=[frame_first],
-        onPage=lambda c, d: draw_header_with_photo(c, d, student_data, logo_path, photo_dir)
+        onPage=lambda c, d, s=session: draw_header_with_photo(c, d, student_data, logo_path, photo_dir, s)
     )
     
     middle_page_template = PageTemplate(
@@ -428,7 +428,7 @@ def generate_pdf(student_id, student_data, report_date, output_dir, logo_path, p
         st.error(f"❌ PDF build failed: {e}")
         return None
 
-def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir):
+def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir, session):
     """Generate single-page PDF transcript."""
     width, height = A4
     filename = os.path.join(output_dir, f"Transcript_{student_data.iloc[0]['CNAME']}_onepage.pdf")
@@ -470,7 +470,7 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
     single_page_template = PageTemplate(
         id="OnePage",
         frames=[frame_main],
-        onPage=lambda c, d: draw_header_with_photo(c, d, student_data, logo_path, photo_dir),
+        onPage=lambda c, d, s=session: draw_header_with_photo(c, d, student_data, logo_path, photo_dir, s),
         onPageEnd=lambda c, d: draw_footer(c, d, report_date)
     )
     doc.addPageTemplates([single_page_template])
@@ -566,14 +566,14 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
         st.error(f"❌ PDF build failed: {e}")
         return None
 
-def generate_pdf_auto(student_id, student_data, report_date, output_dir, logo_path, photo_dir):
+def generate_pdf_auto(student_id, student_data, report_date, output_dir, logo_path, photo_dir, session):
     """Automatically choose one-page or multipage PDF generation."""
     total_subjects = student_data[["SUB_CODE", "SUB_NAME"]].notna().sum().max()
     
     if total_subjects <= 15:
-        return generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir)
+        return generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir, session)
     else:
-        return generate_pdf(student_id, student_data, report_date, output_dir, logo_path, photo_dir)
+        return generate_pdf(student_id, student_data, report_date, output_dir, logo_path, photo_dir, session)
 
 def app():
     fix_streamlit_layout()
@@ -601,12 +601,20 @@ def app():
             help="Upload a ZIP file containing student photos (named by enrollment number)"
         )
         
-        # Report date input
-        report_date = st.date_input(
-            "📅 Report Date",
-            value=datetime.now().date(),
-            help="Select the report generation date"
-        )
+        # Report date and session inputs
+        col_date, col_session = st.columns(2)
+        with col_date:
+            report_date = st.date_input(
+                "📅 Report Date",
+                value=datetime.now().date(),
+                help="Select the report generation date"
+            )
+        with col_session:
+            session = st.text_input(
+                "Enter Session",
+                value="2025-26",
+                help="Academic session shown on the transcript (e.g. 2025-26)"
+            )
         
         # Generate button
         if st.button("🚀 Generate Transcripts", type="primary"):
@@ -679,7 +687,8 @@ def app():
                                     report_date.strftime("%d-%m-%Y"), 
                                     output_dir, 
                                     logo_path,
-                                    images_dir
+                                    images_dir,
+                                    session.strip() or "2025-26"
                                 )
                                 if filename:
                                     generated_files.append(filename)

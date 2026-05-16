@@ -223,7 +223,7 @@ def process_marks_long_format(df, df_courses=None):
 
     return df_long[final_columns]
 
-def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
+def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir, session):
     """Draw header with logo and student photo."""
     # Validate inputs
     if student_data is None or len(student_data) == 0:
@@ -270,7 +270,7 @@ def draw_header_with_photo(canvas, doc, student_data, logo_path, photo_dir):
     canvas.drawCentredString(width / 2, height - 85, "MARKSHEET")
     canvas.setFont("Times-Roman", 12)
     canvas.drawCentredString(width / 2, height - 100, program_name)
-    canvas.drawCentredString(width / 2, height - 115, "2023-2025")
+    canvas.drawCentredString(width / 2, height - 115, session)
     canvas.translate(0, -30)
     # Student data table
     std_data = [
@@ -363,7 +363,7 @@ def sanitize_filename(name):
         name = name[:100]
     return name if name else "Unknown"
 
-def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir, suffix=""):
+def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo_path, photo_dir, session, suffix=""):
     """Generate single-page PDF transcript with marks (ABC format)."""
     width, height = A4
     # Sanitize student name for filename
@@ -422,7 +422,7 @@ def generate_pdf_onepage(student_id, student_data, report_date, output_dir, logo
     single_page_template = PageTemplate(
         id="OnePage",
         frames=[frame_main],
-        onPage=lambda c, d: draw_header_with_photo(c, d, student_data, logo_path, photo_dir),
+        onPage=lambda c, d, s=session: draw_header_with_photo(c, d, student_data, logo_path, photo_dir, s),
         onPageEnd=lambda c, d: draw_footer(c, d, report_date)
     )
     doc.addPageTemplates([single_page_template])
@@ -698,12 +698,20 @@ def app():
             help="Upload a ZIP file containing student photos (named by Student Code/enrollment number). Photos will be added later if not uploaded now."
         )
         
-        # Report date input
-        report_date = st.date_input(
-            "📅 Report Date",
-            value=datetime.now().date(),
-            help="Select the report generation date"
-        )
+        # Report date and session inputs
+        col_date, col_session = st.columns(2)
+        with col_date:
+            report_date = st.date_input(
+                "📅 Report Date",
+                value=datetime.now().date(),
+                help="Select the report generation date"
+            )
+        with col_session:
+            session = st.text_input(
+                "Enter Session",
+                value="2025-26",
+                help="Academic session shown on the marksheet (e.g. 2025-26)"
+            )
         
         # Generate button
         if st.button("🚀 Generate Transcripts (Marks)", type="primary"):
@@ -812,6 +820,7 @@ def app():
                                         output_dir, 
                                         logo_path,
                                         images_dir,
+                                        session.strip() or "2025-26",
                                         suffix="_1"
                                     )
                                     if filename:
@@ -833,6 +842,7 @@ def app():
                                         output_dir, 
                                         logo_path,
                                         images_dir,
+                                        session.strip() or "2025-26",
                                         suffix="_2"
                                     )
                                     if filename:
